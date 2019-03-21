@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="external"
+        path="/"/>
+    <root-path
+        name="storage"
+        path="/storage/"/>
+    <files-path
+        name="pictures"
+        path="Images/"/>
+    <files-path
+        name="videos"
+        path="Videos"/>
+    <files-path
+        name="files"
+        path="Files/"/>
+    <files-path
+        name="recordings"
+        path="Recordings/"/>
+    <cache-path
+        name="camera"
+        path="Camera/"/>
+</paths>

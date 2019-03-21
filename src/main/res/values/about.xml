@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2018, Daniel Gultsch All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without modification,
+  ~ are permitted provided that the following conditions are met:
+  ~
+  ~ 1. Redistributions of source code must retain the above copyright notice, this
+  ~ list of conditions and the following disclaimer.
+  ~
+  ~ 2. Redistributions in binary form must reproduce the above copyright notice,
+  ~ this list of conditions and the following disclaimer in the documentation and/or
+  ~ other materials provided with the distribution.
+  ~
+  ~ 3. Neither the name of the copyright holder nor the names of its contributors
+  ~ may be used to endorse or promote products derived from this software without
+  ~ specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+  ~ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  ~ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  ~ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+  ~ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  ~ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  ~ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+  ~ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  ~ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  ~ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<resources>
+    <string name="pref_about_message" translatable="false">Skriva - Secure communication made simple   Copyright © 2014-2019 Daniel Gultsch   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.   This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.   You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses   Download the full source code at https://github.com/siacs/Conversations    Libraries   https://github.com/ypresto/android-transcoder (Apache License, Version 2.0)   https://www.bouncycastle.org (The MIT License (MIT))   https://www.gnu.org/software/libidn (Apache License, Version 2.0)   https://github.com/ge0rg/MemorizingTrustManager (The MIT License (MIT))   https://github.com/rtreffer/minidns (WTFPL)   https://github.com/open-keychain/openkeychain-api-lib (Apache License, Version 2.0)   https://developer.android.com/tools/support-library (Apache License, Version 2.0)   https://github.com/google/material-design-icons (CC BY 4.0)   https://github.com/leolin310148/ShortcutBadger (Apache License, Version 2.0)   https://github.com/WhisperSystems/libaxolotl-java (GPLv3)   https://github.com/vinc3m1/RoundedImageView (Apache License, Version 2.0)   https://github.com/jdamcd/android-crop (Apache License, Version 2.0)   https://github.com/zxing/zxing (Apache License, Version 2.0)   https://github.com/osmdroid/osmdroid (Apache License, Version 2.0)    Maps   Maps by Open Street Map (https://www.openstreetmap.org). Copyright restrictions may apply.</string>
+</resources>

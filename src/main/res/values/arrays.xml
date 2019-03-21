@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string-array name="themes">
+		<item>@string/pref_theme_light</item>
+		<item>@string/pref_theme_dark</item>
+	</string-array>
+	<string-array name="themes_values">
+		<item>light</item>
+		<item>dark</item>
+	</string-array>
+	<string-array name="filesizes">
+		<item>@string/never</item>
+		<item>256 KiB</item>
+		<item>512 KiB</item>
+		<item>1 MiB</item>
+		<item>5 MiB</item>
+		<item>10 MiB</item>
+	</string-array>
+	<string-array name="filesizes_values">
+		<item>0</item>
+		<item>262144</item>
+		<item>524288</item>
+		<item>1048576</item>
+		<item>5242880</item>
+		<item>10485760</item>
+	</string-array>
+
+	<integer-array name="mute_options_durations">
+		<item>1800</item>
+		<item>3600</item>
+		<item>7200</item>
+		<item>28800</item>
+		<item>-1</item>
+	</integer-array>
+
+	<string-array name="quick_actions">
+		<item>@string/none</item>
+		<item>@string/recently_used</item>
+		<item>@string/attach_take_picture</item>
+		<item>@string/attach_record_video</item>
+		<item>@string/attach_choose_picture</item>
+		<item>@string/attach_record_voice</item>
+		<item>@string/send_location</item>
+	</string-array>
+
+	<string-array name="quick_action_values">
+		<item>none</item>
+		<item>recent</item>
+		<item>TAKE_PHOTO</item>
+		<item>RECORD_VIDEO</item>
+		<item>CHOOSE_PICTURE</item>
+		<item>RECORD_VOICE</item>
+		<item>SEND_LOCATION</item>
+	</string-array>
+
+	<string-array name="picture_compression_values">
+		<item>never</item>
+		<item>auto</item>
+		<item>always</item>
+	</string-array>
+
+	<string-array name="picture_compression_entries">
+		<item>@string/never</item>
+		<item>@string/automatically</item>
+		<item>@string/always</item>
+	</string-array>
+
+	<string-array name="mam_prefs">
+		<item>@string/never</item>
+		<item>@string/contacts</item>
+		<item>@string/always</item>
+	</string-array>
+
+	<string-array name="grace_periods">
+		<item>@string/gp_disable</item>
+		<item>@string/gp_short</item>
+		<item>@string/gp_medium</item>
+		<item>@string/gp_long</item>
+	</string-array>
+
+	<string-array name="grace_periods_values">
+		<item>0</item>
+		<item>144</item>
+		<item>610</item>
+		<item>2584</item>
+	</string-array>
+	<integer-array name="automatic_message_deletion_values">
+		<item>0</item>
+		<item>86400</item>
+		<item>604800</item>
+		<item>2592000</item>
+		<item>15811200</item>
+	</integer-array>
+	<string-array name="omemo_setting_entry_values">
+		<item>always</item>
+		<item>default_on</item>
+		<item>default_off</item>
+	</string-array>
+	<string-array name="omemo_setting_entries">
+		<item>@string/always</item>
+		<item>@string/default_on</item>
+		<item>@string/default_off</item>
+	</string-array>
+	<string-array name="font_size_entry_values">
+		<item>small</item>
+		<item>medium</item>
+		<item>large</item>
+	</string-array>
+	<string-array name="font_size_entries">
+		<item>@string/small</item>
+		<item>@string/medium</item>
+		<item>@string/large</item>
+	</string-array>
+
+	<string-array name="video_compression_values">
+		<item>360</item>
+		<item>720</item>
+		<item>uncompressed</item>
+	</string-array>
+
+	<string-array name="video_compression_entries">
+		<item>@string/video_360p</item>
+		<item>@string/video_720p</item>
+		<item>@string/video_original</item>
+	</string-array>
+</resources>
