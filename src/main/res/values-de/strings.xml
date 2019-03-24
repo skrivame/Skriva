@@ -817,4 +817,5 @@
   <string name="file_too_large">Datei ist zu groß</string>
   <string name="corresponding_conversations_closed">Entsprechende Unterhaltung geschlossen.</string>
   <string name="unread_conversations">ungelesene Unterhaltungen</string>
+  <string name="attach">Anfügen</string>
 </resources>
