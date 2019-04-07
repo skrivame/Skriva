@@ -6,7 +6,10 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
@@ -29,6 +32,7 @@ import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
@@ -47,6 +51,7 @@ import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView.OnEditorActionListener;
@@ -118,6 +123,9 @@ import me.skriva.ceph.xmpp.chatstate.ChatState;
 import me.skriva.ceph.xmpp.jingle.JingleConnection;
 import rocks.xmpp.addr.Jid;
 
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiPopup;
+
 import static me.skriva.ceph.ui.XmppActivity.EXTRA_ACCOUNT;
 import static me.skriva.ceph.ui.XmppActivity.REQUEST_INVITE_TO_CONVERSATION;
 import static me.skriva.ceph.ui.util.SoftKeyboardUtils.hideSoftKeyboard;
@@ -128,9 +136,14 @@ import static me.skriva.ceph.utils.PermissionUtils.writeGranted;
 
 public class ConversationFragment extends XmppFragment implements EditMessage.KeyboardListener, MessageAdapter.OnContactPictureLongClicked, MessageAdapter.OnContactPictureClicked {
 
+    static final String TAG = "MainActivity";
+    EmojiPopup emojiPopup;
+
+    EditMessage editText;
+    ViewGroup rootView;
+    ImageView emojiButton;
 
     public static final int REQUEST_SEND_MESSAGE = 0x0201;
-    public static final int REQUEST_DECRYPT_PGP = 0x0202;
     public static final int REQUEST_ENCRYPT_MESSAGE = 0x0207;
     public static final int REQUEST_TRUST_KEYS_TEXT = 0x0208;
     public static final int REQUEST_TRUST_KEYS_ATTACHMENTS = 0x0209;
@@ -395,6 +408,14 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             setSelection(binding.messagesView.getCount() - 1, true);
         }
     };
+
+    private OnClickListener mToggleEmoji = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            emojiPopup.toggle();
+        }
+    };
+
     private OnClickListener mSendButtonListener = new OnClickListener() {
 
         @Override
@@ -968,6 +989,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         binding.scrollToBottomButton.setOnClickListener(this.mScrollButtonListener);
         binding.messagesView.setOnScrollListener(mOnScrollListener);
         binding.messagesView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
+        rootView = binding.mainActivityRootView;
+        emojiButton = binding.mainActivityEmoji;
+        editText = binding.textinput;
+        emojiButton.setOnClickListener(this.mToggleEmoji);
         mediaPreviewAdapter = new MediaPreviewAdapter(this);
         binding.mediaPreview.setAdapter(mediaPreviewAdapter);
         messageListAdapter = new MessageAdapter((XmppActivity) getActivity(), this.messageList);
@@ -981,8 +1006,31 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             this.binding.textinput.setCustomInsertionActionModeCallback(new EditMessageActionModeCallback(this.binding.textinput));
         }
+        setUpEmojiPopup();
 
         return binding.getRoot();
+    }
+
+
+    private void setUpEmojiPopup() {
+
+        TypedArray attrsicon = activity.getTheme().obtainStyledAttributes(new int[] {R.attr.icon_emoji,R.attr.icon_keyboard});
+
+        int emojiResourceId = attrsicon.getResourceId(0, 0);
+        int keyboardResourceId = attrsicon.getResourceId(1, 0);
+
+        Drawable emojiicon = getResources().getDrawable(emojiResourceId);
+        Drawable keyboardicon = getResources().getDrawable(keyboardResourceId);
+        attrsicon.recycle();
+
+        emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                .setOnEmojiBackspaceClickListener(ignore -> Log.d(TAG, "Clicked on Backspace"))
+                .setOnEmojiClickListener((ignore, ignore2) -> Log.d(TAG, "Clicked on emoji"))
+                .setOnEmojiPopupShownListener(() ->emojiButton.setImageDrawable(keyboardicon))
+                .setOnSoftKeyboardOpenListener(ignore -> Log.d(TAG, "Opened soft keyboard"))
+                .setOnEmojiPopupDismissListener(() -> emojiButton.setImageDrawable(emojiicon))
+                .setOnSoftKeyboardCloseListener(() -> Log.d(TAG, "Closed soft keyboard"))
+                .build(editText);
     }
 
     private void quoteText(String text) {

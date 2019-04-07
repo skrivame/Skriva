@@ -19,11 +19,15 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
+import com.vanniktech.emoji.EmojiEditTextInterface;
+import com.vanniktech.emoji.emoji.Emoji;
+
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
 
-public class EditMessage extends EmojiWrapperEditText {
+public class EditMessage extends EmojiWrapperEditText implements EmojiEditTextInterface {
 
+	private float emojiSize = 48;
 	private static final InputFilter SPAN_FILTER = (source, start, end, dest, dstart, dend) -> source instanceof Spanned ? source.toString() : source;
 	protected Handler mTypingHandler = new Handler();
 	protected KeyboardListener keyboardListener;
@@ -172,6 +176,55 @@ public class EditMessage extends EmojiWrapperEditText {
 			setInputType(getInputType() | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
 			setInputType(getInputType() | InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE);
 		}
+	}
+
+	@Override
+	public void backspace() {
+		final KeyEvent event = new KeyEvent(0, 0, 0, KeyEvent.KEYCODE_DEL, 0, 0, 0, 0, KeyEvent.KEYCODE_ENDCALL);
+		dispatchKeyEvent(event);
+	}
+
+	@Override
+	public void input(Emoji emoji) {
+		if (emoji != null) {
+			final int start = getSelectionStart();
+			final int end = getSelectionEnd();
+
+			if (start < 0) {
+				append(emoji.getUnicode());
+			} else {
+				getText().replace(Math.min(start, end), Math.max(start, end), emoji.getUnicode(), 0, emoji.getUnicode().length());
+			}
+		}
+	}
+
+	@Override
+	public float getEmojiSize() {
+		return emojiSize;
+	}
+
+	@Override
+	public void setEmojiSize(int pixels) {
+		setEmojiSize(pixels, true);
+	}
+
+	@Override
+	public void setEmojiSize(int pixels, boolean shouldInvalidate) {
+		emojiSize = pixels;
+
+		if (shouldInvalidate) {
+			setText(getText());
+		}
+	}
+
+	@Override
+	public void setEmojiSizeRes(int res) {
+		setEmojiSizeRes(res, true);
+	}
+
+	@Override
+	public void setEmojiSizeRes(int res, boolean shouldInvalidate) {
+		setEmojiSize(getResources().getDimensionPixelSize(res), shouldInvalidate);
 	}
 
 	public interface OnCommitContentListener {

@@ -23,8 +23,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.openintents.openpgp.util.OpenPgpUtils;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

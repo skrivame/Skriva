@@ -12,6 +12,7 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -220,15 +221,37 @@ public class SettingsActivity extends XmppActivity implements
 			});
 		}
 
-		if (Config.ONLY_INTERNAL_STORAGE) {
-			final Preference cleanCachePreference = mSettingsFragment.findPreference("clean_cache");
-			if (cleanCachePreference != null) {
-				cleanCachePreference.setOnPreferenceClickListener(preference -> cleanCache());
-			}
+		final Preference cleanCachePreference = mSettingsFragment.findPreference("clean_cache");
+		if (cleanCachePreference != null) {
+			cleanCachePreference.setOnPreferenceClickListener(preference ->
+			{new AsyncTask<Void, Void, Void>() {
+				@Override
+				protected Void doInBackground(Void... params) {
+					FileBackend.cleanCache(SettingsActivity.this);
+					return null;
+				}
+				@Override
+				protected void onPostExecute(Void result) {
+					displayToast(getString(R.string.clean_cache_complete));
+				}
+			}.execute(); return true;});
+		}
 
+		if (Config.ONLY_INTERNAL_STORAGE) {
 			final Preference cleanPrivateStoragePreference = mSettingsFragment.findPreference("clean_private_storage");
 			if (cleanPrivateStoragePreference != null) {
-				cleanPrivateStoragePreference.setOnPreferenceClickListener(preference -> cleanPrivateStorage());
+				cleanPrivateStoragePreference.setOnPreferenceClickListener(preference ->
+				{new AsyncTask<Void, Void, Void>() {
+					@Override
+					protected Void doInBackground(Void... params) {
+						FileBackend.cleanPrivateStorage(SettingsActivity.this);
+						return null;
+					}
+					@Override
+					protected void onPostExecute(Void result) {
+						displayToast(getString(R.string.clean_private_storage_complete));
+					}
+				}.execute(); return true;});
 			}
 		}
 
@@ -260,41 +283,6 @@ public class SettingsActivity extends XmppActivity implements
 
 	private boolean isCallable(final Intent i) {
 		return i != null && getPackageManager().queryIntentActivities(i, PackageManager.MATCH_DEFAULT_ONLY).size() > 0;
-	}
-
-
-	private boolean cleanCache() {
-		Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-		intent.setData(Uri.parse("package:" + getPackageName()));
-		startActivity(intent);
-		return true;
-	}
-
-	private boolean cleanPrivateStorage() {
-		for(String type : Arrays.asList("Images", "Videos", "Files", "Recordings")) {
-		        cleanPrivateFiles(type);
-	    }
-		return true;
-	}
-
-	private void cleanPrivateFiles(final String type) {
-		try {
-			File dir = new File(getFilesDir().getAbsolutePath(), "/" + type + "/");
-			File[] array = dir.listFiles();
-			if (array != null) {
-				for (int b = 0; b < array.length; b++) {
-					String name = array[b].getName().toLowerCase();
-					if (name.equals(".nomedia")) {
-						continue;
-					}
-					if (array[b].isFile()) {
-						array[b].delete();
-					}
-				}
-			}
-		} catch (Throwable e) {
-			Log.e("CleanCache", e.toString());
-		}
 	}
 
 	private boolean deleteOmemoIdentities() {

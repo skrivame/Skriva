@@ -27,9 +27,7 @@ public class SettingsFragment extends PreferenceFragment {
 		if (!Config.ONLY_INTERNAL_STORAGE) {
 			PreferenceCategory mCategory = (PreferenceCategory) findPreference("security_options");
 			if (mCategory != null) {
-				Preference cleanCache = findPreference("clean_cache");
 				Preference cleanPrivateStorage = findPreference("clean_private_storage");
-				mCategory.removePreference(cleanCache);
 				mCategory.removePreference(cleanPrivateStorage);
 			}
 		}

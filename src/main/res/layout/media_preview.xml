@@ -5,12 +5,13 @@
         android:layout_height="wrap_content">
         <ImageView
             android:id="@+id/media_preview"
-            android:layout_width="@dimen/media_preview_size"
-            android:layout_height="@dimen/media_preview_size"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="@color/black54"
             android:layout_centerInParent="true"
             android:scaleType="center"
-            android:layout_margin="12dp"/>
+            android:layout_margin="12dp"
+            android:paddingLeft="48dp"/>
         <ImageButton
             android:id="@+id/delete_button"
             android:layout_width="wrap_content"

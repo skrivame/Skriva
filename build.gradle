@@ -34,7 +34,6 @@ dependencies {
         exclude group: 'com.google.firebase', module: 'firebase-analytics'
         exclude group: 'com.google.firebase', module: 'firebase-measurement-connector'
     }
-    implementation 'org.sufficientlysecure:openpgp-api:10.0'
     implementation ('com.theartofdev.edmodo:android-image-cropper:2.7.+') {
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'exifinterface'
@@ -47,7 +46,7 @@ dependencies {
     implementation "com.android.support:design:$supportLibVersion"
     compatImplementation "com.android.support:support-emoji-appcompat:$supportLibVersion"
     skrivaFreeCompatImplementation "com.android.support:support-emoji-bundled:$supportLibVersion"
-    implementation 'org.bouncycastle:bcmail-jdk15on:1.58'
+    implementation 'org.bouncycastle:bcmail-jdk15on:1.61'
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'de.measite.minidns:minidns-hla:0.2.4'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
@@ -56,11 +55,12 @@ dependencies {
     implementation "com.wefika:flowlayout:0.4.1"
     implementation 'net.ypresto.androidtranscoder:android-transcoder:0.3.0'
     implementation project(':libs:xmpp-addr')
-    implementation 'org.osmdroid:osmdroid-android:6.0.3'
+    implementation 'org.osmdroid:osmdroid-android:6.1.0'
     implementation 'org.hsluv:hsluv:0.2'
-    implementation 'org.conscrypt:conscrypt-android:1.3.0'
+    implementation 'org.conscrypt:conscrypt-android:2.1.0'
     implementation 'me.drakeet.support:toastcompat:1.1.0'
     implementation "com.leinardi.android:speed-dial:2.0.1"
+    implementation 'com.vanniktech:emoji-google:0.6.0'
 }
 
 ext {

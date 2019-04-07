@@ -2,8 +2,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/main_activity_root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/color_background_secondary">
@@ -21,21 +21,20 @@
             android:listSelector="@android:color/transparent"
             android:stackFromBottom="true"
             android:transcriptMode="normal"
-            tools:listitem="@layout/message_sent">
-        </ListView>
+            tools:listitem="@layout/message_sent"></ListView>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/scroll_to_bottom_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
             android:layout_alignBottom="@+id/messages_view"
+            android:layout_alignParentEnd="true"
             android:alpha="0.85"
-            app:backgroundTint="?attr/color_background_primary"
             android:src="?attr/icon_scroll_down"
-            app:fabSize="mini"
             android:visibility="gone"
-            app:useCompatPadding="true"/>
+            app:backgroundTint="?attr/color_background_primary"
+            app:fabSize="mini"
+            app:useCompatPadding="true" />
 
         <me.skriva.ceph.ui.widget.UnreadCountCustomView
             android:id="@+id/unread_count_custom_view"
@@ -53,59 +52,75 @@
             android:id="@+id/textsend"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            >
+            android:layout_alignParentBottom="true">
 
             <android.support.v7.widget.RecyclerView
-                android:visibility="gone"
                 android:id="@+id/media_preview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/textSendButton"
-                tools:listitem="@layout/media_preview"
                 android:orientation="horizontal"
-                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                 android:paddingTop="8dp"
-                android:requiresFadingEdge="horizontal">
+                android:requiresFadingEdge="horizontal"
+                android:visibility="gone"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                tools:listitem="@layout/media_preview">
 
             </android.support.v7.widget.RecyclerView>
 
+
             <me.skriva.ceph.ui.widget.EditMessage
                 android:id="@+id/textinput"
+                style="@style/Widget.Conversations.EditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="12dp"
                 android:layout_alignParentStart="true"
+                android:layout_margin="12dp"
                 android:layout_toStartOf="@+id/textSendButton"
+                android:layout_toEndOf="@+id/main_activity_emoji"
                 android:background="@drawable/rounded_edittext"
                 android:ems="10"
-                style="@style/Widget.Conversations.EditText"
                 android:imeOptions="flagNoExtractUi|actionSend"
                 android:inputType="textShortMessage|textMultiLine|textCapSentences"
                 android:maxLines="8"
                 android:minHeight="48dp"
                 android:minLines="1"
-                android:paddingBottom="12dp"
-                android:paddingLeft="8dp"
+                android:paddingLeft="48dp"
+                android:paddingTop="12dp"
                 android:paddingRight="8dp"
-                android:paddingTop="12dp">
+                android:paddingBottom="12dp">
 
-                <requestFocus/>
+                <requestFocus />
+
             </me.skriva.ceph.ui.widget.EditMessage>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/textSendButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_gravity="end|bottom"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                app:backgroundTint="?colorPrimary"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="4dp"
                 android:contentDescription="@string/send_message"
-                android:src="?attr/ic_send_text_offline"/>
+                android:src="?attr/ic_send_text_offline"
+                app:backgroundTint="?colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/main_activity_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerCrop"
+                app:srcCompat="?attr/icon_emoji"
+                tools:ignore="ContentDescription"
+                android:paddingLeft="24dp"
+                android:paddingTop="12dp"
+                android:paddingRight="8dp"
+                android:paddingBottom="12dp"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -113,9 +128,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/textsend"
-            android:layout_marginBottom="4dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
             android:background="@drawable/snackbar"
             android:minHeight="48dp"
             android:visibility="gone">
@@ -128,7 +143,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@+id/snackbar_action"
                 android:paddingStart="24dp"
-                android:textAppearance="@style/TextAppearance.Conversations.Body1.OnDark"/>
+                android:textAppearance="@style/TextAppearance.Conversations.Body1.OnDark" />
 
             <TextView
                 android:id="@+id/snackbar_action"
@@ -136,13 +151,13 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:paddingBottom="16dp"
                 android:paddingLeft="24dp"
-                android:paddingRight="24dp"
                 android:paddingTop="16dp"
+                android:paddingRight="24dp"
+                android:paddingBottom="16dp"
                 android:textAllCaps="true"
                 android:textAppearance="@style/TextAppearance.Conversations.Body1.OnDark"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
         </RelativeLayout>
 
     </RelativeLayout>

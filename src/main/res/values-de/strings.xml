@@ -581,7 +581,7 @@
   <string name="blindly_trusted_omemo_keys">Blind vertraute OMEMO-Schlüssel</string>
   <string name="not_trusted">Nicht vertraut</string>
   <string name="invalid_barcode">Ungültiger Barcode</string>
-  <string name="pref_clean_cache_summary">Lösche Cache-Ordner (wurde von der Kamera benutzt)</string>
+  <string name="pref_clean_cache_summary">Lösche Cache-Ordner</string>
   <string name="pref_clean_cache">Lösche Cache</string>
   <string name="pref_clean_private_storage">Lösche privaten Speicher</string>
   <string name="pref_clean_private_storage_summary">Lösche privaten Speicher, in dem die Dateien gespeichert werden (sie können erneut vom Server heruntergeladen werden)</string>
@@ -818,4 +818,6 @@
   <string name="corresponding_conversations_closed">Entsprechende Unterhaltung geschlossen.</string>
   <string name="unread_conversations">ungelesene Unterhaltungen</string>
   <string name="attach">Anfügen</string>
+    <string name="clean_cache_complete">Cache komplett leeren</string>
+    <string name="clean_private_storage_complete">Private Cache komplett leeren</string>
 </resources>

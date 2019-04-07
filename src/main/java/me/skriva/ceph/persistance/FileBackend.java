@@ -44,6 +44,7 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -155,6 +156,45 @@ public class FileBackend {
 
     public static String getBackupDirectory(String app) {
         return Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+app+"/Backup/";
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+            return dir.delete();
+        } else if(dir!= null && dir.isFile()) {
+            return dir.delete();
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean cleanCache(Context context) {
+        try {
+            File dir = context.getCacheDir();
+            deleteDir(dir);
+        } catch (Throwable e) {
+            Log.e("cleanCache", e.toString());
+        }
+        return true;
+    }
+
+    public static boolean cleanPrivateStorage(Context context) {
+        try {
+            for(String type : Arrays.asList("Images", "Videos", "Files", "Recordings")) {
+                File dir = new File(context.getFilesDir().getAbsolutePath(), "/" + type + "/");
+                deleteDir(dir);
+            }
+        } catch (Throwable e) {
+            Log.e("cleanPrivateStorage", e.toString());
+        }
+        return true;
     }
 
     private static Bitmap rotate(Bitmap bitmap, int degree) {
@@ -637,6 +677,7 @@ public class FileBackend {
         }
         message.setRelativeFilePath(message.getUuid() + "." + extension);
         copyFileToPrivateStorage(mXmppConnectionService.getFileBackend().getFile(message), uri);
+        removeImageFromCameraCache(uri);
     }
 
     private String getExtensionFromUri(Uri uri) {
@@ -728,9 +769,19 @@ public class FileBackend {
         }
     }
 
+    public void removeImageFromCameraCache(Uri image) {
+        if (Config.ONLY_INTERNAL_STORAGE &&
+                image.toString().startsWith("content://"
+                        + mXmppConnectionService.getPackageName() + ".files/camera")) {
+            Log.d(Config.LOGTAG, "remove image (" + image.toString() + ") from app cache");
+            mXmppConnectionService.getContentResolver().delete(image, null, null);
+        }
+    }
+
     public void copyImageToPrivateStorage(File file, Uri image) throws FileCopyException {
         Log.d(Config.LOGTAG, "copy image (" + image.toString() + ") to private storage " + file.getAbsolutePath());
         copyImageToPrivateStorage(file, image, 0);
+        removeImageFromCameraCache(image);
     }
 
     public void copyImageToPrivateStorage(Message message, Uri image) throws FileCopyException {

@@ -12,8 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.openintents.openpgp.util.OpenPgpUtils;
-
 import me.skriva.ceph.R;
 import me.skriva.ceph.databinding.ContactBinding;
 import me.skriva.ceph.entities.Contact;
@@ -91,14 +89,6 @@ public class UserAdapter extends ListAdapter<MucOptions.User, UserAdapter.ViewHo
         } else {
             viewHolder.binding.contactDisplayName.setText(name == null ? "" : name);
             viewHolder.binding.contactJid.setText(ConferenceDetailsActivity.getStatus(viewHolder.binding.getRoot().getContext(), user, advancedMode));
-        }
-        if (advancedMode && user.getPgpKeyId() != 0) {
-            viewHolder.binding.key.setVisibility(View.VISIBLE);
-            viewHolder.binding.key.setOnClickListener(v -> {
-                final XmppActivity activity = XmppActivity.find(v);
-                final XmppConnectionService service = activity == null ? null : activity.xmppConnectionService;
-            });
-            viewHolder.binding.key.setText(OpenPgpUtils.convertKeyIdToHex(user.getPgpKeyId()));
         }
 
 
