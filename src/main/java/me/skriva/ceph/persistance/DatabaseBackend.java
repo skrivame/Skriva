@@ -62,7 +62,7 @@ import rocks.xmpp.addr.Jid;
 public class DatabaseBackend extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "history";
-    private static final int DATABASE_VERSION = 44;
+    private static final int DATABASE_VERSION = 45;
     private static DatabaseBackend instance = null;
     private static String CREATE_CONTATCS_STATEMENT = "create table "
             + Contact.TABLENAME + "(" + Contact.ACCOUNT + " TEXT, "
@@ -228,6 +228,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
                 + " TEXT, " + Message.TRUE_COUNTERPART + " TEXT,"
                 + Message.BODY + " TEXT, " + Message.ENCRYPTION + " NUMBER, "
                 + Message.STATUS + " NUMBER," + Message.TYPE + " NUMBER, "
+                + Message.MESSAGE_REFERENCE + " TEXT, "
                 + Message.RELATIVE_FILE_PATH + " TEXT, "
                 + Message.SERVER_MSG_ID + " TEXT, "
                 + Message.FINGERPRINT + " TEXT, "
@@ -532,6 +533,11 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             db.execSQL(CREATE_MESSAGE_RELATIVE_FILE_PATH_INDEX);
             db.execSQL(CREATE_MESSAGE_TYPE_INDEX);
         }
+
+        if (oldVersion < 45 && newVersion >= 45) {
+            db.execSQL("ALTER TABLE " + Message.TABLENAME + " ADD COLUMN "
+                    + Message.MESSAGE_REFERENCE + " TEXT");
+        }
     }
 
     private void canonicalizeJids(SQLiteDatabase db) {
@@ -720,27 +726,83 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return list;
     }
 
-    public ArrayList<Message> getMessages(Conversation conversations, int limit) {
-        return getMessages(conversations, limit, -1);
+    public Message getMsgByUuidOrRemoteMsgId(final Conversation conversation, final String id){
+        Message message = getMessageByUUID(conversation, id);
+        if (message == null){
+            message = getMessageByRemoteMsgId(conversation, id);
+        }
+        return message;
     }
 
-    public ArrayList<Message> getMessages(Conversation conversation, int limit, long timestamp) {
-        ArrayList<Message> list = new ArrayList<>();
+    public Message getMessageByUUID(final Conversation conversation, final String uuid){
+        return getMessage(conversation, Message.UUID, uuid);
+    }
+
+    public Message getMessageByRemoteMsgId(final Conversation conversation, final String remoteMsgId){
+        return getMessage(conversation, Message.REMOTE_MSG_ID, remoteMsgId);
+    }
+
+    /**
+     * Retrieves messages for a given limit.
+     * @param conversation conversation that holds the messages
+     * @param limit count of retrieved messages or -1 for ignoring this parameter
+     * @return retrieved messages
+     */
+    public ArrayList<Message> getMessages(Conversation conversation, int limit) {
+        return getMessages(conversation, limit, -1);
+    }
+
+    /**
+     * Searches a message in a conversation by an additional selection which returns only one message.
+     * @param conversation conversation that may contain the message
+     * @param additionalSelection column for searching
+     * @param value value for the additional selection
+     * @return message in the given conversation that has the given value as the field for the given additional selection
+     */
+    private Message getMessage(final Conversation conversation, final String additionalSelection, final String value){
+        final SQLiteDatabase db = this.getReadableDatabase();
+        final String[] selectionArgs = {conversation.getUuid(), value};
+        final String selection = Message.CONVERSATION + "=? and " + additionalSelection + "=?";
+        final Cursor cursor = db.query(Message.TABLENAME, null, selection, selectionArgs, null, null, null, null);
+        Message message = null;
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                message = Message.fromCursor(cursor, conversation);
+            }
+            cursor.close();
+        }
+        return message;
+    }
+
+    /**
+     * Retrieves messages between an earliest and a latest timestamp.
+     * @param conversation conversation that holds the messages
+     * @param limit count of retrieved messages or -1 for ignoring this parameter
+     * @param earliestTimestamp earliest time of a retrieved message (including this message) or -1 for ignoring this parameter
+     * @param latestTimestamp latest time of a retrieved message (excluding this message) or -1 for ignoring this parameter
+     * @return retrieved messages
+     */
+    public ArrayList<Message> getMessages(final Conversation conversation, int limit, final long earliestTimestamp, final long latestTimestamp) {
+        final ArrayList<Message> list = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor;
-        if (timestamp == -1) {
-            String[] selectionArgs = {conversation.getUuid()};
-            cursor = db.query(Message.TABLENAME, null, Message.CONVERSATION
-                    + "=?", selectionArgs, null, null, Message.TIME_SENT
-                    + " DESC", String.valueOf(limit));
-        } else {
-            String[] selectionArgs = {conversation.getUuid(),
-                    Long.toString(timestamp)};
-            cursor = db.query(Message.TABLENAME, null, Message.CONVERSATION
-                            + "=? and " + Message.TIME_SENT + "<?", selectionArgs,
-                    null, null, Message.TIME_SENT + " DESC",
-                    String.valueOf(limit));
+        String selection = Message.CONVERSATION + "=?";
+        final List<String> selectionArgs = new ArrayList<>();
+        selectionArgs.add(conversation.getUuid());
+        String limitation = limit == -1 ? null : String.valueOf(limit);
+
+        if (earliestTimestamp != -1) {
+            selection += " and " + Message.TIME_SENT + ">=?";
+            selectionArgs.add(Long.toString(earliestTimestamp));
         }
+        if (latestTimestamp != -1) {
+            selectionArgs.add(Long.toString(latestTimestamp));
+            selection += " and " + Message.TIME_SENT + "<?";
+        }
+
+        cursor = db.query(Message.TABLENAME, null, selection, selectionArgs.toArray(new String[selectionArgs.size()]), null, null, Message.TIME_SENT + " DESC", limitation);
+
+
         if (cursor.getCount() > 0) {
             cursor.moveToLast();
             do {
@@ -752,6 +814,16 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         }
         cursor.close();
         return list;
+    }
+
+    /**
+     * Retrieves messages before a latest timestamp.
+     * @param conversation conversation that holds the messages
+     * @param limit count of retrieved messages or -1 for ignoring this parameter
+     * @param latestTimestamp latest time of a retrieved message (excluding this message) or -1 for ignoring this parameter	 * @return retrieved messages
+     */
+    public ArrayList<Message> getMessages(Conversation conversation, int limit, long latestTimestamp) {
+        return getMessages(conversation, limit, -1, latestTimestamp);
     }
 
     public Cursor getMessageSearchCursor(List<String> term) {

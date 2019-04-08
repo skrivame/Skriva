@@ -1,66 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/message_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="8dp"
-        android:adjustViewBounds="true"
-        android:background="@color/black87"
-        android:longClickable="true"
-        android:scaleType="centerCrop"/>
+    <!--
+    The purpose of this frame layout is only to use the complete layout file
+    as a separate layout with Android Data Binding (as MessageContentBinding.java)
+    since the usage of this layout file as an "include" in another layout file
+    and using the "merge" tag for this layout file does not work as intended.
+    -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <me.skriva.ceph.ui.widget.CopyTextView
-        android:id="@+id/message_body"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoLink="web"
-        android:longClickable="true"
-        android:textAppearance="@style/TextAppearance.Conversations.Body1"/>
-
-    <Button
-        android:id="@+id/download_button"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:longClickable="true"
-        android:visibility="gone"/>
-
-    <RelativeLayout
-        android:id="@+id/audio_player"
-        android:layout_width="@dimen/audio_player_width"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        >
-
-        <ImageButton
-            android:id="@+id/play_pause"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:alpha="?attr/icon_alpha"
-            android:background="?android:selectableItemBackground"/>
-
-        <TextView
-            android:id="@+id/runtime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:paddingBottom="16dp"
-            android:paddingRight="16dp"
-            android:textAppearance="@style/TextAppearance.Conversations.Caption"/>
-
-        <SeekBar
-            android:id="@+id/progress"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/runtime"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/play_pause"
-            android:progress="100"/>
-    </RelativeLayout>
+            android:orientation="vertical">
 
-</merge>
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/message_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:background="@color/black87"
+                android:longClickable="true"
+                android:scaleType="centerCrop"
+                app:riv_corner_radius="5dp" />
+
+            <include layout="@layout/message_reference"
+                android:id="@+id/message_reference" />
+
+            <me.skriva.ceph.ui.widget.CopyTextView
+                android:id="@+id/message_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:longClickable="true"
+                android:textAppearance="@style/TextAppearance.Conversations.Body1" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/download_button"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:longClickable="true"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:id="@+id/audio_player"
+            android:layout_width="@dimen/audio_player_width"
+            android:layout_height="wrap_content"
+            android:visibility="gone">
+
+            <ImageButton
+                android:id="@+id/play_pause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:alpha="?attr/icon_alpha"
+                android:background="?android:selectableItemBackground" />
+
+            <TextView
+                android:id="@+id/runtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:paddingBottom="16dp"
+                android:paddingRight="16dp"
+                android:textAppearance="@style/TextAppearance.Conversations.Caption" />
+
+            <SeekBar
+                android:id="@+id/progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/runtime"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/play_pause"
+                android:progress="100" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</layout>

@@ -29,12 +29,14 @@
 
 package me.skriva.ceph.utils;
 
+import android.text.SpannableStringBuilder;
 import android.util.LruCache;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Emoticons {
@@ -134,6 +136,17 @@ public class Emoticons {
 			pattern.append(Pattern.quote(emoji));
 		}
 		return Pattern.compile(pattern.toString());
+	}
+
+	/**
+	 * Checks whether a given string contains at least one emoji.
+	 * @param input text to search for emojis in
+	 * @return true if the given string contains at least one emoji. false otherwise.
+	 */
+	public static boolean containsEmoji(String input) {
+		SpannableStringBuilder text = new SpannableStringBuilder(MessageUtils.filterLtrRtl(input).trim());
+		Matcher matcher = getEmojiPattern(text).matcher(text);
+		return matcher.find();
 	}
 
 	public static boolean isEmoji(String input) {

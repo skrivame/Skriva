@@ -22,6 +22,7 @@ import me.skriva.ceph.crypto.OmemoSetting;
 import me.skriva.ceph.persistance.DatabaseBackend;
 import me.skriva.ceph.services.AvatarService;
 import me.skriva.ceph.services.QuickConversationsService;
+import me.skriva.ceph.ui.ConversationFragment;
 import me.skriva.ceph.utils.JidHelper;
 import me.skriva.ceph.utils.UIHelper;
 import me.skriva.ceph.xmpp.chatstate.ChatState;
@@ -77,6 +78,9 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	private ChatState mIncomingChatState = Config.DEFAULT_CHATSTATE;
 	private String mFirstMamReference = null;
 	private Message correctingMessage;
+	private String messageReference = null;
+	private String messageReferenceQuote;
+	private ConversationFragment conversationFragment;
 
 	public Conversation(final String name, final Account account, final Jid contactJid,
 	                    final int mode) {
@@ -318,6 +322,17 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		return null;
 	}
 
+	public Message findMessageWithUuidOrRemoteMsgId(String id) {
+		synchronized (this.messages) {
+			for (Message message : this.messages) {
+				if (id.equals(message.getRemoteMsgId()) || id.equals(message.getUuid())) {
+					return message;
+				}
+			}
+		}
+		return null;
+	}
+
 	public Message findMessageWithRemoteId(String id, Jid counterpart) {
 		synchronized (this.messages) {
 			for (Message message : this.messages) {
@@ -474,13 +489,41 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		return null;
 	}
 
+	/**
+	 * Creates a status message without a body.
+	 * @return status message
+	 */
+	private Message createEmptyStatusMessage() {
+		Message message = new Message(this, "", Message.ENCRYPTION_NONE);
+		message.setType(Message.TYPE_STATUS);
+		message.setTime(Math.max(getCreated(), getLastClearHistory().getTimestamp()));
+		return message;
+	}
+
+	/**
+	 * Returns the first message in the current list of messages if the list is not empty
+	 * or otherwise a new status message.
+	 * @return first message or new status message
+	 */
+	public Message getFirstMessage() {
+		synchronized (this.messages) {
+			if (this.messages.size() == 0) {
+				return createEmptyStatusMessage();
+			} else {
+				return this.messages.get(0);
+			}
+		}
+	}
+
+	/**
+	 * Returns the last message in the current list of messages if the list is not empty
+	 * or otherwise a new status message.
+	 * @return latest message or new status message
+	 */
 	public Message getLatestMessage() {
 		synchronized (this.messages) {
 			if (this.messages.size() == 0) {
-				Message message = new Message(this, "", Message.ENCRYPTION_NONE);
-				message.setType(Message.TYPE_STATUS);
-				message.setTime(Math.max(getCreated(), getLastClearHistory().getTimestamp()));
-				return message;
+				return createEmptyStatusMessage();
 			} else {
 				return this.messages.get(this.messages.size() - 1);
 			}
@@ -973,6 +1016,30 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	@Override
 	public int getAvatarBackgroundColor() {
 		return UIHelper.getColorForName(getName().toString());
+	}
+
+	public String getMessageReference() {
+		return messageReference;
+	}
+
+	public void setMessageReference(String messageReference) {
+		this.messageReference = messageReference;
+	}
+
+	public String getMessageReferenceQuote() {
+		return messageReferenceQuote;
+	}
+
+	public void setMessageReferenceQuote(String messageReferenceQuote) {
+		this.messageReferenceQuote = messageReferenceQuote;
+	}
+
+	public ConversationFragment getConversationFragment() {
+		return conversationFragment;
+	}
+
+	public void setConversationFragment(ConversationFragment conversationFragment) {
+		this.conversationFragment = conversationFragment;
 	}
 
 	public interface OnMessageFound {

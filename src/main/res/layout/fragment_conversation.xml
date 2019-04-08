@@ -48,6 +48,14 @@
             android:visibility="gone"
             app:backgroundColor="?attr/unread_count" />
 
+        <include layout="@layout/message_reference"
+            android:id="@+id/message_reference_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:layout_alignParentLeft="true"
+            android:layout_above="@+id/textsend" />
+
         <RelativeLayout
             android:id="@+id/textsend"
             android:layout_width="fill_parent"
@@ -127,7 +135,7 @@
             android:id="@+id/snackbar"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/textsend"
+            android:layout_above="@+id/message_reference_preview"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginBottom="4dp"

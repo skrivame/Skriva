@@ -52,6 +52,9 @@
         <item type="reference" name="ic_attach_photo">@drawable/ic_attach_photo</item>
         <item type="reference" name="ic_attach_record">@drawable/ic_attach_record</item>
 
+        <item type="reference" name="ic_file_download">@drawable/ic_file_download</item>
+        <item type="reference" name="ic_file_deleted">@drawable/ic_file_deleted</item>
+
         <item type="reference" name="message_bubble_received_monochrome">@drawable/message_bubble_received_white</item>
         <item type="reference" name="message_bubble_sent">@drawable/message_bubble_sent</item>
         <item type="reference" name="message_bubble_received_green">@drawable/message_bubble_received</item>
@@ -168,6 +171,8 @@
         <item type="reference" name="ic_attach_location">@drawable/ic_attach_location_white</item>
         <item type="reference" name="ic_attach_photo">@drawable/ic_attach_photo_white</item>
         <item type="reference" name="ic_attach_record">@drawable/ic_attach_record_white</item>
+
+        <item type="reference" name="ic_file_download">@drawable/ic_file_download_white</item>
 
         <item type="reference" name="message_bubble_received_monochrome">@drawable/message_bubble_received_grey</item>
         <item type="reference" name="message_bubble_sent">@drawable/message_bubble_sent_grey</item>

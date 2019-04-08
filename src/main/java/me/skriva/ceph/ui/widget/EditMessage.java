@@ -24,6 +24,7 @@ import com.vanniktech.emoji.emoji.Emoji;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
+import me.skriva.ceph.utils.MessageUtils;
 
 public class EditMessage extends EmojiWrapperEditText implements EmojiEditTextInterface {
 
@@ -133,7 +134,7 @@ public class EditMessage extends EmojiWrapperEditText implements EmojiEditTextIn
 	}
 
 	public void insertAsQuote(String text) {
-		text = text.replaceAll("(\n *){2,}", "\n").replaceAll("(^|\n)", "$1> ").replaceAll("\n$", "");
+		text = MessageUtils.createQuote(text);
 		Editable editable = getEditableText();
 		int position = getSelectionEnd();
 		if (position == -1) position = editable.length();

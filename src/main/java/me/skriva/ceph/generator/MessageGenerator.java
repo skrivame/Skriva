@@ -59,6 +59,10 @@ public class MessageGenerator extends AbstractGenerator {
 		if (message.edited()) {
 			packet.addChild("replace", "urn:xmpp:message-correct:0").setAttribute("id", message.getEditedId());
 		}
+		// message that has a message reference for XEP-0367: Message Attaching
+		if (message.hasMessageReference()) {
+			packet.addChild("attach-to", Namespace.MESSAGE_ATTACHING).setAttribute("id", message.getMessageReference());
+		}
 		return packet;
 	}
 

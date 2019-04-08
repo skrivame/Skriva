@@ -326,10 +326,18 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
         final Jid from = packet.getFrom();
         final Element originId = packet.findChild("origin-id", Namespace.STANZA_IDS);
         final String remoteMsgId;
+        final Element messageReferenceElement = packet.findChild("attach-to", Namespace.MESSAGE_ATTACHING);
+        final String messageReference;
         if (originId != null && originId.getAttribute("id") != null) {
             remoteMsgId = originId.getAttribute("id");
         } else {
             remoteMsgId = packet.getId();
+        }
+
+        if (messageReferenceElement != null) {
+            messageReference = messageReferenceElement.getAttribute("id");
+        } else {
+            messageReference = null;
         }
         boolean notify = false;
 
@@ -364,7 +372,7 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
             return;
         }
 
-        if ((body != null || pgpEncrypted != null || (axolotlEncrypted != null && axolotlEncrypted.hasChild("payload")) || oobUrl != null || xP1S3 != null) && !isMucStatusMessage) {
+        if ((body != null || pgpEncrypted != null || (axolotlEncrypted != null && axolotlEncrypted.hasChild("payload")) || oobUrl != null || xP1S3 != null) && !isMucStatusMessage || messageReference != null) {
             final boolean conversationIsProbablyMuc = isTypeGroupChat || mucUserElement != null || account.getXmppConnection().getMucServersWithholdAccount().contains(counterpart.getDomain());
             final Conversation conversation = mXmppConnectionService.findOrCreateConversation(account, counterpart.asBareJid(), conversationIsProbablyMuc, false, query, false);
             final boolean conversationMultiMode = conversation.getMode() == Conversation.MODE_MULTI;
@@ -475,6 +483,7 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
 
             message.setCounterpart(counterpart);
             message.setRemoteMsgId(remoteMsgId);
+            message.setMessageReference(messageReference);
             message.setServerMsgId(serverMsgId);
             message.setCarbon(isCarbon);
             message.setTime(timestamp);
@@ -533,6 +542,7 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
                             replacedMessage.setBody(message.getBody());
                             replacedMessage.putEdited(replacedMessage.getRemoteMsgId(), replacedMessage.getServerMsgId());
                             replacedMessage.setRemoteMsgId(remoteMsgId);
+                            replacedMessage.setMessageReference(messageReference);
                             if (replacedMessage.getServerMsgId() == null || message.getServerMsgId() != null) {
                                 replacedMessage.setServerMsgId(message.getServerMsgId());
                             }

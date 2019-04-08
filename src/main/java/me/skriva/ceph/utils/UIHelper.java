@@ -354,6 +354,21 @@ public class UIHelper {
 		return input.length() > 256 ? StylingHelper.subSequence(input, 0, 256) : input;
 	}
 
+	/**
+	 * Checks if a given line is a quotation.
+	 * @param possibleQuotationLine line that will be checked for being a quotation
+	 * @return true if the given line is a quotation
+	 */
+	public static boolean isQuotationLine(String possibleQuotationLine) {
+		char firstCharacter = possibleQuotationLine.charAt(0);
+		if (firstCharacter == '>' && UIHelper.isPositionFollowedByQuoteableCharacter(possibleQuotationLine, 0)
+				|| (firstCharacter == '\u00bb' && !UIHelper.isPositionFollowedByQuote(possibleQuotationLine, 0))) {
+			return true;
+		} else{
+			return false;
+		}
+	}
+
 	public static boolean isPositionFollowedByQuoteableCharacter(CharSequence body, int pos) {
 		return !isPositionFollowedByNumber(body, pos)
 				&& !isPositionFollowedByEmoticon(body, pos)

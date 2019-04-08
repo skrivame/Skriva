@@ -820,4 +820,7 @@
   <string name="attach">Anfügen</string>
     <string name="clean_cache_complete">Cache komplett leeren</string>
     <string name="clean_private_storage_complete">Private Cache komplett leeren</string>
+    <string name="comment">Kommentieren</string>
+    <string name="message_not_found">Nachricht nicht gefunden</string>
+    <string name="message_too_old_for_jumping_to_it">Die Nachricht ist zu alt um dorthin zu springen</string>
 </resources>

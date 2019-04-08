@@ -21,6 +21,10 @@
         android:title="@string/copy_link"
         android:visible="false" />
     <item
+        android:id="@+id/comment_message"
+        android:title="@string/comment"
+        android:visible="false"/>
+    <item
         android:id="@+id/quote_message"
         android:title="@string/quote"
         android:visible="false" />

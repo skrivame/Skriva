@@ -57,6 +57,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	public static final int TYPE_STATUS = 3;
 	public static final int TYPE_PRIVATE = 4;
 
+	public static final String UUID = "uuid";
 	public static final String CONVERSATION = "conversationUuid";
 	public static final String COUNTERPART = "counterpart";
 	public static final String TRUE_COUNTERPART = "trueCounterpart";
@@ -69,6 +70,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	public static final String OOB = "oob";
 	public static final String EDITED = "edited";
 	public static final String REMOTE_MSG_ID = "remoteMsgId";
+	public static final String MESSAGE_REFERENCE = "messageReference";
 	public static final String SERVER_MSG_ID = "serverMsgId";
 	public static final String RELATIVE_FILE_PATH = "relativeFilePath";
 	public static final String FINGERPRINT = "axolotl_fingerprint";
@@ -103,6 +105,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	private final Conversational conversation;
 	protected Transferable transferable = null;
 	private Message mNextMessage = null;
+	private String messageReference = null;
 	private Message mPreviousMessage = null;
 	private String axolotlFingerprint = null;
 	private String errorMessage = null;
@@ -138,6 +141,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 				null,
 				null,
 				null,
+				null,
 				true,
 				null,
 				false,
@@ -150,7 +154,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	protected Message(final Conversational conversation, final String uuid, final String conversationUUid, final Jid counterpart,
 	                final Jid trueCounterpart, final String body, final long timeSent,
 	                final int encryption, final int status, final int type, final boolean carbon,
-	                final String remoteMsgId, final String relativeFilePath,
+					  final String remoteMsgId, final String messageReference, final String relativeFilePath,
 	                final String serverMsgId, final String fingerprint, final boolean read,
 	                final String edited, final boolean oob, final String errorMessage, final Set<ReadByMarker> readByMarkers,
 	                final boolean markable, final boolean deleted) {
@@ -166,6 +170,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 		this.type = type;
 		this.carbon = carbon;
 		this.remoteMsgId = remoteMsgId;
+		this.messageReference = messageReference;
 		this.relativeFilePath = relativeFilePath;
 		this.serverMsgId = serverMsgId;
 		this.axolotlFingerprint = fingerprint;
@@ -215,6 +220,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 				cursor.getInt(cursor.getColumnIndex(TYPE)),
 				cursor.getInt(cursor.getColumnIndex(CARBON)) > 0,
 				cursor.getString(cursor.getColumnIndex(REMOTE_MSG_ID)),
+				cursor.getString(cursor.getColumnIndex(MESSAGE_REFERENCE)),
 				cursor.getString(cursor.getColumnIndex(RELATIVE_FILE_PATH)),
 				cursor.getString(cursor.getColumnIndex(SERVER_MSG_ID)),
 				cursor.getString(cursor.getColumnIndex(FINGERPRINT)),
@@ -264,6 +270,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 		values.put(TYPE, type);
 		values.put(CARBON, carbon ? 1 : 0);
 		values.put(REMOTE_MSG_ID, remoteMsgId);
+		values.put(MESSAGE_REFERENCE, messageReference);
 		values.put(RELATIVE_FILE_PATH, relativeFilePath);
 		values.put(SERVER_MSG_ID, serverMsgId);
 		values.put(FINGERPRINT, axolotlFingerprint);
@@ -380,6 +387,18 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 
 	public void setRemoteMsgId(String id) {
 		this.remoteMsgId = id;
+	}
+
+	public void setMessageReference(String messageReference) {
+		this.messageReference = messageReference;
+	}
+
+	public String getMessageReference() {
+		return messageReference;
+	}
+
+	public boolean hasMessageReference() {
+		return this.messageReference != null;
 	}
 
 	public String getServerMsgId() {
@@ -583,6 +602,8 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	public boolean mergeable(final Message message) {
 		return message != null &&
 				(message.getType() == Message.TYPE_TEXT &&
+						!message.hasMessageReference() &&
+						!this.hasMessageReference() &&
 						this.getTransferable() == null &&
 						message.getTransferable() == null &&
 						message.getEncryption() != Message.ENCRYPTION_PGP &&
@@ -638,6 +659,18 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 		}
 	}
 
+	public boolean isText() {
+		return type == Message.TYPE_TEXT;
+	}
+
+	public boolean isImageOrVideo() {
+		return getFileParams().width > 0 && getFileParams().height > 0;
+	}
+
+	public boolean isAudio() {
+		return getFileParams().runtime > 0;
+	}
+
 	public static class MergeSeparator {
 	}
 
@@ -690,6 +723,19 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	public boolean wasMergedIntoPrevious() {
 		Message prev = this.prev();
 		return prev != null && prev.mergeable(this);
+	}
+
+	public boolean wasMergedWithNext() {
+		Message next = this.next();
+		return next != null && next.mergeable(this);
+	}
+
+	public Message firstMergeMessage() {
+		Message firstMergeMessage = this;
+		while (firstMergeMessage.wasMergedIntoPrevious()) {
+			firstMergeMessage = firstMergeMessage.prev();
+		}
+		return firstMergeMessage;
 	}
 
 	public boolean trusted() {

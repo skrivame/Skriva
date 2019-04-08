@@ -19,6 +19,7 @@ import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,7 @@ import java.util.regex.Pattern;
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
 import me.skriva.ceph.crypto.axolotl.FingerprintStatus;
+import me.skriva.ceph.databinding.MessageReferenceBinding;
 import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.Conversation;
 import me.skriva.ceph.entities.Conversational;
@@ -58,6 +60,7 @@ import me.skriva.ceph.ui.service.AudioPlayer;
 import me.skriva.ceph.ui.text.DividerSpan;
 import me.skriva.ceph.ui.text.QuoteSpan;
 import me.skriva.ceph.ui.util.AvatarWorkerTask;
+import me.skriva.ceph.ui.util.MessageReferenceUtils;
 import me.skriva.ceph.ui.util.MyLinkify;
 import me.skriva.ceph.ui.util.ViewUtil;
 import me.skriva.ceph.ui.widget.ClickableMovementMethod;
@@ -87,7 +90,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private OnContactPictureLongClicked mOnContactPictureLongClickedListener;
 	private boolean mIndicateReceived = false;
 	private boolean mUseGreenBackground = false;
-	private OnQuoteListener onQuoteListener;
+	private OnCommentListener onCommentListener;
 	public MessageAdapter(XmppActivity activity, List<Message> messages) {
 		super(activity, 0, messages);
 		this.audioPlayer = new AudioPlayer(this);
@@ -125,8 +128,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		this.mOnContactPictureLongClickedListener = listener;
 	}
 
-	public void setOnQuoteListener(OnQuoteListener listener) {
-		this.onQuoteListener = listener;
+	public void setOnCommentListener(OnCommentListener listener) {
+		this.onCommentListener = listener;
 	}
 
 	@Override
@@ -242,7 +245,11 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				break;
 		}
 		if (error && type == SENT) {
-			viewHolder.time.setTextAppearance(getContext(), R.style.TextAppearance_Conversations_Caption_Warning);
+			if (darkBackground) {
+				viewHolder.time.setTextAppearance(getContext(), R.style.TextAppearance_Conversations_Caption_Warning_OnDark);
+			} else {
+				viewHolder.time.setTextAppearance(getContext(), R.style.TextAppearance_Conversations_Caption_Warning);
+			}
 		} else {
 			if (darkBackground) {
 				viewHolder.time.setTextAppearance(getContext(), R.style.TextAppearance_Conversations_Caption_OnDark);
@@ -400,6 +407,19 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			applyQuoteSpan(body, quoteStart, body.length(), darkBackground);
 		}
 		return startsWithQuote;
+	}
+
+	/**
+	 * Displays the text, image, preview image or tag of a referenced message next to a bar that indicates the referencing
+	 * and underneath the comment on that message.
+	 * Or displays only an info message for a message reference that has no associated message.
+	 */
+	private void displayReferencingMessage(final ViewHolder viewHolder, final Message message, final Message referencedMessage, boolean darkBackground, int type) {
+		// Show the message reference area.
+		MessageReferenceUtils.displayMessageReference(activity, viewHolder.messageReferenceBinding, message, referencedMessage, darkBackground);
+
+		// Show the comment on the referenced message.
+		displayTextMessage(viewHolder, message, darkBackground, type);
 	}
 
 	private void displayTextMessage(final ViewHolder viewHolder, final Message message, boolean darkBackground, int type) {
@@ -606,6 +626,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				case SENT:
 					view = activity.getLayoutInflater().inflate(R.layout.message_sent, parent, false);
 					viewHolder.message_box = view.findViewById(R.id.message_box);
+					viewHolder.messageReferenceBinding = MessageReferenceBinding.bind(view.findViewById(R.id.message_reference));
 					viewHolder.contact_picture = view.findViewById(R.id.message_photo);
 					viewHolder.download_button = view.findViewById(R.id.download_button);
 					viewHolder.indicator = view.findViewById(R.id.security_indicator);
@@ -619,6 +640,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				case RECEIVED:
 					view = activity.getLayoutInflater().inflate(R.layout.message_received, parent, false);
 					viewHolder.message_box = view.findViewById(R.id.message_box);
+					viewHolder.messageReferenceBinding = MessageReferenceBinding.bind(view.findViewById(R.id.message_reference));
 					viewHolder.contact_picture = view.findViewById(R.id.message_photo);
 					viewHolder.download_button = view.findViewById(R.id.download_button);
 					viewHolder.indicator = view.findViewById(R.id.security_indicator);
@@ -641,7 +663,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			}
 			if (viewHolder.messageBody != null) {
 				listSelectionManager.onCreate(viewHolder.messageBody,
-						new MessageBodyActionModeCallback(viewHolder.messageBody));
+						new MessageBodyActionModeCallback(message, viewHolder.messageBody));
 				viewHolder.messageBody.setCopyHandler(this);
 			}
 			view.setTag(viewHolder);
@@ -715,6 +737,9 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			}
 		});
 
+		// Hide all referencing message views to make them individually visible later.
+		MessageReferenceUtils.hideMessageReference(viewHolder.messageReferenceBinding);
+
 		final Transferable transferable = message.getTransferable();
 		if (message.isDeleted() || (transferable != null && transferable.getStatus() != Transferable.STATUS_UPLOADING)) {
 			if (transferable != null && transferable.getStatus() == Transferable.STATUS_OFFER) {
@@ -724,10 +749,24 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			} else {
 				displayInfoMessage(viewHolder, UIHelper.getMessagePreview(activity, message).first, darkBackground);
 			}
+			// Display a referenced message and a comment for it if the referencing message has a message reference that matches a locally available message-
+			// Otherwise display the referencing message normally.
+		} else if (message.hasMessageReference() && message.getEncryption() != Message.ENCRYPTION_DECRYPTION_FAILED && message.getEncryption() != Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
+			Message referencedMessage = ((Conversation) conversation).findMessageWithUuidOrRemoteMsgId(message.getMessageReference());
+
+			// Try to load the referenced message from the DB if it is null and could not be found in the currently loaded conversation.
+			// If it cannot be loaded from the DB it will remain null.
+			if(referencedMessage == null){
+				referencedMessage = activity.xmppConnectionService.databaseBackend.getMsgByUuidOrRemoteMsgId((Conversation) conversation, message.getMessageReference());
+			}
+
+			MessageReferenceUtils.deleteLegacyQuotation(activity, message, referencedMessage);
+
+			displayReferencingMessage(viewHolder, message, referencedMessage, darkBackground, type);
 		} else if (message.isFileOrImage() && message.getEncryption() != Message.ENCRYPTION_PGP && message.getEncryption() != Message.ENCRYPTION_DECRYPTION_FAILED) {
-			if (message.getFileParams().width > 0 && message.getFileParams().height > 0) {
+			if (message.isImageOrVideo()) {
 				displayImageMessage(viewHolder, message);
-			} else if (message.getFileParams().runtime > 0) {
+			} else if (message.isAudio()) {
 				displayAudioMessage(viewHolder, message, darkBackground);
 			} else {
 				displayOpenableMessage(viewHolder, message);
@@ -880,8 +919,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		this.highlightedTerm = terms == null ? null : StylingHelper.filterHighlightedWords(terms);
 	}
 
-	public interface OnQuoteListener {
-		void onQuote(String text);
+	public interface OnCommentListener {
+		void onComment(Message message, boolean quoteMessage);
 	}
 
 	public interface OnContactPictureClicked {
@@ -898,6 +937,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		public ImageView edit_indicator;
 		public RelativeLayout audioPlayer;
 		protected LinearLayout message_box;
+		protected MessageReferenceBinding messageReferenceBinding;
 		protected Button download_button;
 		protected ImageView image;
 		protected ImageView indicator;
@@ -912,15 +952,17 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 
 	private class MessageBodyActionModeCallback implements ActionMode.Callback {
 
+		private final Message message;
 		private final TextView textView;
 
-		public MessageBodyActionModeCallback(TextView textView) {
+		public MessageBodyActionModeCallback(Message message, TextView textView) {
+			this.message = message;
 			this.textView = textView;
 		}
 
 		@Override
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			if (onQuoteListener != null) {
+			if (onCommentListener  != null) {
 				int quoteResId = activity.getThemeResource(R.attr.icon_quote, R.drawable.ic_action_reply);
 				// 3rd item is placed after "copy" item
 				menu.add(0, android.R.id.button1, 3, R.string.quote).setIcon(quoteResId)
@@ -941,8 +983,9 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				int end = textView.getSelectionEnd();
 				if (end > start) {
 					String text = transformText(textView.getText(), start, end, false);
-					if (onQuoteListener != null) {
-						onQuoteListener.onQuote(text);
+					if (onCommentListener != null) {
+						message.setBody(text);
+						onCommentListener.onComment(message, true);
 					}
 					mode.finish();
 				}

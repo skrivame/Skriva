@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/message_reference_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/message_reference_background"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/message_reference_bar"
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="0.5dp"
+            android:background="@color/green700" />
+
+        <TextView
+            android:id="@+id/message_reference_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textAppearance="@style/TextAppearance.Conversations.Caption" />
+
+        <ImageView
+            android:id="@+id/message_reference_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/message_reference_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/message_reference_preview_cancel_button"
+                android:layout_centerVertical="true"
+                android:paddingLeft="10dp"
+                android:paddingRight="15dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textAppearance="@style/TextAppearance.Conversations.MessageReferenceText"
+                android:visibility="gone" />
+
+            <com.makeramen.roundedimageview.RoundedImageView
+                android:id="@+id/message_reference_image_thumbnail"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@id/message_reference_preview_cancel_button"
+                android:scaleType="centerCrop"
+                app:riv_corner_radius_top_right="3dp"
+                app:riv_corner_radius_bottom_right="3dp"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/message_reference_preview_cancel_button"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="6.5dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_send_cancel_offline_dark"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</layout>

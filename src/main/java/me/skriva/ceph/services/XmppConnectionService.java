@@ -41,6 +41,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 import android.util.Pair;
+import android.widget.Toast;
 
 import org.conscrypt.Conscrypt;
 
@@ -104,6 +105,7 @@ import me.skriva.ceph.persistance.FileBackend;
 import me.skriva.ceph.ui.ChooseAccountForProfilePictureActivity;
 import me.skriva.ceph.ui.SettingsActivity;
 import me.skriva.ceph.ui.UiCallback;
+import me.skriva.ceph.ui.XmppActivity;
 import me.skriva.ceph.ui.interfaces.OnAvatarPublication;
 import me.skriva.ceph.ui.interfaces.OnMediaLoaded;
 import me.skriva.ceph.ui.interfaces.OnSearchResultsAvailable;
@@ -1663,6 +1665,24 @@ public class XmppConnectionService extends Service {
 		};
 		mDatabaseReaderExecutor.execute(runnable);
 	}
+
+    /**
+     * Loads up to 1000 messages between a given message (inclusive) and the currently loaded earliest message.
+     * @param message earliest message to load
+     * @param callback method that will be called after the messages are loaded
+     */
+    public void loadMoreMessages(final Message message, final OnMoreMessagesLoaded callback){
+        final int limit = 1000;
+        final Conversation conversation = (Conversation) message.getConversation();
+        final XmppActivity activity = (XmppActivity) conversation.getConversationFragment().getActivity();
+        final List<Message> messages = activity.xmppConnectionService.databaseBackend.getMessages(conversation, limit, message.getTimeSent(), conversation.getFirstMessage().getTimeSent());
+        if (messages.size() == limit && !messages.get(0).getUuid().equals(message.getUuid())) {
+            Toast.makeText(activity, R.string.message_too_old_for_jumping_to_it, Toast.LENGTH_SHORT).show();
+        } else if (messages.size() > 0) {
+            conversation.addAll(0, messages);
+            callback.onMoreMessagesLoaded(messages.size(), conversation);
+        }
+    }
 
 	public List<Account> getAccounts() {
 		return this.accounts;

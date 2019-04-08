@@ -99,6 +99,7 @@ import me.skriva.ceph.ui.util.DateSeparator;
 import me.skriva.ceph.ui.util.EditMessageActionModeCallback;
 import me.skriva.ceph.ui.util.ListViewUtils;
 import me.skriva.ceph.ui.util.MenuDoubleTabUtil;
+import me.skriva.ceph.ui.util.MessageReferenceUtils;
 import me.skriva.ceph.ui.util.MucDetailsContextMenuHelper;
 import me.skriva.ceph.ui.util.PendingItem;
 import me.skriva.ceph.ui.util.PresenceSelector;
@@ -252,65 +253,92 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                     } else {
                         timestamp = messageList.get(0).getTimeSent();
                     }
-                    activity.xmppConnectionService.loadMoreMessages(conversation, timestamp, new XmppConnectionService.OnMoreMessagesLoaded() {
-                        @Override
-                        public void onMoreMessagesLoaded(final int c, final Conversation conversation) {
-                            if (ConversationFragment.this.conversation != conversation) {
-                                conversation.messagesLoaded.set(true);
-                                return;
-                            }
-                            runOnUiThread(() -> {
-                                synchronized (messageList) {
-                                    final int oldPosition = binding.messagesView.getFirstVisiblePosition();
-                                    Message message = null;
-                                    int childPos;
-                                    for (childPos = 0; childPos + oldPosition < messageList.size(); ++childPos) {
-                                        message = messageList.get(oldPosition + childPos);
-                                        if (message.getType() != Message.TYPE_STATUS) {
-                                            break;
-                                        }
-                                    }
-                                    final String uuid = message != null ? message.getUuid() : null;
-                                    View v = binding.messagesView.getChildAt(childPos);
-                                    final int pxOffset = (v == null) ? 0 : v.getTop();
-                                    ConversationFragment.this.conversation.populateWithMessages(ConversationFragment.this.messageList);
-                                    try {
-                                        updateStatusMessages();
-                                    } catch (IllegalStateException e) {
-                                        Log.d(Config.LOGTAG, "caught illegal state exception while updating status messages");
-                                    }
-                                    messageListAdapter.notifyDataSetChanged();
-                                    int pos = Math.max(getIndexOf(uuid, messageList), 0);
-                                    binding.messagesView.setSelectionFromTop(pos, pxOffset);
-                                    if (messageLoaderToast != null) {
-                                        messageLoaderToast.cancel();
-                                    }
-                                    conversation.messagesLoaded.set(true);
-                                }
-                            });
-                        }
-
-                        @Override
-                        public void informUser(final int resId) {
-
-                            runOnUiThread(() -> {
-                                if (messageLoaderToast != null) {
-                                    messageLoaderToast.cancel();
-                                }
-                                if (ConversationFragment.this.conversation != conversation) {
-                                    return;
-                                }
-                                messageLoaderToast = Toast.makeText(view.getContext(), resId, Toast.LENGTH_LONG);
-                                messageLoaderToast.show();
-                            });
-
-                        }
-                    });
-
+                    activity.xmppConnectionService.loadMoreMessages(conversation, timestamp, new OnMoreMessagesLoadedImpl(view, null));
                 }
             }
         }
     };
+
+    private class OnMoreMessagesLoadedImpl implements XmppConnectionService.OnMoreMessagesLoaded {
+        private AbsListView view;
+        private Message jumpToMessage;
+
+        public OnMoreMessagesLoadedImpl(AbsListView view, Message jumpToMessage) {
+            this.view = view;
+            this.jumpToMessage = jumpToMessage;
+        }
+
+        @Override
+        public void onMoreMessagesLoaded(int count, final Conversation conversation) {
+            if (ConversationFragment.this.conversation != conversation) {
+                conversation.messagesLoaded.set(true);
+                return;
+            }
+            runOnUiThread(() -> {
+                synchronized (messageList) {
+                    String uuid = null;
+                    int pxOffset = 0;
+
+                    if (jumpToMessage == null) {
+                        final int oldPosition = binding.messagesView.getFirstVisiblePosition();
+                        Message message = null;
+                        int childPos;
+                        for (childPos = 0; childPos + oldPosition < messageList.size(); ++childPos) {
+                            message = messageList.get(oldPosition + childPos);
+                            if (message.getType() != Message.TYPE_STATUS) {
+                                break;
+                            }
+                        }
+                        uuid = message != null ? message.getUuid() : null;
+                        View v = binding.messagesView.getChildAt(childPos);
+                        pxOffset = (v == null) ? 0 : v.getTop();
+                    }
+
+                    ConversationFragment.this.conversation.populateWithMessages(ConversationFragment.this.messageList);
+                    try {
+                        updateStatusMessages();
+                    } catch (IllegalStateException e) {
+                        Log.d(Config.LOGTAG, "caught illegal state exception while updating status messages");
+                    }
+                    messageListAdapter.notifyDataSetChanged();
+
+                    if (jumpToMessage == null) {
+                        int pos = Math.max(getIndexOf(uuid, messageList), 0);
+                        binding.messagesView.setSelectionFromTop(pos, pxOffset);
+                    } else {
+                        setSelection(messageListAdapter.getPosition(conversation.findSentMessageWithUuid(jumpToMessage.getUuid())), false);
+                    }
+
+                    if (messageLoaderToast != null) {
+                        messageLoaderToast.cancel();
+                    }
+                    conversation.messagesLoaded.set(true);
+                }
+            });
+        }
+
+        @Override
+        public void informUser(final int resId) {
+
+            runOnUiThread(() -> {
+                if (messageLoaderToast != null) {
+                    messageLoaderToast.cancel();
+                }
+                if (ConversationFragment.this.conversation != conversation) {
+                    return;
+                }
+                messageLoaderToast = Toast.makeText(view.getContext(), resId, Toast.LENGTH_LONG);
+                messageLoaderToast.show();
+            });
+
+        }
+    }
+
+    public OnMoreMessagesLoadedImpl getOnMoreMessagesLoadedImpl(AbsListView view, Message jumpToMessage) {
+        return new OnMoreMessagesLoadedImpl(view, jumpToMessage);
+    }
+
+
     private EditMessage.OnCommitContentListener mEditorContentListener = new EditMessage.OnCommitContentListener() {
         @Override
         public boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags, Bundle opts, String[] contentMimeTypes) {
@@ -732,6 +760,20 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         final Message message;
         if (conversation.getCorrectingMessage() == null) {
             message = new Message(conversation, body, conversation.getNextEncryption());
+
+            // Set the message reference for the message to be sent.
+            final String messageReference = conversation.getMessageReference();
+            if (messageReference != null) {
+                message.setMessageReference(messageReference);
+                message.setBody(conversation.getMessageReferenceQuote() + body);
+
+                // Reset the currently referenced message so that new non-referencing messages will not be sent as referencing messages.
+                this.conversation.setMessageReference(null);
+
+                // Hide the whole area where the referenced message was displayed.
+                MessageReferenceUtils.hideMessageReference(binding.messageReferencePreview);
+            }
+
             if (conversation.getMode() == Conversation.MODE_MULTI) {
                 final Jid nextCounterpart = conversation.getNextCounterpart();
                 if (nextCounterpart != null) {
@@ -746,6 +788,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             message.putEdited(message.getUuid(), message.getServerMsgId());
             message.setServerMsgId(null);
             message.setUuid(UUID.randomUUID().toString());
+
+            // Display a previously hidden message reference preview.
+            conversation.setCorrectingMessage(null);
+            displayMessageReferencePreview();
         }
         switch (conversation.getNextEncryption()) {
             default:
@@ -783,6 +829,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         final boolean multi = conversation.getMode() == Conversation.MODE_MULTI;
         if (conversation.getCorrectingMessage() != null) {
             this.binding.textinput.setHint(R.string.send_corrected_message);
+        } else if (conversation.getMessageReference() != null) {
+            this.binding.textinput.setHint(R.string.comment);
         } else if (multi && conversation.getNextCounterpart() != null) {
             this.binding.textinput.setHint(getString(
                     R.string.send_private_message_to,
@@ -998,7 +1046,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         messageListAdapter = new MessageAdapter((XmppActivity) getActivity(), this.messageList);
         messageListAdapter.setOnContactPictureClicked(this);
         messageListAdapter.setOnContactPictureLongClicked(this);
-        messageListAdapter.setOnQuoteListener(this::quoteText);
+        messageListAdapter.setOnCommentListener(this::commentMessage);
         binding.messagesView.setAdapter(messageListAdapter);
 
         registerForContextMenu(binding.messagesView);
@@ -1033,9 +1081,72 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                 .build(editText);
     }
 
-    private void quoteText(String text) {
+    /**
+     * Comments the whole given message or line by line for a given message reference.
+     * @param messageReference id of the message that should be referenced when a new message is sent
+     * @param quoteMessage quote the lines of the given message
+     */
+    private void commentMessage(String messageReference, boolean quoteMessage) {
+        commentMessage(conversation.findMessageWithUuidOrRemoteMsgId(messageReference), quoteMessage);
+    }
+
+    /**
+     * Comments the whole given message or line by line.
+     * Sets the message reference for the current conversation so that it can be used by sendMessage()
+     * and shows a preview of the referenced message.
+     *
+     * Uses XEP-0367: Message Attaching while still supporting legacy quoting method ("> ").
+     * @param message message that should be referenced when a new message is sent
+     * @param quoteMessage quote the lines of the given message
+     */
+    private void commentMessage(Message message, boolean quoteMessage) {
+        // Add a message reference to be used later in sendMessage().
+        String remoteMsgId = message.getRemoteMsgId();
+        if (remoteMsgId == null) {
+            conversation.setMessageReference(message.getUuid());
+        } else {
+            conversation.setMessageReference(remoteMsgId);
+        }
+
+        updateChatMsgHint();
+        displaySoftInput();
+
+        // Show the message reference preview.
+        MessageReferenceUtils.displayMessageReference(activity, binding.messageReferencePreview, null, message, activity.isDarkTheme());
+
+        if (quoteMessage) {
+            // Show the lines of the referenced message as quotations instead of letting a legacy quotation be used for the body of the message to be sent.
+            binding.textinput.insertAsQuote(MessageUtils.prepareQuote(message));
+            conversation.setMessageReferenceQuote("");
+        } else {
+            // Set the legacy quotation so that it can be used as the first part of the body for the message to be sent.
+            conversation.setMessageReferenceQuote(MessageUtils.createQuote(MessageUtils.prepareQuote(message)) + "\n");
+        }
+    }
+
+    /**
+     * Display a preview for the last set message reference.
+     */
+    private void displayMessageReferencePreview() {
+        String messageReference = conversation.getMessageReference();
+        if (messageReference != null && conversation.getCorrectingMessage() == null) {
+            Message referencedMessage = conversation.findMessageWithUuidOrRemoteMsgId(messageReference);
+            MessageReferenceUtils.displayMessageReference(activity, binding.messageReferencePreview, null, referencedMessage, activity.isDarkTheme());
+        }
+    }
+
+    /**
+     * Hide the preview for the last set message reference.
+     */
+    private void hideMessageReferencePreview() {
+        MessageReferenceUtils.hideMessageReference(binding.messageReferencePreview);
+    }
+
+    /**
+     * Opens the soft keyboard and places the cursor inside of the text input.
+     */
+    private void displaySoftInput() {
         if (binding.textinput.isEnabled()) {
-            binding.textinput.insertAsQuote(text);
             binding.textinput.requestFocus();
             InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputMethodManager != null) {
@@ -1044,9 +1155,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    private void quoteMessage(Message message) {
-        quoteText(MessageUtils.prepareQuote(message));
-    }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -1080,7 +1188,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             MenuItem openWith = menu.findItem(R.id.open_with);
             MenuItem copyMessage = menu.findItem(R.id.copy_message);
             MenuItem copyLink = menu.findItem(R.id.copy_link);
-            MenuItem quoteMessage = menu.findItem(R.id.quote_message);
+            MenuItem commentMessage = menu.findItem(R.id.comment_message);
             MenuItem retryDecryption = menu.findItem(R.id.retry_decryption);
             MenuItem correctMessage = menu.findItem(R.id.correct_message);
             MenuItem shareWith = menu.findItem(R.id.share_with);
@@ -1091,9 +1199,12 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             MenuItem deleteFile = menu.findItem(R.id.delete_file);
             MenuItem showErrorMessage = menu.findItem(R.id.show_error_message);
             final boolean showError = m.getStatus() == Message.STATUS_SEND_FAILED && m.getErrorMessage() != null && !Message.ERROR_MESSAGE_CANCELLED.equals(m.getErrorMessage());
+            if (!encrypted && !m.wasMergedWithNext()) {
+                commentMessage.setVisible(MessageUtils.prepareQuote(m).length() > 0);
+            }
             if (!m.isFileOrImage() && !encrypted && !m.isGeoUri() && !m.treatAsDownloadable()) {
                 copyMessage.setVisible(true);
-                quoteMessage.setVisible(!showError && MessageUtils.prepareQuote(m).length() > 0);
+                commentMessage.setVisible(!showError && MessageUtils.prepareQuote(m).length() > 0);
                 String body = m.getMergedBody().toString();
                 if (ShareUtil.containsXmppUri(body)) {
                     copyLink.setTitle(R.string.copy_jabber_id);
@@ -1167,8 +1278,11 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             case R.id.copy_link:
                 ShareUtil.copyLinkToClipboard(activity, selectedMessage);
                 return true;
+            case R.id.comment_message:
+                commentMessage(selectedMessage, false);
+                return true;
             case R.id.quote_message:
-                quoteMessage(selectedMessage);
+                commentMessage(selectedMessage, true);
                 return true;
             case R.id.send_again:
                 resendMessage(selectedMessage);
@@ -1588,6 +1702,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
+    public int getMessagePosition(Message message) {
+        return messageListAdapter.getPosition(message);
+    }
+
     private void showErrorMessage(final Message message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.error_message);
@@ -1689,6 +1807,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     }
 
     private void correctMessage(Message message) {
+        hideMessageReferencePreview();
         while (message.mergeable(message.next())) {
             message = message.next();
         }
@@ -1862,6 +1981,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             return false;
         }
         this.conversation = conversation;
+
+        // Add this object to the Conversation object so that it can be used by methods that only have access to Conversation objects (e.g., via a Message object) but not to ConversationFragment objects.
+        conversation.setConversationFragment(this);
+
         //once we set the conversation all is good and it will automatically do the right thing in onStart()
         if (this.activity == null || this.binding == null) {
             return false;
@@ -1869,6 +1992,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
 
         if (!activity.xmppConnectionService.isConversationStillOpen(this.conversation)) {
             activity.onConversationArchived(this.conversation);
+            displayMessageReferencePreview();
             return false;
         }
 
@@ -1938,7 +2062,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         this.binding.unreadCountCustomView.setVisibility(View.GONE);
     }
 
-    private void setSelection(int pos, boolean jumpToBottom) {
+    public void setSelection(int pos, boolean jumpToBottom) {
         ListViewUtils.setSelection(this.binding.messagesView, pos, jumpToBottom);
         this.binding.messagesView.post(() -> ListViewUtils.setSelection(this.binding.messagesView, pos, jumpToBottom));
         this.binding.messagesView.post(this::fireReadEvent);
@@ -1953,7 +2077,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         final String downloadUuid = extras.getString(ConversationsActivity.EXTRA_DOWNLOAD_UUID);
         final String text = extras.getString(Intent.EXTRA_TEXT);
         final String nick = extras.getString(ConversationsActivity.EXTRA_NICK);
-        final boolean asQuote = extras.getBoolean(ConversationsActivity.EXTRA_AS_QUOTE);
+        final String messageReference = extras.getString(ConversationsActivity.EXTRA_MESSAGE_REFERENCE);
+        final boolean quoteMessage = extras.getBoolean(ConversationsActivity.EXTRA_QUOTE_MESSAGE);
         final boolean pm = extras.getBoolean(ConversationsActivity.EXTRA_IS_PRIVATE_MESSAGE, false);
         final boolean doNotAppend = extras.getBoolean(ConversationsActivity.EXTRA_DO_NOT_APPEND, false);
         final List<Uri> uris = extractUris(extras);
@@ -1979,8 +2104,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                 }
             }
         } else {
-            if (text != null && asQuote) {
-                quoteText(text);
+            if (messageReference != null) {
+                commentMessage(messageReference, quoteMessage);
             } else {
                 appendText(text, doNotAppend);
             }

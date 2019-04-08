@@ -41,6 +41,9 @@
         android:id="@+id/copy_message"
         android:title="@string/copy_to_clipboard"/>
     <item
+        android:id="@+id/comment_message"
+        android:title="@string/comment"/>
+    <item
         android:id="@+id/quote_message"
         android:title="@string/quote"/>
     <item

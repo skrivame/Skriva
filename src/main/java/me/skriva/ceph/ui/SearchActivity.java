@@ -161,11 +161,14 @@ public class SearchActivity extends XmppActivity implements TextWatcher, OnSearc
 				case R.id.copy_message:
 					ShareUtil.copyToClipboard(this, message);
 					break;
-				case R.id.copy_url:
-					ShareUtil.copyUrlToClipboard(this, message);
+				case R.id.comment_message:
+					commentMessage(message, false);
 					break;
 				case R.id.quote_message:
-					quote(message);
+					commentMessage(message, true);
+					break;
+				case R.id.copy_url:
+					ShareUtil.copyUrlToClipboard(this, message);
 					break;
 			}
 		}
@@ -181,8 +184,12 @@ public class SearchActivity extends XmppActivity implements TextWatcher, OnSearc
 		super.onSaveInstanceState(bundle);
 	}
 
-	private void quote(Message message) {
-		switchToConversationAndQuote(wrap(message.getConversation()), MessageUtils.prepareQuote(message));
+	private void commentMessage(Message message, boolean quoteMessage) {
+		String messageReference = message.getRemoteMsgId();
+		if (messageReference == null) {
+			messageReference = message.getUuid();
+		}
+		switchToConversationAndCommentMessage(wrap(message.getConversation()), messageReference, quoteMessage);
 	}
 
 	private Conversation wrap(Conversational conversational) {

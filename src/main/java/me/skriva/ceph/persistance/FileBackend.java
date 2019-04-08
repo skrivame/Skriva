@@ -829,12 +829,18 @@ public class FileBackend {
     }
 
     public Bitmap getThumbnail(Message message, int size, boolean cacheOnly) throws IOException {
-        final String uuid = message.getUuid();
+        final String uuid = message.getUuid();        // The key for getting a cached thumbnail contains the UUID and the size
+        // since this method is used for thumbnails of (bigger) normal image messages and (smaller) image message references.
+        // If only the UUID were used, the first loaded thumbnail would be cached and the next loading
+        // would get that thumbnail which would have the size of the first cached thumbnail
+        // possibly leading to undesirable appearance of the displayed thumbnail.
+        final String key = message.getUuid() + String.valueOf(size);
+
         final LruCache<String, Bitmap> cache = mXmppConnectionService.getBitmapCache();
-        Bitmap thumbnail = cache.get(uuid);
+        Bitmap thumbnail = cache.get(key);
         if ((thumbnail == null) && (!cacheOnly)) {
             synchronized (THUMBNAIL_LOCK) {
-                thumbnail = cache.get(uuid);
+                thumbnail = cache.get(key);
                 if (thumbnail != null) {
                     return thumbnail;
                 }
@@ -856,7 +862,7 @@ public class FileBackend {
                         thumbnail = withGifOverlay;
                     }
                 }
-                cache.put(uuid, thumbnail);
+                cache.put(key, thumbnail);
             }
         }
         return thumbnail;

@@ -45,14 +45,20 @@ public class MessageUtils {
 
 	public static String prepareQuote(Message message) {
 		final StringBuilder builder = new StringBuilder();
-		final String body = message.getMergedBody().toString();
+		final String body;
+
+		// If the message is a file message, quote only the URL.
+		// For image messages the URL can be taken without other FileParams like the dimensions.
+		if (message.hasFileOnRemoteHost()) {
+			body = message.getFileParams().url.toString();
+		} else {
+			body = message.getMergedBody().toString();
+		}
 		for (String line : body.split("\n")) {
 			if (line.length() <= 0) {
 				continue;
 			}
-			final char c = line.charAt(0);
-			if (c == '>' && UIHelper.isPositionFollowedByQuoteableCharacter(line, 0)
-					|| (c == '\u00bb' && !UIHelper.isPositionFollowedByQuote(line, 0))) {
+			if (UIHelper.isQuotationLine(line)) {
 				continue;
 			}
 			if (builder.length() != 0) {
@@ -61,6 +67,10 @@ public class MessageUtils {
 			builder.append(line.trim());
 		}
 		return builder.toString();
+	}
+
+	public static String createQuote(String text) {
+		return text.replaceAll("(\n *){2,}", "\n").replaceAll("(^|\n)", "$1> ").replaceAll("\n$", "");
 	}
 
 	public static boolean treatAsDownloadable(final String body, final boolean oob) {
