@@ -938,6 +938,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     public void toggleInputMethod() {
         boolean hasAttachments = mediaPreviewAdapter.hasAttachments();
         binding.textinput.setVisibility(hasAttachments ? View.GONE : View.VISIBLE);
+        binding.mainActivityEmoji.setVisibility(hasAttachments ? View.GONE : View.VISIBLE);
         binding.mediaPreview.setVisibility(hasAttachments ? View.VISIBLE : View.GONE);
         updateSendButton();
     }
