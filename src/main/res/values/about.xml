@@ -29,5 +29,36 @@
   -->
 
 <resources>
-    <string name="pref_about_message" translatable="false">Skriva - Secure communication made simple   Copyright © 2014-2019 Daniel Gultsch   This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.   This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.   You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses   Download the full source code at https://github.com/siacs/Conversations    Libraries   https://github.com/ypresto/android-transcoder (Apache License, Version 2.0)   https://www.bouncycastle.org (The MIT License (MIT))   https://www.gnu.org/software/libidn (Apache License, Version 2.0)   https://github.com/ge0rg/MemorizingTrustManager (The MIT License (MIT))   https://github.com/rtreffer/minidns (WTFPL)   https://github.com/open-keychain/openkeychain-api-lib (Apache License, Version 2.0)   https://developer.android.com/tools/support-library (Apache License, Version 2.0)   https://github.com/google/material-design-icons (CC BY 4.0)   https://github.com/leolin310148/ShortcutBadger (Apache License, Version 2.0)   https://github.com/WhisperSystems/libaxolotl-java (GPLv3)   https://github.com/vinc3m1/RoundedImageView (Apache License, Version 2.0)   https://github.com/jdamcd/android-crop (Apache License, Version 2.0)   https://github.com/zxing/zxing (Apache License, Version 2.0)   https://github.com/osmdroid/osmdroid (Apache License, Version 2.0)    Maps   Maps by Open Street Map (https://www.openstreetmap.org). Copyright restrictions may apply.</string>
+    <string name="pref_about_message" translatable="false">Skriva - Secure communication made simple. Copyright © 2019 Rey Koxha. Originally based upon Conversations.im developed by Daniel Gultsch.\n
+        This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\n
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n
+        You should have received a copy of the GNU General Public License along with this program. If not, see https://www.gnu.org/licenses \n
+        Download the full source code at https://github.com/skrivame/Skriva \n\n
+
+        Base Code\n
+        https://github.com/siacs/Conversations (GPLv3)\n\n
+
+        Libraries\n
+        https://github.com/ypresto/android-transcoder (Apache License, Version 2.0)\n
+        https://www.bouncycastle.org (The MIT License (MIT))\n
+        https://www.gnu.org/software/libidn (Apache License, Version 2.0)\n
+        https://github.com/ge0rg/MemorizingTrustManager (The MIT License (MIT))\n
+        https://github.com/rtreffer/minidns (WTFPL)\n
+        https://github.com/open-keychain/openkeychain-api-lib (Apache License, Version 2.0)\n
+        https://developer.android.com/tools/support-library (Apache License, Version 2.0)\n
+        https://github.com/google/material-design-icons (CC BY 4.0)\n
+        https://github.com/leolin310148/ShortcutBadger (Apache License, Version 2.0)\n
+        https://github.com/WhisperSystems/libaxolotl-java (GPLv3)\n
+        https://github.com/vinc3m1/RoundedImageView (Apache License, Version 2.0)\n
+        https://github.com/jdamcd/android-crop (Apache License, Version 2.0)\n
+        https://github.com/zxing/zxing (Apache License, Version 2.0)\n
+        https://github.com/osmdroid/osmdroid (Apache License, Version 2.0)\n
+        https://github.com/vanniktech/Emoji (Apache License, Version 2.0)\n\n
+
+        Maps\n
+        Maps by Open Street Map (https://www.openstreetmap.org). Copyright restrictions may apply.\n\n
+
+        Font\n
+        https://www.behance.net/gallery/66893685/Potra-Free-Font-Typeface
+    </string>
 </resources>

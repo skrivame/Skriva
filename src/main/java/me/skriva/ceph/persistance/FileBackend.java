@@ -86,8 +86,11 @@ public class FileBackend {
     }
 
     public static boolean isInDirectoryThatShouldNotBeScanned(Context context, String path) {
+        String SentPath = Environment.getExternalStorageDirectory() + "/" + context.getString(R.string.app_name) + "/Media/" + context.getString(R.string.app_name) +  " " + "Images/" + "Sent" ;
         for (String type : new String[]{RecordingActivity.STORAGE_DIRECTORY_TYPE_NAME, "Files"}) {
             if (path.startsWith(getConversationsDirectory(context, type))) {
+                return true;
+            } else if (path.startsWith(SentPath)) {
                 return true;
             }
         }
@@ -787,13 +790,13 @@ public class FileBackend {
     public void copyImageToPrivateStorage(Message message, Uri image) throws FileCopyException {
         switch (Config.IMAGE_FORMAT) {
             case JPEG:
-                message.setRelativeFilePath(message.getUuid() + ".jpg");
+                message.setRelativeFilePath("Sent/" + message.getUuid() + ".jpg");
                 break;
             case PNG:
-                message.setRelativeFilePath(message.getUuid() + ".png");
+                message.setRelativeFilePath("Sent/" + message.getUuid() + ".png");
                 break;
             case WEBP:
-                message.setRelativeFilePath(message.getUuid() + ".webp");
+                message.setRelativeFilePath("Sent/" + message.getUuid() + ".webp");
                 break;
         }
         copyImageToPrivateStorage(getFile(message), image);
@@ -829,7 +832,7 @@ public class FileBackend {
     }
 
     public Bitmap getThumbnail(Message message, int size, boolean cacheOnly) throws IOException {
-        final String uuid = message.getUuid();        // The key for getting a cached thumbnail contains the UUID and the size
+        // The key for getting a cached thumbnail contains the UUID and the size
         // since this method is used for thumbnails of (bigger) normal image messages and (smaller) image message references.
         // If only the UUID were used, the first loaded thumbnail would be cached and the next loading
         // would get that thumbnail which would have the size of the first cached thumbnail
