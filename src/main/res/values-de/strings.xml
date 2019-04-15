@@ -574,7 +574,7 @@
   <string name="use_camera_icon_to_scan_barcode">Nutze Kamera, um Barcodes deiner Kontakte zu scannen</string>
   <string name="please_wait_for_keys_to_be_fetched">Bitte warten bis Schlüssel abgerufen werden …</string>
   <string name="share_as_barcode">Als Barcode teilen</string>
-  <string name="share_as_uri">Als Skriva URI teilen</string>
+  <string name="share_as_uri">Als XMPP URI teilen</string>
   <string name="share_as_http">Als HTTP Link teilen</string>
   <string name="pref_blind_trust_before_verification">Blind vertrauen vor der Überprüfung</string>
   <string name="pref_blind_trust_before_verification_summary">Vertraue automatisch allen neuen Geräten von Kontakten, die noch nicht überprüft wurden und zeige eine Aufforderung zur manuellen Bestätigung an, wenn ein bereits überprüfter Kontakt ein neues Gerät hinzufügt.</string>

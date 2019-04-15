@@ -60,7 +60,7 @@ public class XmppUri {
 		String scheme = uri.getScheme();
 		String host = uri.getHost();
 		List<String> segments = uri.getPathSegments();
-		if ("https".equalsIgnoreCase(scheme) && "conversations.im".equalsIgnoreCase(host)) {
+		if ("https".equalsIgnoreCase(scheme) && "skriva.me".equalsIgnoreCase(host)) {
 			if (segments.size() >= 2 && segments.get(1).contains("@")) {
 				// sample : https://conversations.im/i/foo@bar.com
 				try {

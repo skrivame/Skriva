@@ -576,7 +576,7 @@
     <string name="use_camera_icon_to_scan_barcode">Use the camera to scan a contact’s barcode</string>
     <string name="please_wait_for_keys_to_be_fetched">Please wait for keys to be fetched</string>
     <string name="share_as_barcode">Share as Barcode</string>
-    <string name="share_as_uri">Share as Skriva URI</string>
+    <string name="share_as_uri">Share as XMPP URI</string>
     <string name="share_as_http">Share as HTTP link</string>
     <string name="pref_blind_trust_before_verification">Blind Trust Before Verification</string>
     <string name="pref_blind_trust_before_verification_summary">Automatically trust all new devices of contacts that haven’t been verified before, and prompt for manual confirmation each time a verified contact adds a new device.</string>
