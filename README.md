@@ -11,7 +11,7 @@ Therefore, its coming with a slightly reduced feature set compared to Conversati
 For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/).
 
 ### Features
-- Fully OMEMO encrypted
+- Fully OMEMO encrypted (except public groups)
 - Modern UI
 - Media Commenting
 - Emoji Keyboard
