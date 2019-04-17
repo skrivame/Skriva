@@ -161,7 +161,7 @@
     <string name="block_jabber_id">Block User ID</string>
     <string name="account_settings_example_jabber_id">username@skriva.me</string>
     <string name="password">Password</string>
-    <string name="invalid_jid">This is not a valid Skriva address</string>
+    <string name="invalid_jid">This is not a valid XMPP address</string>
     <string name="error_out_of_memory">Out of memory. Image is too large</string>
     <string name="add_phone_book_text">Do you want to add %s to your address book?</string>
     <string name="server_info_show_more">Server info</string>
@@ -791,7 +791,7 @@
     <string name="restore_warning">Do not use the restore backup feature in an attempt to clone (run simultaneously) an installation. Restoring a backup is only meant for migrations or in case you’ve lost the original device.</string>
     <string name="unable_to_restore_backup">Unable to restore backup.</string>
     <string name="unable_to_decrypt_backup">Unable to decrypt backup. Is the password correct?</string>
-    <string name="backup_channel_name">Backup &amp; Restore</string>
+    <string name="backup_channel_name">Backup and restore</string>
     <string name="enter_jabber_id">Enter Skriva address</string>
     <string name="create_group_chat">Create group chat</string>
     <string name="join_public_channel">Join public channel</string>
