@@ -505,7 +505,7 @@
   <string name="security_error_invalid_file_access">Sicherheitsfehler: Dateizugriff nicht erlaubt</string>
   <string name="no_application_to_share_uri">Keine Anwendung zum Teilen der URI gefunden</string>
   <string name="share_uri_with">Teile URI mit…</string>
-  <string name="welcome_text">Skriva ist ein auf XMPP basierter Instant Messenger, welcher größten Wert auf Datenschutz legt. Genieße deine Privatsphäre völlig kostenfrei.</string>
+  <string name="welcome_text">Skriva ist ein auf XMPP basierter Instant Messenger, welcher größten Wert auf Datenschutz legt. Genieße deine Privatsphäre absolut kostenfrei und ohne jegliche Einschränkungen.</string>
   <string name="agree_and_continue">Zustimmen &amp; fortfahren</string>
   <string name="magic_create_text">Wir führen dich durch den Prozess der Kontoerstellung.</string>
   <string name="your_full_jid_will_be">Deine vollständige Skriva-Adresse lautet: %s</string>

@@ -8,7 +8,7 @@
         <meta-data android:name="firebase_analytics_collection_deactivated" android:value="true" />
         <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
 
-        <receiver android:name="me.skriva.ceph.services.MaintenanceReceiver"
+        <receiver android:name=".services.MaintenanceReceiver"
                   android:exported="true"
                   android:permission="android.permission.CHANGE_CONFIGURATION">
             <intent-filter>
@@ -17,7 +17,7 @@
         </receiver>
 
         <service
-            android:name="me.skriva.ceph.services.PushMessageReceiver"
+            android:name=".services.PushMessageReceiver"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
