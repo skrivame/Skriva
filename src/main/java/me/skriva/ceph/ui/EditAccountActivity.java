@@ -77,6 +77,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         OnKeyStatusUpdated, OnCaptchaRequested, XmppConnectionService.OnShowErrorToast, XmppConnectionService.OnMamPreferencesFetched {
 
     public static final String EXTRA_OPENED_FROM_NOTIFICATION = "opened_from_notification";
+    public static final String EXTRA_FORCE_REGISTER = "force_register";
 
     private static final int REQUEST_DATA_SAVER = 0xf244;
     private static final int REQUEST_CHANGE_STATUS = 0xee11;
@@ -86,6 +87,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
     private AlertDialog mCaptchaDialog = null;
     private Jid jidToEdit;
     private boolean mInitMode = false;
+    private Boolean mForceRegister = null;
     private boolean mUsernameMode = Config.DOMAIN_LOCK != null;
     private boolean mShowOptions = false;
     private Account mAccount;
@@ -146,7 +148,12 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
                 }
                 return;
             }
-            final boolean registerNewAccount = binding.accountRegisterNew.isChecked() && !Config.DISALLOW_REGISTRATION_IN_UI;
+            final boolean registerNewAccount;
+            if (mForceRegister != null) {
+                registerNewAccount = mForceRegister;
+            } else {
+                registerNewAccount = binding.accountRegisterNew.isChecked() && !Config.DISALLOW_REGISTRATION_IN_UI;
+            }
             if (mUsernameMode && binding.accountJid.getText().toString().contains("@")) {
                 binding.accountJidLayout.setError(getString(R.string.invalid_username));
                 removeErrorsOnAllBut(binding.accountJidLayout);
@@ -352,7 +359,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         }
 
         if (xmppConnectionService.getAccounts().size() == 0 && Config.MAGIC_CREATE_DOMAIN != null) {
-            Intent intent = SignupUtils.getSignUpIntent(this);
+            Intent intent = SignupUtils.getSignUpIntent(this, mForceRegister != null && mForceRegister);
             startActivity(intent);
         }
     }
@@ -616,6 +623,9 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
             }
             boolean init = intent.getBooleanExtra("init", false);
             boolean openedFromNotification = intent.getBooleanExtra(EXTRA_OPENED_FROM_NOTIFICATION, false);
+            Log.d(Config.LOGTAG,"extras "+intent.getExtras());
+            this.mForceRegister = intent.hasExtra(EXTRA_FORCE_REGISTER) ? intent.getBooleanExtra(EXTRA_FORCE_REGISTER,false) : null;
+            Log.d(Config.LOGTAG,"force register="+mForceRegister);
             this.mInitMode = init || this.jidToEdit == null;
             this.messageFingerprint = intent.getStringExtra("fingerprint");
             if (!mInitMode) {
@@ -625,12 +635,23 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
             } else {
                 this.binding.avater.setVisibility(View.GONE);
                 configureActionBar(getSupportActionBar(), !(init && Config.MAGIC_CREATE_DOMAIN == null));
-                setTitle(R.string.action_add_account);
+                if (mForceRegister != null) {
+                    if (mForceRegister) {
+                        setTitle(R.string.register_new_account);
+                    } else {
+                        setTitle(R.string.add_existing_account);
+                    }
+                } else {
+                    setTitle(R.string.action_add_account);
+                }
             }
         }
         SharedPreferences preferences = getPreferences();
         mUseTor = QuickConversationsService.isConversations() && preferences.getBoolean("use_tor", getResources().getBoolean(R.bool.use_tor));
         this.mShowOptions = mUseTor || (QuickConversationsService.isConversations() && preferences.getBoolean("show_connection_options", getResources().getBoolean(R.bool.show_connection_options)));
+        if (mForceRegister != null) {
+            this.binding.accountRegisterNew.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -865,7 +886,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
                 }
             }
             this.binding.accountRegisterNew.setVisibility(View.GONE);
-        } else if (this.mAccount.isOptionSet(Account.OPTION_REGISTER)) {
+        } else if (this.mAccount.isOptionSet(Account.OPTION_REGISTER) && mForceRegister == null) {
             this.binding.accountRegisterNew.setVisibility(View.VISIBLE);
         } else {
             this.binding.accountRegisterNew.setVisibility(View.GONE);

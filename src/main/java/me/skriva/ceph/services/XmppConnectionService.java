@@ -345,7 +345,7 @@ public class XmppConnectionService extends Service {
                     }
                 }
                 if (account.setShowErrorNotification(true)) {
-                    databaseBackend.updateAccount(account);
+                    mDatabaseWriterExecutor.execute(() -> databaseBackend.updateAccount(account));
                 }
                 mMessageArchiveService.executePendingQueries(account);
                 if (connection != null && connection.getFeatures().csi()) {
@@ -444,9 +444,7 @@ public class XmppConnectionService extends Service {
     public void attachLocationToConversation(final Conversation conversation, final Uri uri, final UiCallback<Message> callback) {
         int encryption = conversation.getNextEncryption();
         Message message = new Message(conversation, uri.toString(), encryption);
-        if (conversation.getNextCounterpart() != null) {
-            message.setCounterpart(conversation.getNextCounterpart());
-        }
+        Message.configurePrivateMessage(message);
         sendMessage(message);
         callback.success(message);
     }
@@ -454,8 +452,12 @@ public class XmppConnectionService extends Service {
     public void attachFileToConversation(final Conversation conversation, final Uri uri, final String type, final UiCallback<Message> callback) {
         final Message message;
         message = new Message(conversation, "", conversation.getNextEncryption());
-        message.setCounterpart(conversation.getNextCounterpart());
-        message.setType(Message.TYPE_FILE);
+        if (!Message.configurePrivateFileMessage(message)) {
+            message.setCounterpart(conversation.getNextCounterpart());
+            message.setType(Message.TYPE_FILE);
+        }
+        Log.d(Config.LOGTAG,"attachFile: type="+message.getType());
+        Log.d(Config.LOGTAG,"counterpart="+message.getCounterpart());
         final AttachFileToConversationRunnable runnable = new AttachFileToConversationRunnable(this, uri, type, message, callback);
         if (runnable.isVideoMessage()) {
             mVideoCompressionExecutor.execute(runnable);
@@ -478,8 +480,11 @@ public class XmppConnectionService extends Service {
         }
         final Message message;
         message = new Message(conversation, "", conversation.getNextEncryption());
-        message.setCounterpart(conversation.getNextCounterpart());
-        message.setType(Message.TYPE_IMAGE);
+        if (!Message.configurePrivateFileMessage(message)) {
+            message.setCounterpart(conversation.getNextCounterpart());
+            message.setType(Message.TYPE_IMAGE);
+        }
+        Log.d(Config.LOGTAG,"attachImage: type="+message.getType());
         mFileAddingExecutor.execute(() -> {
             try {
                 getFileBackend().copyImageToPrivateStorage(message, uri);
@@ -854,7 +859,7 @@ public class XmppConnectionService extends Service {
             if (account.hasErrorStatus()) {
                 Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": dismissing error notification");
                 if (account.setShowErrorNotification(false)) {
-                    databaseBackend.updateAccount(account);
+                    mDatabaseWriterExecutor.execute(() -> databaseBackend.updateAccount(account));
                 }
             }
         }
@@ -1272,7 +1277,7 @@ public class XmppConnectionService extends Service {
         }
 
 
-        boolean mucMessage = conversation.getMode() == Conversation.MODE_MULTI && message.getType() != Message.TYPE_PRIVATE;
+        boolean mucMessage = conversation.getMode() == Conversation.MODE_MULTI && !message.isPrivateMessage();
         if (mucMessage) {
             message.setCounterpart(conversation.getMucOptions().getSelf().getFullJid());
         }
@@ -1308,6 +1313,7 @@ public class XmppConnectionService extends Service {
                 }
             }
             sendMessagePacket(account, packet);
+            Log.d(Config.LOGTAG,packet.toString());
         }
     }
 

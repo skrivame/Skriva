@@ -506,7 +506,7 @@
     <string name="security_error_invalid_file_access">Security error: Invalid file access</string>
     <string name="no_application_to_share_uri">No application found to share URI</string>
     <string name="share_uri_with">Share URI with…</string>
-    <string name="welcome_header" translatable="false">Join Skriva!</string>
+    <string name="welcome_header" translatable="false">Skriva!</string>
     <string name="welcome_text">Skriva is a XMPP based instant messaging app featuring highest security standards. Enjoy an absolutely private and free messaging experience.</string>
     <string name="agree_and_continue">Agree &amp; continue</string>
     <string name="magic_create_text">We will guide you through the process of creating an account.</string>
@@ -824,4 +824,7 @@
     <string name="comment">Comment...</string>
     <string name="message_not_found">Message not found</string>
     <string name="message_too_old_for_jumping_to_it">Message too old for jumping to it</string>
+    <string name="i_already_have_an_account">I already have an account</string>
+    <string name="add_existing_account">Add existing account</string>
+    <string name="register_new_account">Register new account</string>
 </resources>

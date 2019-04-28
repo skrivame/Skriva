@@ -55,6 +55,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	private static final String ATTRIBUTE_NEXT_MESSAGE_TIMESTAMP = "next_message_timestamp";
 	private static final String ATTRIBUTE_CRYPTO_TARGETS = "crypto_targets";
 	private static final String ATTRIBUTE_NEXT_ENCRYPTION = "next_encryption";
+	private static final String ATTRIBUTE_CORRECTING_MESSAGE = "correcting_message";
 	static final String ATTRIBUTE_MEMBERS_ONLY = "members_only";
 	static final String ATTRIBUTE_MODERATED = "moderated";
 	static final String ATTRIBUTE_NON_ANONYMOUS = "non_anonymous";
@@ -77,7 +78,6 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	private ChatState mOutgoingChatState = Config.DEFAULT_CHATSTATE;
 	private ChatState mIncomingChatState = Config.DEFAULT_CHATSTATE;
 	private String mFirstMamReference = null;
-	private Message correctingMessage;
 	private String messageReference = null;
 	private String messageReferenceQuote;
 	private ConversationFragment conversationFragment;
@@ -422,12 +422,13 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	}
 
 	public boolean setCorrectingMessage(Message correctingMessage) {
-		this.correctingMessage = correctingMessage;
+		setAttribute(ATTRIBUTE_CORRECTING_MESSAGE,correctingMessage == null ? null : correctingMessage.getUuid());
 		return correctingMessage == null && draftMessage != null;
 	}
 
 	public Message getCorrectingMessage() {
-		return this.correctingMessage;
+		final String uuid = getAttribute(ATTRIBUTE_CORRECTING_MESSAGE);
+		return uuid == null ? null : findSentMessageWithUuid(uuid);
 	}
 
 	public boolean withSelf() {
@@ -482,7 +483,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 				final Message message = messages.get(i);
 				if (message.getStatus() <= Message.STATUS_RECEIVED
 						&& (message.markable || isPrivateAndNonAnonymousMuc)
-						&& message.getType() != Message.TYPE_PRIVATE) {
+						&& !message.isPrivateMessage()) {
 					return message;
 				}
 			}
@@ -766,7 +767,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		synchronized (this.messages) {
 			for (int i = this.messages.size() - 1; i >= 0; --i) {
 				final Message message = this.messages.get(i);
-				if (message.getType() == Message.TYPE_PRIVATE) {
+				if (message.isPrivateMessage()) {
 					continue; //it's unsafe to use private messages as anchor. They could be coming from user archive
 				}
 				if (message.getStatus() == Message.STATUS_RECEIVED || message.isCarbon() || message.getServerMsgId() != null) {

@@ -28,8 +28,7 @@
   <string name="unread_conversations">непрочитане преписке</string>
   <string name="sending">шаљем…</string>
   <string name="message_decrypting">Дешифрујем поруку, сачекајте…</string>
-  <string name="pgp_message">ОпенПГП шифрована порука</string>
-  <string name="nick_in_use">Надимак је већ у употреби</string>
+    <string name="nick_in_use">Надимак је већ у употреби</string>
   <string name="invalid_muc_nick">Неисправан надимак</string>
   <string name="admin">Администратор</string>
   <string name="owner">Власник</string>

@@ -823,4 +823,8 @@
     <string name="comment">Kommentieren...</string>
     <string name="message_not_found">Nachricht nicht gefunden</string>
     <string name="message_too_old_for_jumping_to_it">Die Nachricht ist zu alt um dorthin zu springen</string>
+  <string name="i_already_have_an_account">Ich habe bereits ein Konto</string>
+  <string name="add_existing_account">Bestehendes Konto hinzufügen</string>
+  <string name="register_new_account">Neues Konto erstellen</string>
+  <string name="create_new_account">Neues Konto erstellen</string>
 </resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pick_a_server">Zeit loszulegen!</string>
+    <string name="use_skriva.me">Bestehendes Konto verwenden</string>
+    <string name="create_new_account">Neues Konto erstellen</string>
+    <string name="server_select_text">XMPP ist ein providerunabhängiges Nachrichtennetzwerk. \nUm einen einfachen Einstieg zu gewährleisten, werden wir nachfolgend ein Konto unter skriva.me registrieren.</string>
+
+</resources>

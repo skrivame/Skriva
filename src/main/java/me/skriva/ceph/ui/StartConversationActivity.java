@@ -97,6 +97,7 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 	private List<String> mActivatedAccounts = new ArrayList<>();
 	private EditText mSearchEditText;
 	private AtomicBoolean mRequestedContactsPermission = new AtomicBoolean(false);
+	private AtomicBoolean mOpenedFab = new AtomicBoolean(false);
 	private boolean mHideOfflineContacts = false;
 	private boolean createdByViewIntent = false;
 	private MenuItem.OnActionExpandListener mOnActionExpandListener = new MenuItem.OnActionExpandListener() {
@@ -303,6 +304,7 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 			mInitialSearchValue.push("");
 		}
 		mRequestedContactsPermission.set(savedInstanceState != null && savedInstanceState.getBoolean("requested_contacts_permission",false));
+		mOpenedFab.set(savedInstanceState != null && savedInstanceState.getBoolean("opened_fab",false));
 		binding.speedDial.setOnActionSelectedListener(actionItem -> {
 			final String searchString = mSearchEditText != null ? mSearchEditText.getText().toString() : null;
 			final String prefilled;
@@ -343,6 +345,7 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 		Intent pendingIntent = pendingViewIntent.peek();
 		savedInstanceState.putParcelable("intent", pendingIntent != null ? pendingIntent : getIntent());
 		savedInstanceState.putBoolean("requested_contacts_permission",mRequestedContactsPermission.get());
+		savedInstanceState.putBoolean("opened_fab",mOpenedFab.get());
 		savedInstanceState.putBoolean("created_by_view_intent",createdByViewIntent);
 		if (mMenuSearchView != null && mMenuSearchView.isActionViewExpanded()) {
 			savedInstanceState.putString("search", mSearchEditText != null ? mSearchEditText.getText().toString() : null);
@@ -793,6 +796,9 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 		if (fragment instanceof OnBackendConnected) {
 			Log.d(Config.LOGTAG, "calling on backend connected on dialog");
 			((OnBackendConnected) fragment).onBackendConnected();
+		}
+		if (QuickConversationsService.isConversations() && AccountUtils.hasEnabledAccounts(xmppConnectionService) && this.contacts.size() == 0 && this.conferences.size() == 0 && mOpenedFab.compareAndSet(false,true)) {
+			binding.speedDial.open();
 		}
 	}
 
