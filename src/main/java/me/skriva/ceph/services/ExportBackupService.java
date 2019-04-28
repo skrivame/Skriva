@@ -102,7 +102,7 @@ public class ExportBackupService extends Service {
                 final String value = accountCursor.getString(i);
                 if (value == null || Account.ROSTERVERSION.equals(accountCursor.getColumnName(i))) {
                     builder.append("NULL");
-                } else if (value.matches("\\d+")) {
+                } else if (value.matches("[0-9]+")) {
                     int intValue = Integer.parseInt(value);
                     if (Account.OPTIONS.equals(accountCursor.getColumnName(i))) {
                         intValue |= 1 << Account.OPTION_DISABLED;

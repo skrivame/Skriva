@@ -1237,6 +1237,7 @@ public class FileBackend {
     public void updateFileParams(Message message, URL url) {
         DownloadableFile file = getFile(message);
         final String mime = file.getMimeType();
+        final boolean privateMessage = message.isPrivateMessage();
         final boolean image = message.getType() == Message.TYPE_IMAGE || (mime != null && mime.startsWith("image/"));
         final boolean video = mime != null && mime.startsWith("video/");
         final boolean audio = mime != null && mime.startsWith("audio/");
