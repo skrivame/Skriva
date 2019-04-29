@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
@@ -61,6 +61,7 @@ dependencies {
     implementation 'me.drakeet.support:toastcompat:1.1.0'
     implementation "com.leinardi.android:speed-dial:2.0.1"
     implementation 'com.vanniktech:emoji-google:0.6.0'
+    implementation 'com.google.guava:guava:27.1-android'
 }
 
 ext {
@@ -74,8 +75,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 100
-        versionName "1.0.0"
+        versionCode 102
+        versionName "1.0.1"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
         resValue "string", "applicationId", applicationId

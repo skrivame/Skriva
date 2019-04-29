@@ -10,11 +10,11 @@
 
 -keep class com.google.android.gms.**
 
--keep class org.openintents.openpgp.*
-
 -dontwarn org.bouncycastle.mail.**
 -dontwarn org.bouncycastle.x509.util.LDAPStoreHelper
 -dontwarn org.bouncycastle.jce.provider.X509LDAPCertStoreSpi
 -dontwarn org.bouncycastle.cert.dane.**
 -dontwarn rocks.xmpp.addr.**
 -dontwarn com.google.firebase.analytics.connector.AnalyticsConnector
+-dontwarn java.lang.**
+-dontwarn javax.lang.**
