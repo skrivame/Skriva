@@ -782,7 +782,11 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             message.setBody(body);
             message.putEdited(message.getUuid(), message.getServerMsgId());
             message.setServerMsgId(null);
-            message.setUuid(UUID.randomUUID().toString());
+            String oldMessageUuid = message.getUuid();
+            String newMessageUuid = UUID.randomUUID().toString();
+            message.setUuid(newMessageUuid);
+
+            activity.xmppConnectionService.updateMessageReferences(conversation, oldMessageUuid, newMessageUuid);
 
             // Display a previously hidden message reference preview.
             conversation.setCorrectingMessage(null);

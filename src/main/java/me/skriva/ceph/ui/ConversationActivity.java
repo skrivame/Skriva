@@ -13,7 +13,6 @@ public class ConversationActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EmojiManager.install(new GoogleEmojiProvider());
 		startActivity(new Intent(this, ConversationsActivity.class));
 		finish();
 	}

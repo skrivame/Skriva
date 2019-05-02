@@ -46,6 +46,7 @@ import android.widget.Toast;
 import org.conscrypt.Conscrypt;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.Security;
@@ -2919,6 +2920,42 @@ public class XmppConnectionService extends Service {
         }
 		updateConversationUi();
 	}
+
+    /**
+     * Updates all occurrences of a reference to a replaced message.
+     *
+     * This is used when a referenced message is corrected.
+     *
+     * @param conversation conversation that potentially contains messages referencing to other messages
+     * @param oldId UUID of the replaced message
+     * @param newId UUID of the replacing message
+     */
+    public void updateMessageReferences(Conversation conversation, String oldId, String newId) {
+        List<String> uuidsOfMessagesWithReferences;
+        try {
+            // Update all occurrences of the given message reference oldId with newId in the database.
+            uuidsOfMessagesWithReferences = databaseBackend.updateMessageReferences(oldId, newId);
+
+            // If another conversation already updated the occurrences of the given message reference oldId in the database, get the UUDIs of the updated messages from it.
+            // That way it is possible to update the currently loaded messages of the given conversation later.
+            if (uuidsOfMessagesWithReferences.isEmpty()) {
+                uuidsOfMessagesWithReferences = databaseBackend.findMessagesWithMessageReference(newId);
+            }
+
+            // Update the currently loaded messages of the given conversation by setting the new message reference newId.
+            if (!uuidsOfMessagesWithReferences.isEmpty()) {
+                for (String uuidOfMessageWithReference : uuidsOfMessagesWithReferences) {
+                    Message message = conversation.findSentMessageWithUuid(uuidOfMessageWithReference);
+                    if (message != null) {
+                        message.setMessageReference(newId);
+                    }
+                }
+                Log.d(Config.LOGTAG,"updated message references");
+            }
+        } catch (IOException e) {
+            Log.e(Config.LOGTAG, e.toString());
+        }
+    }
 
 	protected void syncDirtyContacts(Account account) {
 		for (Contact contact : account.getRoster().getContacts()) {

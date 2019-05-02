@@ -30,7 +30,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -803,14 +802,15 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         cursor = db.query(Message.TABLENAME, null, selection, selectionArgs.toArray(new String[selectionArgs.size()]), null, null, Message.TIME_SENT + " DESC", limitation);
 
 
-        if (cursor.getCount() > 0) {
-            cursor.moveToLast();
-            do {
-                Message message = Message.fromCursor(cursor, conversation);
+        while (cursor.moveToNext()) {
+            try {
+                final Message message = Message.fromCursor(cursor, conversation);
                 if (message != null) {
-                    list.add(message);
+                    list.add(0, message);
                 }
-            } while (cursor.moveToPrevious());
+            } catch (Exception e) {
+            Log.e(Config.LOGTAG,"unable to restore message");
+        }
         }
         cursor.close();
         return list;
@@ -831,40 +831,6 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         String SQL = "SELECT " + Message.TABLENAME + ".*," + Conversation.TABLENAME + '.' + Conversation.CONTACTJID + ',' + Conversation.TABLENAME + '.' + Conversation.ACCOUNT + ',' + Conversation.TABLENAME + '.' + Conversation.MODE + " FROM " + Message.TABLENAME + " join " + Conversation.TABLENAME + " on " + Message.TABLENAME + '.' + Message.CONVERSATION + '=' + Conversation.TABLENAME + '.' + Conversation.UUID + " join messages_index ON messages_index.uuid=messages.uuid where " + Message.ENCRYPTION + " NOT IN(" + Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE + ',' + Message.ENCRYPTION_DECRYPTION_FAILED + ',' + Message.ENCRYPTION_AXOLOTL_FAILED + ") AND " + Message.TYPE + " IN(" + Message.TYPE_TEXT + ',' + Message.TYPE_PRIVATE + ") AND messages_index.body MATCH ? ORDER BY " + Message.TIME_SENT + " DESC limit " + Config.MAX_SEARCH_RESULTS;
         Log.d(Config.LOGTAG, "search term: " + FtsUtils.toMatchString(term));
         return db.rawQuery(SQL, new String[]{FtsUtils.toMatchString(term)});
-    }
-
-    public Iterable<Message> getMessagesIterable(final Conversation conversation) {
-        return () -> {
-            class MessageIterator implements Iterator<Message> {
-                private SQLiteDatabase db = getReadableDatabase();
-                private String[] selectionArgs = {conversation.getUuid()};
-                private Cursor cursor = db.query(Message.TABLENAME, null, Message.CONVERSATION
-                        + "=?", selectionArgs, null, null, Message.TIME_SENT
-                        + " ASC", null);
-
-                private MessageIterator() {
-                    cursor.moveToFirst();
-                }
-
-                @Override
-                public boolean hasNext() {
-                    return !cursor.isAfterLast();
-                }
-
-                @Override
-                public Message next() {
-                    Message message = Message.fromCursor(cursor, conversation);
-                    cursor.moveToNext();
-                    return message;
-                }
-
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException();
-                }
-            }
-            return new MessageIterator();
-        };
     }
 
     public List<String> markFileAsDeleted(final File file, final boolean internal) {
@@ -920,6 +886,58 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         }
         db.setTransactionSuccessful();
         db.endTransaction();
+    }
+
+    /**
+     * Updates all occurrences of a reference to a replaced message.
+     *
+     * This is used when a referenced message is corrected.
+     *
+     * @param oldId UUID of the replaced message
+     * @param newId UUID of the replacing message
+     */
+    public List<String> updateMessageReferences(String oldId, String newId) throws IOException {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        List<String> uuidsOfMessagesWithReferences = findMessagesWithMessageReference(oldId);
+
+        if (!uuidsOfMessagesWithReferences.isEmpty()) {
+            final String where = Message.MESSAGE_REFERENCE + "=?";
+            final String[] args = {oldId};
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put(Message.MESSAGE_REFERENCE, newId);
+
+            if (db.update(Message.TABLENAME, contentValues, where, args) == 0) {
+                throw new IOException("message references could not be updated in DB");
+            }
+        }
+
+        return uuidsOfMessagesWithReferences;
+    }
+
+    /**
+     * Provides all UUIDs of messages that have a given reference to another message.
+     *
+     * @param messageReference reference to another message
+     * @return UUIDs of messages that have the given messageReference
+     */
+    public List<String> findMessagesWithMessageReference(String messageReference) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        final String[] columns = {Message.UUID};
+        final String where = Message.MESSAGE_REFERENCE + "=?";
+        final String[] args = {messageReference};
+
+        List<String> messageUuids = new ArrayList<>();
+        Cursor cursor = db.query(Message.TABLENAME, columns, where, args, null,
+                null, null);
+
+        while (cursor.moveToNext()) {
+            messageUuids.add(cursor.getString(cursor.getColumnIndex(Message.UUID)));
+        }
+        cursor.close();
+
+        return messageUuids;
     }
 
     public List<FilePathInfo> getFilePathInfo() {
