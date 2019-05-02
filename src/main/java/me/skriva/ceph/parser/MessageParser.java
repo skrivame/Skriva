@@ -550,6 +550,7 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
                             if (replacedMessage.getStatus() == Message.STATUS_RECEIVED) {
                                 replacedMessage.markUnread();
                             }
+                            mXmppConnectionService.updateMessageReferences(conversation, replacementId, replacedMessage.getRemoteMsgId());
                             extractChatState(mXmppConnectionService.find(account, counterpart.asBareJid()), isTypeGroupChat, packet);
                             mXmppConnectionService.updateMessage(replacedMessage, uuid);
                             if (mXmppConnectionService.confirmMessages()

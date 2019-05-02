@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pick_a_server">Time to roll!</string>
-    <string name="use_skriva.me">Use existing account</string>
+    <string name="pick_a_server">Let\'s roll!</string>
     <string name="create_new_account">Create new account</string>
-    <string name="server_select_text">XMPP is a provider independent instant messaging network. \nHowever for simplicity reasons we will register an account for you on skriva.me. </string>
-
+    <string name="server_select_text">We will now guide you through the process to create an account. The password will be automatically generated for you. You can check and change it on your profile overview later.</string>
 </resources>

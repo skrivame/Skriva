@@ -56,16 +56,13 @@
                         style="@style/Widget.Conversations.Button.Borderless"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:text="@string/create_new_account"
+                        android:text="@string/next"
                         android:textColor="?colorAccent" />
 
-                    <Button
-                        android:id="@+id/use_own_provider"
-                        style="@style/Widget.Conversations.Button.Borderless"
+                    <Space
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="@string/use_skriva.me"
-                        android:textColor="?android:textColorSecondary" />
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
                 </LinearLayout>
 
                 <RelativeLayout
