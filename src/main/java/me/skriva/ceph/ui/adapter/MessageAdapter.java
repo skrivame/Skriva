@@ -18,15 +18,19 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ActionMode;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -35,6 +39,8 @@ import android.widget.Toast;
 
 import com.google.common.base.Strings;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -75,6 +81,9 @@ import me.skriva.ceph.utils.GeoHelper;
 import me.skriva.ceph.utils.StylingHelper;
 import me.skriva.ceph.utils.UIHelper;
 import me.skriva.ceph.xmpp.mam.MamReference;
+
+import pl.droidsonroids.gif.GifDrawable;
+import pl.droidsonroids.gif.GifImageView;
 
 import rocks.xmpp.addr.Jid;
 
@@ -319,6 +328,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		viewHolder.download_button.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.messageBody.setVisibility(View.VISIBLE);
 		viewHolder.messageBody.setText(text);
 		if (darkBackground) {
@@ -333,6 +344,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		viewHolder.download_button.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.messageBody.setVisibility(View.VISIBLE);
 		if (darkBackground) {
 			viewHolder.messageBody.setTextAppearance(getContext(), R.style.TextAppearance_Conversations_Body1_Emoji_OnDark);
@@ -429,6 +442,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private void displayTextMessage(final ViewHolder viewHolder, final Message message, boolean darkBackground, int type) {
 		viewHolder.download_button.setVisibility(View.GONE);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
 		viewHolder.messageBody.setVisibility(View.VISIBLE);
 
@@ -524,6 +539,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private void displayDownloadableMessage(ViewHolder viewHolder, final Message message, String text, final boolean darkBackground) {
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
 		viewHolder.download_button.setVisibility(View.VISIBLE);
 		viewHolder.download_button.setText(text);
@@ -533,6 +550,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private void displayOpenableMessage(ViewHolder viewHolder, final Message message, final boolean darkBackground) {
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
 		viewHolder.download_button.setVisibility(View.VISIBLE);
 		viewHolder.download_button.setText(activity.getString(R.string.open_x_file, UIHelper.getFileDescriptionString(activity, message)));
@@ -542,6 +561,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private void displayLocationMessage(ViewHolder viewHolder, final Message message, final boolean darkBackground) {
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
 		viewHolder.download_button.setVisibility(View.VISIBLE);
 		viewHolder.download_button.setText(R.string.show_location);
@@ -551,6 +572,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private void displayAudioMessage(ViewHolder viewHolder, Message message, boolean darkBackground) {
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.image.setVisibility(View.GONE);
+		viewHolder.gifImage.setVisibility(View.GONE);
+		viewHolder.gif_btn.setVisibility(View.GONE);
 		viewHolder.download_button.setVisibility(View.GONE);
 		final RelativeLayout audioPlayer = viewHolder.audioPlayer;
 		audioPlayer.setVisibility(View.VISIBLE);
@@ -562,29 +585,107 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.download_button.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
-		viewHolder.image.setVisibility(View.VISIBLE);
-		FileParams params = message.getFileParams();
-		double target = metrics.density * 288;
-		int scaledW;
-		int scaledH;
-		if (Math.max(params.height, params.width) * metrics.density <= target) {
-			scaledW = (int) (params.width * metrics.density);
-			scaledH = (int) (params.height * metrics.density);
-		} else if (Math.max(params.height, params.width) <= target) {
-			scaledW = params.width;
-			scaledH = params.height;
-		} else if (params.width <= params.height) {
-			scaledW = (int) (params.width / ((double) params.height / target));
-			scaledH = (int) target;
-		} else {
-			scaledW = (int) target;
-			scaledH = (int) (params.height / ((double) params.width / target));
+		DownloadableFile file = activity.xmppConnectionService.getFileBackend().getFile(message);
+		if (!file.exists()) {
+			Toast.makeText(activity, R.string.file_deleted, Toast.LENGTH_SHORT).show();
+			return;
 		}
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaledW, scaledH);
-		layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
-		viewHolder.image.setLayoutParams(layoutParams);
-		activity.loadBitmap(message, viewHolder.image);
-		viewHolder.image.setOnClickListener(v -> openDownloadable(message));
+		String mime = file.getMimeType();
+		if (mime != null && mime.equals("image/gif")) {
+			Log.d(Config.LOGTAG, "Gif Image file");
+			viewHolder.image.setVisibility(View.GONE);
+			viewHolder.gifImage.setVisibility(View.VISIBLE);
+			FileParams params = message.getFileParams();
+			double target = metrics.density * 800;
+			int scaledW;
+			int scaledH;
+			if (Math.max(params.height, params.width) * metrics.density <= target) {
+				scaledW = (int) (params.width * metrics.density);
+				scaledH = (int) (params.height * metrics.density);
+			} else if (Math.max(params.height, params.width) <= target) {
+				scaledW = params.width;
+				scaledH = params.height;
+			} else if (params.width <= params.height) {
+				scaledW = (int) (params.width / ((double) params.height / target));
+				scaledH = (int) target;
+			} else {
+				scaledW = (int) target;
+				scaledH = (int) (params.height / ((double) params.width / target));
+			}
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(scaledW, scaledH);
+			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
+			viewHolder.gifImage.setLayoutParams(layoutParams);
+
+			if (message.getMimeType() != null && message.getMimeType().endsWith("/gif")) {
+				GifDrawable drawable;
+				try {
+					File gif = activity.xmppConnectionService.getFileBackend().getFile(message);
+					drawable = new GifDrawable(gif);
+				}
+				catch (IOException error) {
+					// TODO: something better?
+					error.printStackTrace();
+					return;
+				}
+				drawable.stop();
+				viewHolder.gif_btn.setVisibility(View.VISIBLE);
+
+				viewHolder.gifImage.setImageDrawable(drawable);
+
+				viewHolder.gifImage.setOnTouchListener(new View.OnTouchListener() {
+					private GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+						@Override
+						public boolean onSingleTapUp(MotionEvent e) {
+							GifDrawable gif = ((GifDrawable) viewHolder.gifImage.getDrawable());
+
+							// Play/Pause
+							if (gif.isRunning()) {
+								gif.stop();
+								viewHolder.gif_btn.setVisibility(View.VISIBLE);
+							} else {
+								gif.start();
+								viewHolder.gif_btn.setVisibility(View.INVISIBLE);
+							}
+
+							return true;
+						}
+					});
+
+					@Override
+					public boolean onTouch(View v, MotionEvent event) {
+						gestureDetector.onTouchEvent(event);
+						return true;
+					}
+				});
+			}
+			viewHolder.gifImage.setOnClickListener(v -> openDownloadable(message));
+		} else {
+			viewHolder.image.setVisibility(View.VISIBLE);
+			viewHolder.gifImage.setVisibility(View.GONE);
+			viewHolder.gif_btn.setVisibility(View.GONE);
+			FileParams params = message.getFileParams();
+			double target = metrics.density * 200;
+			int scaledW;
+			int scaledH;
+			if (Math.max(params.height, params.width) * metrics.density <= target) {
+				scaledW = (int) (params.width * metrics.density);
+				scaledH = (int) (params.height * metrics.density);
+			} else if (Math.max(params.height, params.width) <= target) {
+				scaledW = params.width;
+				scaledH = params.height;
+			} else if (params.width <= params.height) {
+				scaledW = (int) (params.width / ((double) params.height / target));
+				scaledH = (int) target;
+			} else {
+				scaledW = (int) target;
+				scaledH = (int) (params.height / ((double) params.width / target));
+			}
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaledW, scaledH);
+			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
+			viewHolder.image.setLayoutParams(layoutParams);
+			activity.loadBitmap(message, viewHolder.image);
+			viewHolder.image.setOnClickListener(v -> openDownloadable(message));
+		}
 	}
 
 	private void toggleWhisperInfo(ViewHolder viewHolder, final Message message, final boolean darkBackground) {
@@ -650,6 +751,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 					viewHolder.indicator = view.findViewById(R.id.security_indicator);
 					viewHolder.edit_indicator = view.findViewById(R.id.edit_indicator);
 					viewHolder.image = view.findViewById(R.id.message_image);
+					viewHolder.gif_btn = view.findViewById(R.id.message_gif_btn);
+					viewHolder.gifImage = view.findViewById(R.id.message_image_gif);
 					viewHolder.messageBody = view.findViewById(R.id.message_body);
 					viewHolder.time = view.findViewById(R.id.message_time);
 					viewHolder.indicatorReceived = view.findViewById(R.id.indicator_received);
@@ -664,6 +767,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 					viewHolder.indicator = view.findViewById(R.id.security_indicator);
 					viewHolder.edit_indicator = view.findViewById(R.id.edit_indicator);
 					viewHolder.image = view.findViewById(R.id.message_image);
+					viewHolder.gif_btn = view.findViewById(R.id.message_gif_btn);
+					viewHolder.gifImage = view.findViewById(R.id.message_image_gif);
 					viewHolder.messageBody = view.findViewById(R.id.message_body);
 					viewHolder.time = view.findViewById(R.id.message_time);
 					viewHolder.indicatorReceived = view.findViewById(R.id.indicator_received);
@@ -797,7 +902,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			displayInfoMessage(viewHolder, activity.getString(R.string.omemo_decryption_failed), darkBackground);
 		} else {
 			if (message.isGeoUri()) {
-				displayOpenableMessage(viewHolder, message, darkBackground);
+				displayLocationMessage(viewHolder, message, darkBackground);
 			} else if (message.bodyIsOnlyEmojis() && message.getType() != Message.TYPE_PRIVATE) {
 				displayEmojiMessage(viewHolder, message.getBody().trim(), darkBackground);
 			} else if (message.treatAsDownloadable()) {
@@ -959,6 +1064,8 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		protected MessageReferenceBinding messageReferenceBinding;
 		protected Button download_button;
 		protected ImageView image;
+		protected GifImageView gifImage;
+		protected ImageView gif_btn;
 		protected ImageView indicator;
 		protected ImageView indicatorReceived;
 		protected TextView time;

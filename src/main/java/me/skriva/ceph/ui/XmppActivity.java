@@ -52,6 +52,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
@@ -82,6 +83,7 @@ import me.skriva.ceph.utils.ExceptionHelper;
 import me.skriva.ceph.utils.ThemeHelper;
 import me.skriva.ceph.xmpp.OnKeyStatusUpdated;
 import me.skriva.ceph.xmpp.OnUpdateBlocklist;
+import pl.droidsonroids.gif.GifDrawable;
 import rocks.xmpp.addr.Jid;
 
 public abstract class XmppActivity extends ActionBarActivity {

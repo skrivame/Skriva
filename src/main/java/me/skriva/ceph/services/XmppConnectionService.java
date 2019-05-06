@@ -107,6 +107,7 @@ import me.skriva.ceph.ui.ChooseAccountForProfilePictureActivity;
 import me.skriva.ceph.ui.SettingsActivity;
 import me.skriva.ceph.ui.UiCallback;
 import me.skriva.ceph.ui.XmppActivity;
+import me.skriva.ceph.ui.adapter.MessageAdapter;
 import me.skriva.ceph.ui.interfaces.OnAvatarPublication;
 import me.skriva.ceph.ui.interfaces.OnMediaLoaded;
 import me.skriva.ceph.ui.interfaces.OnSearchResultsAvailable;
