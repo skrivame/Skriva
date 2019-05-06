@@ -31,13 +31,14 @@ package me.skriva.ceph.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ImStyleParser {
 
     private final static List<Character> KEYWORDS = Arrays.asList('*', '_', '~', '`');
-    private final static List<Character> NO_SUB_PARSING_KEYWORDS = Arrays.asList('`');
-    private final static List<Character> BLOCK_KEYWORDS = Arrays.asList('`');
+    private final static List<Character> NO_SUB_PARSING_KEYWORDS = Collections.singletonList('`');
+    private final static List<Character> BLOCK_KEYWORDS = Collections.singletonList('`');
     private final static boolean ALLOW_EMPTY = false;
     private final static boolean PARSE_HIGHER_ORDER_END = true;
 

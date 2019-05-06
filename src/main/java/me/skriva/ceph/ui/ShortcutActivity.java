@@ -18,7 +18,7 @@ import me.skriva.ceph.entities.ListItem;
 
 public class ShortcutActivity extends AbstractSearchableListItemActivity {
 
-    private static final List<String> BLACKLISTED_ACTIVITIES = Arrays.asList("com.teslacoilsw.launcher.ChooseActionIntentActivity");
+    private static final List<String> BLACKLISTED_ACTIVITIES = Collections.singletonList("com.teslacoilsw.launcher.ChooseActionIntentActivity");
 
     @Override
     protected void refreshUiReal() {

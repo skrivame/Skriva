@@ -1296,8 +1296,7 @@ public class AxolotlService implements OnAdvancedStreamFeaturesLoaded {
 		if (jid == null) {
 			return false;
 		}
-		HashSet<XmppAxolotlSession> sessions = new HashSet<>();
-		sessions.addAll(this.sessions.getAll(getAddressForJid(jid).getName()).values());
+		HashSet<XmppAxolotlSession> sessions = new HashSet<>(this.sessions.getAll(getAddressForJid(jid).getName()).values());
 		if (sessions.isEmpty()) {
 			return false;
 		}
