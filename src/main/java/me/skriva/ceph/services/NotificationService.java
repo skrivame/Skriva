@@ -319,9 +319,36 @@ public class NotificationService {
             final Account account = conversation.getAccount();
             final boolean doNotify = (!(this.mIsInForeground && this.mOpenConversation == null) || !isScreenOn)
                     && !account.inGracePeriod()
-                    && !this.inMiniGracePeriod(account);
+                    && !this.inMiniGracePeriod(account)
+                    && notifyAgain((Conversation) conversation);
             updateNotification(doNotify, Collections.singletonList(conversation.getUuid()));
         }
+    }
+
+    /**
+     * This method should be used only by a method like {@link #push(Message)} for checking
+     * if the user should be notified for an incoming message while Conversations is not open
+     * or the screen off.
+     * Checks whether a recent receiving of a message inside the given conversation has already led to a notification.
+     * Multiple notifications for multiple incoming messages of one conversation closely following each other
+     * can be avoided by using this method when checking for the need of a new notification.
+     * @param conversation conversation which contains the incoming message maybe triggering a notification.
+     * @return true if the user should be notified or false otherwise
+     */
+    public boolean notifyAgain(Conversation conversation) {
+        // This is true if enough time has passed after the last receiving of a message.
+        boolean timePassed = System.currentTimeMillis() - conversation.getLastPossibleNotificationTime() > Config.MESSAGE_MERGE_WINDOW * 1000;
+
+        boolean notifyAgain = timePassed || conversation.wasResumed();
+        if (!notifyAgain) {
+            Log.d(Config.LOGTAG, conversation.getAccount().getJid().asBareJid()
+                    + ": suppressing notification because time difference to messsage received before is less than "
+                    + Config.MESSAGE_MERGE_WINDOW + "ms and ConversationFragment object"
+                    + "has not been resumed after receiving that message");
+        }
+        conversation.resetResumed();
+        conversation.updateLastPossibleNotificationTime();
+        return notifyAgain;
     }
 
     public void clear() {
