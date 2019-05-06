@@ -62,6 +62,7 @@ dependencies {
     implementation "com.leinardi.android:speed-dial:2.0.1"
     implementation 'com.vanniktech:emoji-google:0.6.0'
     implementation 'com.google.guava:guava:27.1-android'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
 }
 
 ext {
@@ -75,8 +76,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 104
-        versionName "1.0.1"
+        versionCode 105
+        versionName "1.0.2"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
         resValue "string", "applicationId", applicationId
