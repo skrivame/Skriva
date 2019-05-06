@@ -13,9 +13,10 @@ For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/
 ### Features
 - Fully OMEMO encrypted (except public groups)
 - Modern UI
-- Media Commenting
-- Emoji Keyboard
+- Media commenting
+- Emoji keyboard
 - Beginner friendly
+- Inline GIFs
 
 ### Useful links
 - [Homepage](https://skriva.me)
