@@ -50,7 +50,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'de.measite.minidns:minidns-hla:0.2.4'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
-    implementation 'org.whispersystems:signal-protocol-java:2.6.2'
+    implementation 'org.whispersystems:signal-protocol-java:2.7.1'
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation "com.wefika:flowlayout:0.4.1"
     implementation 'net.ypresto.androidtranscoder:android-transcoder:0.3.0'
@@ -76,7 +76,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 105
+        versionCode 107
         versionName "1.0.2"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
@@ -162,8 +162,6 @@ android {
             versionNameSuffix "d"
         }
     }
-
-
 
     if (new File("signing.properties").exists()) {
         Properties props = new Properties()

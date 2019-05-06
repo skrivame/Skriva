@@ -226,6 +226,11 @@ public class SQLiteAxolotlStore implements SignalProtocolStore {
 		return true;
 	}
 
+	@Override
+	public IdentityKey getIdentity(SignalProtocolAddress address) {
+		return null;
+	}
+
 	public FingerprintStatus getFingerprintStatus(String fingerprint) {
 		return (fingerprint == null)? null : trustCache.get(fingerprint);
 	}

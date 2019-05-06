@@ -1,6 +1,7 @@
 package me.skriva.ceph.ui.adapter;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -581,7 +582,9 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		this.audioPlayer.init(audioPlayer, message);
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
 	private void displayImageMessage(ViewHolder viewHolder, final Message message, final boolean darkBackground) {
+		double target = 0;
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.download_button.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
@@ -592,46 +595,48 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		}
 		String mime = file.getMimeType();
 		if (mime != null && mime.equals("image/gif")) {
-			Log.d(Config.LOGTAG, "Gif Image file");
+			Log.d(Config.LOGTAG, "GIF Image");
+			target = metrics.density * 800;
 			viewHolder.image.setVisibility(View.GONE);
 			viewHolder.gifImage.setVisibility(View.VISIBLE);
-			FileParams params = message.getFileParams();
-			double target = metrics.density * 800;
-			int scaledW;
-			int scaledH;
-			if (Math.max(params.height, params.width) * metrics.density <= target) {
-				scaledW = (int) (params.width * metrics.density);
-				scaledH = (int) (params.height * metrics.density);
-			} else if (Math.max(params.height, params.width) <= target) {
-				scaledW = params.width;
-				scaledH = params.height;
-			} else if (params.width <= params.height) {
-				scaledW = (int) (params.width / ((double) params.height / target));
-				scaledH = (int) target;
-			} else {
-				scaledW = (int) target;
-				scaledH = (int) (params.height / ((double) params.width / target));
-			}
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(scaledW, scaledH);
+		} else {
+			Log.d(Config.LOGTAG, "Image");
+			target = metrics.density * 200;
+			viewHolder.image.setVisibility(View.VISIBLE);
+			viewHolder.gifImage.setVisibility(View.GONE);
+			viewHolder.gif_btn.setVisibility(View.GONE);
+		}
+		FileParams params = message.getFileParams();
+		int scaledW;
+		int scaledH;
+		if (Math.max(params.height, params.width) * metrics.density <= target) {
+			scaledW = (int) (params.width * metrics.density);
+			scaledH = (int) (params.height * metrics.density);
+		} else if (Math.max(params.height, params.width) <= target) {
+			scaledW = params.width;
+			scaledH = params.height;
+		} else if (params.width <= params.height) {
+			scaledW = (int) (params.width / ((double) params.height / target));
+			scaledH = (int) target;
+		} else {
+			scaledW = (int) target;
+			scaledH = (int) (params.height / ((double) params.width / target));
+		}
+		if (mime != null && mime.equals("image/gif")) {
+			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(scaledW, scaledH);
 			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
 			viewHolder.gifImage.setLayoutParams(layoutParams);
-
 			if (message.getMimeType() != null && message.getMimeType().endsWith("/gif")) {
 				GifDrawable drawable;
 				try {
-					File gif = activity.xmppConnectionService.getFileBackend().getFile(message);
-					drawable = new GifDrawable(gif);
-				}
-				catch (IOException error) {
-					// TODO: something better?
-					error.printStackTrace();
+					drawable = new GifDrawable(file);
+				} catch (IOException error) {
+					Log.d(Config.LOGTAG, "File not found.");
 					return;
 				}
 				drawable.stop();
 				viewHolder.gif_btn.setVisibility(View.VISIBLE);
-
 				viewHolder.gifImage.setImageDrawable(drawable);
-
 				viewHolder.gifImage.setOnTouchListener(new View.OnTouchListener() {
 					private GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
 						@Override
@@ -660,26 +665,6 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			}
 			viewHolder.gifImage.setOnClickListener(v -> openDownloadable(message));
 		} else {
-			viewHolder.image.setVisibility(View.VISIBLE);
-			viewHolder.gifImage.setVisibility(View.GONE);
-			viewHolder.gif_btn.setVisibility(View.GONE);
-			FileParams params = message.getFileParams();
-			double target = metrics.density * 200;
-			int scaledW;
-			int scaledH;
-			if (Math.max(params.height, params.width) * metrics.density <= target) {
-				scaledW = (int) (params.width * metrics.density);
-				scaledH = (int) (params.height * metrics.density);
-			} else if (Math.max(params.height, params.width) <= target) {
-				scaledW = params.width;
-				scaledH = params.height;
-			} else if (params.width <= params.height) {
-				scaledW = (int) (params.width / ((double) params.height / target));
-				scaledH = (int) target;
-			} else {
-				scaledW = (int) target;
-				scaledH = (int) (params.height / ((double) params.width / target));
-			}
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaledW, scaledH);
 			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
 			viewHolder.image.setLayoutParams(layoutParams);

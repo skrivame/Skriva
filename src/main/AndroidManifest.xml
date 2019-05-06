@@ -59,10 +59,6 @@
         tools:replace="android:label"
         tools:targetApi="o">
 
-        <meta-data
-            android:name="com.google.android.gms.car.application"
-            android:resource="@xml/automotive_app_desc" />
-
         <service android:name="me.skriva.ceph.services.XmppConnectionService" />
 
         <receiver android:name="me.skriva.ceph.services.EventReceiver">
