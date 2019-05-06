@@ -58,6 +58,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
@@ -398,7 +399,7 @@ public class MemorizingTrustManager {
 	public void checkCertTrusted(X509Certificate[] chain, String authType, String domain, boolean isServer, boolean interactive)
 		throws CertificateException
 	{
-		LOGGER.log(Level.FINE, "checkCertTrusted(" + chain + ", " + authType + ", " + isServer + ")");
+		LOGGER.log(Level.FINE, "checkCertTrusted(" + Arrays.toString(chain) + ", " + authType + ", " + isServer + ")");
 		try {
 			LOGGER.log(Level.FINE, "checkCertTrusted: trying appTrustManager");
 			if (isServer)
