@@ -1646,7 +1646,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     public void onResume() {
         super.onResume();
         binding.messagesView.post(this::fireReadEvent);
-        conversation.resumed();
     }
 
     private void fireReadEvent() {

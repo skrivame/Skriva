@@ -337,9 +337,9 @@ public class NotificationService {
      */
     public boolean notifyAgain(Conversation conversation) {
         // This is true if enough time has passed after the last receiving of a message.
-        boolean timePassed = System.currentTimeMillis() - conversation.getLastPossibleNotificationTime() > Config.MESSAGE_MERGE_WINDOW * 1000;
+        boolean timePassed = System.currentTimeMillis() - conversation.getLastPossibleNotificationTime() > 1000;
 
-        boolean notifyAgain = timePassed || conversation.wasResumed();
+        boolean notifyAgain = timePassed;
         if (!notifyAgain) {
             Log.d(Config.LOGTAG, conversation.getAccount().getJid().asBareJid()
                     + ": suppressing notification because time difference to messsage received before is less than "
