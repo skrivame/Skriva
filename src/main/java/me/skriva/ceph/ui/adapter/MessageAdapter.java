@@ -21,11 +21,9 @@ import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -40,7 +38,6 @@ import android.widget.Toast;
 
 import com.google.common.base.Strings;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -592,7 +589,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			Toast.makeText(activity, R.string.file_deleted, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		double target = 0;
+		double target;
 		String mime = file.getMimeType();
 		if (mime != null && mime.equals("image/gif")) {
 			Log.d(Config.LOGTAG, "GIF Image");
@@ -637,33 +634,20 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				drawable.stop();
 				viewHolder.gif_btn.setVisibility(View.VISIBLE);
 				viewHolder.gifImage.setImageDrawable(drawable);
-				viewHolder.gifImage.setOnTouchListener(new View.OnTouchListener() {
-					private GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-						@Override
-						public boolean onSingleTapUp(MotionEvent e) {
-							GifDrawable gif = ((GifDrawable) viewHolder.gifImage.getDrawable());
+				viewHolder.gifImage.setOnClickListener(v -> {
+					GifDrawable gif = ((GifDrawable) viewHolder.gifImage.getDrawable());
 
-							// Play/Pause
-							if (gif.isRunning()) {
-								gif.stop();
-								viewHolder.gif_btn.setVisibility(View.VISIBLE);
-							} else {
-								gif.start();
-								viewHolder.gif_btn.setVisibility(View.INVISIBLE);
-							}
-
-							return true;
-						}
-					});
-
-					@Override
-					public boolean onTouch(View v, MotionEvent event) {
-						gestureDetector.onTouchEvent(event);
-						return true;
+					// Play/Pause
+					if (gif.isRunning()) {
+						gif.stop();
+						viewHolder.gif_btn.setVisibility(View.VISIBLE);
+					} else {
+						gif.start();
+						viewHolder.gif_btn.setVisibility(View.INVISIBLE);
 					}
+
 				});
 			}
-			viewHolder.gifImage.setOnClickListener(v -> openDownloadable(message));
 		} else {
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaledW, scaledH);
 			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
