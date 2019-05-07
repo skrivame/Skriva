@@ -584,7 +584,6 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 
 	@SuppressLint("ClickableViewAccessibility")
 	private void displayImageMessage(ViewHolder viewHolder, final Message message, final boolean darkBackground) {
-		double target = 0;
 		toggleWhisperInfo(viewHolder, message, darkBackground);
 		viewHolder.download_button.setVisibility(View.GONE);
 		viewHolder.audioPlayer.setVisibility(View.GONE);
@@ -593,6 +592,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			Toast.makeText(activity, R.string.file_deleted, Toast.LENGTH_SHORT).show();
 			return;
 		}
+		double target = 0;
 		String mime = file.getMimeType();
 		if (mime != null && mime.equals("image/gif")) {
 			Log.d(Config.LOGTAG, "GIF Image");
@@ -903,7 +903,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 								message,
 								activity.getString(R.string.check_x_filesize_on_host,
 										UIHelper.getFileDescriptionString(activity, message),url.getHost()),
-										darkBackground);
+								darkBackground);
 					}
 				} catch (Exception e) {
 					displayDownloadableMessage(viewHolder,
