@@ -466,6 +466,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                                 binding.textinput.append(conversation.getDraftMessage());
                                 conversation.setDraftMessage(null);
                             } else if (conversation.getMode() == Conversation.MODE_MULTI) {
+                                conversation.setNextCounterpart(null);
                                 binding.textinput.setText("");
                             } else {
                                 binding.textinput.setText("");
@@ -762,6 +763,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         final Message message;
         if (conversation.getCorrectingMessage() == null) {
             message = new Message(conversation, body, conversation.getNextEncryption());
+            Message.configurePrivateMessage(message);
 
             // Set the message reference for the message to be sent.
             final String messageReference = conversation.getMessageReference();
@@ -775,8 +777,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                 // Hide the whole area where the referenced message was displayed.
                 MessageReferenceUtils.hideMessageReference(binding.messageReferencePreview);
             }
-
-            Message.configurePrivateMessage(message);
         } else {
             message = conversation.getCorrectingMessage();
             message.setBody(body);
@@ -831,6 +831,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         } else if (conversation.getMessageReference() != null) {
             this.binding.textinput.setHint(R.string.comment);
         } else if (multi && conversation.getNextCounterpart() != null) {
+            this.binding.textinput.setHint(R.string.send_unencrypted_message);
             this.binding.textinput.setHint(getString(
                     R.string.send_private_message_to,
                     conversation.getNextCounterpart().getResource()));

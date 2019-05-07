@@ -43,16 +43,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/message_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:background="@color/black87"
-                    android:clickable="true"
-                    android:longClickable="true"
-                    android:scaleType="centerCrop" />
-
                 <include layout="@layout/message_reference"
                     android:id="@+id/message_reference" />
 
@@ -63,17 +53,27 @@
                     android:autoLink="web"
                     android:longClickable="true"
                     android:textAppearance="@style/TextAppearance.Conversations.Body1" />
+
+                <Button
+                    android:id="@+id/download_button"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:longClickable="true"
+                    android:visibility="gone" />
+
+                <ImageView
+                    android:id="@+id/message_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:background="@color/black87"
+                    android:clickable="true"
+                    android:longClickable="true"
+                    android:scaleType="centerCrop" />
             </LinearLayout>
 
         </FrameLayout>
-
-        <Button
-            android:id="@+id/download_button"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:longClickable="true"
-            android:visibility="gone" />
 
         <RelativeLayout
             android:id="@+id/audio_player"

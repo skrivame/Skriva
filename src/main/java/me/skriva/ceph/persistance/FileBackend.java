@@ -1261,7 +1261,7 @@ public class FileBackend {
         }
         message.setBody(body.toString());
         message.setDeleted(false);
-        message.setType(image ? Message.TYPE_IMAGE : Message.TYPE_FILE);
+        message.setType(privateMessage ? Message.TYPE_PRIVATE_FILE : (image ? Message.TYPE_IMAGE : Message.TYPE_FILE));
     }
 
 
