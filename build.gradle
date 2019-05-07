@@ -76,7 +76,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 107
+        versionCode 110
         versionName "1.0.2"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
