@@ -1,6 +1,7 @@
 <div align="center">
 <img src="https://i.ibb.co/ZVd9Gvq/github-logo.png" alt="github-logo" border="0"><br>
-<img alt="GitHub" src="https://img.shields.io/github/license/skrivame/Skriva.svg?style=flat-square"> <img alt="GitHub issues" src="https://img.shields.io/github/issues/skrivame/Skriva.svg?style=flat-square"><br>
+<img alt="GitHub" src="https://img.shields.io/github/license/skrivame/Skriva.svg?style=flat-square"> <img alt="GitHub issues" src="https://img.shields.io/github/issues/skrivame/Skriva.svg?style=flat-square"> <img alt="Travis (.org)" src="https://img.shields.io/travis/skrivame/Skriva.svg?style=popout-square">
+<br>
 <h2>Secure communication made simple</h2><br>
 <img src="https://i.ibb.co/6YvjZLy/Unbenannt-4-compressor.png" alt="Unbenannt-4-compressor" border="0"><br />
 </div>
