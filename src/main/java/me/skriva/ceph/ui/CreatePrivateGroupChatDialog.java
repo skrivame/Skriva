@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -42,6 +43,13 @@ public class CreatePrivateGroupChatDialog extends DialogFragment {
         builder.setTitle(R.string.create_private_group_chat);
         CreateConferenceDialogBinding binding = DataBindingUtil.inflate(getActivity().getLayoutInflater(), R.layout.create_conference_dialog, null, false);
         ArrayList<String> mActivatedAccounts = getArguments().getStringArrayList(ACCOUNTS_LIST_KEY);
+        if (mActivatedAccounts.size() == 1) {
+            binding.account.setVisibility(View.GONE);
+            binding.yourAccount.setVisibility(View.GONE);
+        } else {
+            binding.account.setVisibility(View.VISIBLE);
+            binding.yourAccount.setVisibility(View.VISIBLE);
+        }
         StartConversationActivity.populateAccountSpinner(getActivity(), mActivatedAccounts, binding.account);
         builder.setView(binding.getRoot());
         builder.setPositiveButton(R.string.choose_participants, (dialog, which) -> mListener.onCreateDialogPositiveClick(binding.account, binding.groupChatName.getText().toString().trim()));
