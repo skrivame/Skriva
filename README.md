@@ -18,6 +18,7 @@ For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/
 - Emoji keyboard
 - Beginner friendly
 - Inline GIFs
+- Internal image viewer
 
 ### Useful links
 - [Homepage](https://skriva.me)
