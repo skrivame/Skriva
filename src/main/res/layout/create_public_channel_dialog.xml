@@ -9,6 +9,7 @@
         android:padding="?dialogPreferredPadding">
 
         <TextView
+            android:id="@+id/your_account"
             style="@style/InputLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

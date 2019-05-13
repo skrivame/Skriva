@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
 
@@ -56,6 +57,13 @@ public class JoinConferenceDialog extends DialogFragment implements OnBackendCon
 		String prefilledJid = getArguments().getString(PREFILLED_JID_KEY);
 		if (prefilledJid != null) {
 			binding.jid.append(prefilledJid);
+		}
+		if (getArguments().getStringArrayList(ACCOUNTS_LIST_KEY).size() == 1) {
+			binding.account.setVisibility(View.GONE);
+			binding.yourAccount.setVisibility(View.GONE);
+		} else {
+			binding.account.setVisibility(View.VISIBLE);
+			binding.yourAccount.setVisibility(View.VISIBLE);
 		}
 		StartConversationActivity.populateAccountSpinner(getActivity(), getArguments().getStringArrayList(ACCOUNTS_LIST_KEY), binding.account);
 		builder.setView(binding.getRoot());

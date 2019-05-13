@@ -84,6 +84,8 @@
             android:name="me.skriva.ceph.ui.ShowLocationActivity"
             android:label="@string/title_activity_show_location" />
         <activity
+            android:name="me.skriva.ceph.ui.FullscreenImageActivity" />
+        <activity
             android:name="me.skriva.ceph.ui.ConversationActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>

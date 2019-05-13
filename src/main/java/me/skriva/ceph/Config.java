@@ -16,11 +16,11 @@ public final class Config {
     private static final int ENCRYPTION_MASK = UNENCRYPTED  | OMEMO;
 
     public static boolean supportOmemo() {
-        return (ENCRYPTION_MASK & OMEMO) != 0;
+        return true;
     }
 
     public static boolean multipleEncryptionChoices() {
-        return (ENCRYPTION_MASK & (ENCRYPTION_MASK - 1)) != 0;
+        return false;
     }
 
     public static final String LOGTAG = BuildConfig.LOGTAG;
@@ -135,7 +135,7 @@ public final class Config {
             "TLS_RSA_WITH_AES_256_CBC_SHA",
     };
 
-    public static final String WEAK_CIPHER_PATTERNS[] = {
+    public static final String[] WEAK_CIPHER_PATTERNS = {
             "_NULL_",
             "_EXPORT_",
             "_anon_",

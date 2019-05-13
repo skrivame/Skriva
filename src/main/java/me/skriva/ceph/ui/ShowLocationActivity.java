@@ -1,5 +1,6 @@
 package me.skriva.ceph.ui;
 
+import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -197,6 +198,7 @@ public class ShowLocationActivity extends LocationActivity implements LocationLi
 		)));
 	}
 
+	@SuppressLint("RestrictedApi")
 	@Override
 	protected void updateUi() {
 		final Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=0,0"));

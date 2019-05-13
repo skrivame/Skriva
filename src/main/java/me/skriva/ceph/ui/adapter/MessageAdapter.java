@@ -61,6 +61,7 @@ import me.skriva.ceph.services.MessageArchiveService;
 import me.skriva.ceph.services.NotificationService;
 import me.skriva.ceph.ui.ConversationFragment;
 import me.skriva.ceph.ui.ConversationsActivity;
+import me.skriva.ceph.ui.FullscreenImageActivity;
 import me.skriva.ceph.ui.XmppActivity;
 import me.skriva.ceph.ui.service.AudioPlayer;
 import me.skriva.ceph.ui.text.DividerSpan;
@@ -635,14 +636,12 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				viewHolder.gif_btn.setVisibility(View.VISIBLE);
 				viewHolder.gifImage.setImageDrawable(drawable);
 				viewHolder.gifImage.setOnClickListener(v -> {
-					GifDrawable gif = ((GifDrawable) viewHolder.gifImage.getDrawable());
-
 					// Play/Pause
-					if (gif.isRunning()) {
-						gif.stop();
+					if (drawable.isRunning()) {
+						drawable.stop();
 						viewHolder.gif_btn.setVisibility(View.VISIBLE);
 					} else {
-						gif.start();
+						drawable.start();
 						viewHolder.gif_btn.setVisibility(View.INVISIBLE);
 					}
 
@@ -653,7 +652,11 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
 			viewHolder.image.setLayoutParams(layoutParams);
 			activity.loadBitmap(message, viewHolder.image);
-			viewHolder.image.setOnClickListener(v -> openDownloadable(message));
+			if (mime != null && mime.startsWith("image/") && !mime.contains("gif")) {
+				viewHolder.image.setOnClickListener(v -> showImage(message));
+			} else {
+				viewHolder.image.setOnClickListener(v -> openDownloadable(message));
+			}
 		}
 	}
 
@@ -989,6 +992,11 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		}
 		final DownloadableFile file = activity.xmppConnectionService.getFileBackend().getFile(message);
 		ViewUtil.view(activity, file);
+	}
+
+	private void showImage(Message message) {
+		final DownloadableFile file = activity.xmppConnectionService.getFileBackend().getFile(message);
+		FullscreenImageActivity.start(getContext(), String.valueOf(file));
 	}
 
 	private void showLocation(Message message) {

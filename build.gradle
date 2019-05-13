@@ -16,6 +16,7 @@ repositories {
     google()
     jcenter()
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 configurations {
@@ -63,6 +64,8 @@ dependencies {
     implementation 'com.vanniktech:emoji-google:0.6.0'
     implementation 'com.google.guava:guava:27.1-android'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
+    implementation 'com.facebook.fresco:fresco:1.13.0'
+    implementation 'com.github.piasy:BigImageViewer:1.5.7'
 }
 
 ext {
@@ -76,8 +79,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 110
-        versionName "1.0.2"
+        versionCode 113
+        versionName "1.0.3"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
         resValue "string", "applicationId", applicationId
@@ -93,6 +96,7 @@ android {
         // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
         preDexLibraries = preDexEnabled && !travisBuild
         jumboMode true
+        javaMaxHeapSize "8g"
     }
 
     compileOptions {

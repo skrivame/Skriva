@@ -71,6 +71,7 @@ public class EnterJidDialog extends DialogFragment implements OnBackendConnected
 		final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getArguments().getString(TITLE_KEY));
 		EnterJidDialogBinding binding = DataBindingUtil.inflate(getActivity().getLayoutInflater(), R.layout.enter_jid_dialog, null, false);
+		ArrayList<String> mActivatedAccounts = getArguments().getStringArrayList(ACCOUNTS_LIST_KEY);
 		this.knownHostsAdapter = new KnownHostsAdapter(getActivity(), R.layout.simple_list_item);
 		binding.jid.setAdapter(this.knownHostsAdapter);
 		String prefilledJid = getArguments().getString(PREFILLED_JID_KEY);
@@ -86,9 +87,17 @@ public class EnterJidDialog extends DialogFragment implements OnBackendConnected
 
 		DelayedHintHelper.setHint(R.string.account_settings_example_jabber_id, binding.jid);
 
+		if (mActivatedAccounts.size() == 1) {
+			binding.account.setVisibility(View.GONE);
+			binding.yourAccount.setVisibility(View.GONE);
+		} else {
+			binding.account.setVisibility(View.VISIBLE);
+			binding.yourAccount.setVisibility(View.VISIBLE);
+		}
+
 		String account = getArguments().getString(ACCOUNT_KEY);
 		if (account == null) {
-			StartConversationActivity.populateAccountSpinner(getActivity(), getArguments().getStringArrayList(ACCOUNTS_LIST_KEY), binding.account);
+			StartConversationActivity.populateAccountSpinner(getActivity(), mActivatedAccounts, binding.account);
 		} else {
 			ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
 					R.layout.simple_list_item,

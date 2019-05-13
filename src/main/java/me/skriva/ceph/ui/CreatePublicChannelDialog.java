@@ -102,6 +102,13 @@ public class CreatePublicChannelDialog extends DialogFragment implements OnBacke
         });
         updateInputs(binding,false);
         ArrayList<String> mActivatedAccounts = getArguments().getStringArrayList(ACCOUNTS_LIST_KEY);
+        if (mActivatedAccounts.size() == 1) {
+            binding.account.setVisibility(View.GONE);
+            binding.yourAccount.setVisibility(View.GONE);
+        } else {
+            binding.account.setVisibility(View.VISIBLE);
+            binding.yourAccount.setVisibility(View.VISIBLE);
+        }
         StartConversationActivity.populateAccountSpinner(getActivity(), mActivatedAccounts, binding.account);
         builder.setView(binding.getRoot());
         builder.setPositiveButton(nameEntered ? R.string.create : R.string.next, null);
