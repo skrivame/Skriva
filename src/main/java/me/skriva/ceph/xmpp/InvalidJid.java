@@ -29,7 +29,7 @@
 
 package me.skriva.ceph.xmpp;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import me.skriva.ceph.xmpp.stanzas.AbstractStanza;
 import rocks.xmpp.addr.Jid;

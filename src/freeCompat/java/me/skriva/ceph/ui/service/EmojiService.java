@@ -2,8 +2,8 @@ package me.skriva.ceph.ui.service;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.text.emoji.EmojiCompat;
-import android.support.text.emoji.bundled.BundledEmojiCompatConfig;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.bundled.BundledEmojiCompatConfig;
 
 public class EmojiService {
 

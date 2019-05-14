@@ -30,37 +30,37 @@ ext {
 }
 
 dependencies {
-    playstoreImplementation('com.google.firebase:firebase-messaging:17.4.0') {
+    playstoreImplementation('com.google.firebase:firebase-messaging:18.0.0') {
         exclude group: 'com.google.firebase', module: 'firebase-core'
         exclude group: 'com.google.firebase', module: 'firebase-analytics'
         exclude group: 'com.google.firebase', module: 'firebase-measurement-connector'
     }
-    implementation ('com.theartofdev.edmodo:android-image-cropper:2.7.+') {
+    implementation ('com.theartofdev.edmodo:android-image-cropper:2.8.+') {
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'exifinterface'
     }
-    implementation "com.android.support:support-v13:$supportLibVersion"
-    implementation "com.android.support:appcompat-v7:$supportLibVersion"
-    implementation "com.android.support:exifinterface:$supportLibVersion"
-    implementation "com.android.support:cardview-v7:$supportLibVersion"
-    implementation "com.android.support:support-emoji:$supportLibVersion"
-    implementation "com.android.support:design:$supportLibVersion"
-    compatImplementation "com.android.support:support-emoji-appcompat:$supportLibVersion"
-    skrivaFreeCompatImplementation "com.android.support:support-emoji-bundled:$supportLibVersion"
+    implementation 'androidx.legacy:legacy-support-v13:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.exifinterface:exifinterface:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.emoji:emoji:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    compatImplementation 'androidx.emoji:emoji-appcompat:1.0.0'
+    skrivaFreeCompatImplementation 'androidx.emoji:emoji-bundled:1.0.0'
     implementation 'org.bouncycastle:bcmail-jdk15on:1.61'
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'de.measite.minidns:minidns-hla:0.2.4'
     implementation 'me.leolin:ShortcutBadger:1.1.22@aar'
     implementation 'org.whispersystems:signal-protocol-java:2.7.1'
     implementation 'com.makeramen:roundedimageview:2.3.0'
-    implementation "com.wefika:flowlayout:0.4.1"
+    implementation 'com.wefika:flowlayout:0.4.1'
     implementation 'net.ypresto.androidtranscoder:android-transcoder:0.3.0'
     implementation project(':libs:xmpp-addr')
     implementation 'org.osmdroid:osmdroid-android:6.1.0'
     implementation 'org.hsluv:hsluv:0.2'
     implementation 'org.conscrypt:conscrypt-android:2.1.0'
     implementation 'me.drakeet.support:toastcompat:1.1.0'
-    implementation "com.leinardi.android:speed-dial:2.0.1"
+    implementation 'com.leinardi.android:speed-dial:2.0.1'
     implementation 'com.vanniktech:emoji-google:0.6.0'
     implementation 'com.google.guava:guava:27.1-android'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
@@ -79,7 +79,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 113
+        versionCode 114
         versionName "1.0.3"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
@@ -96,7 +96,7 @@ android {
         // Skip pre-dexing when running on Travis CI or when disabled via -Dpre-dex=false.
         preDexLibraries = preDexEnabled && !travisBuild
         jumboMode true
-        javaMaxHeapSize "8g"
+        javaMaxHeapSize "12g"
     }
 
     compileOptions {

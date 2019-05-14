@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/activity_vertical_margin"
@@ -93,7 +93,7 @@
                                         android:layout_alignParentLeft="true"
                                         android:layout_toLeftOf="@+id/edit_muc_name_button">
 
-                                        <android.support.design.widget.TextInputLayout
+                                        <com.google.android.material.textfield.TextInputLayout
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             app:errorTextAppearance="@style/TextAppearance.Conversations.Design.Error"
@@ -105,9 +105,9 @@
                                                 android:layout_height="wrap_content"
                                                 android:hint="@string/group_chat_name"
                                                 android:textAppearance="@style/Widget.Conversations.EditText"/>
-                                        </android.support.design.widget.TextInputLayout>
+                                        </com.google.android.material.textfield.TextInputLayout>
 
-                                        <android.support.design.widget.TextInputLayout
+                                        <com.google.android.material.textfield.TextInputLayout
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             app:errorTextAppearance="@style/TextAppearance.Conversations.Design.Error"
@@ -119,7 +119,7 @@
                                                 android:layout_height="wrap_content"
                                                 android:hint="@string/topic"
                                                 android:textAppearance="@style/Widget.Conversations.EditText"/>
-                                        </android.support.design.widget.TextInputLayout>
+                                        </com.google.android.material.textfield.TextInputLayout>
 
                                     </LinearLayout>
 
@@ -209,9 +209,9 @@
                             android:layout_marginTop="32dp"
                             android:textAppearance="@style/TextAppearance.Conversations.Caption"/>
                     </LinearLayout>
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:id="@+id/users_wrapper"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -235,7 +235,7 @@
                             android:text="@string/no_users_hint_channel"
                             android:textAppearance="@style/TextAppearance.Conversations.Body2"/>
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/users"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -276,9 +276,9 @@
                                 android:textColor="?attr/colorAccent" />
                         </LinearLayout>
                     </LinearLayout>
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="@dimen/activity_vertical_margin"
@@ -370,8 +370,8 @@
                             android:text="@string/using_account"
                             android:textAppearance="@style/TextAppearance.Conversations.Caption"/>
                     </LinearLayout>
-                </android.support.v7.widget.CardView>
-                <android.support.v7.widget.CardView
+                </androidx.cardview.widget.CardView>
+                <androidx.cardview.widget.CardView
                     android:id="@+id/media_wrapper"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -385,7 +385,7 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
 
-                        <android.support.v7.widget.RecyclerView
+                        <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/media"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -415,7 +415,7 @@
                                 android:textColor="?attr/colorAccent" />
                         </LinearLayout>
                     </LinearLayout>
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
         </ScrollView>

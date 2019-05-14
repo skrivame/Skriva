@@ -1,7 +1,7 @@
 package me.skriva.ceph.utils;
 
 import android.content.Context;
-import android.support.annotation.ColorInt;
+import androidx.annotation.ColorInt;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;

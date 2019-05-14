@@ -1,11 +1,11 @@
 package me.skriva.ceph.ui;
 
 import android.app.Activity;
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import androidx.databinding.DataBindingUtil;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.view.View;
 import android.widget.ArrayAdapter;

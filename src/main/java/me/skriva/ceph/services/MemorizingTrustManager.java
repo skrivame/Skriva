@@ -26,7 +26,7 @@
  */
 package me.skriva.ceph.services;
 
-import android.support.v7.app.AppCompatActivity ;
+import androidx.appcompat.app.AppCompatActivity ;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.app.Service;

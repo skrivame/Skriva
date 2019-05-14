@@ -2,7 +2,7 @@ package me.skriva.ceph.entities;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Base64;
 
 import java.io.UnsupportedEncodingException;

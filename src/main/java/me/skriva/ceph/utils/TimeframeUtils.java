@@ -30,7 +30,7 @@
 package me.skriva.ceph.utils;
 
 import android.content.Context;
-import android.support.annotation.PluralsRes;
+import androidx.annotation.PluralsRes;
 
 import me.skriva.ceph.R;
 

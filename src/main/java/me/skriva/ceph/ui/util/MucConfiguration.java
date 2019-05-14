@@ -2,7 +2,7 @@ package me.skriva.ceph.ui.util;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 import me.skriva.ceph.R;
 import me.skriva.ceph.entities.MucOptions;
