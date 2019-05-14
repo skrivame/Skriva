@@ -20,9 +20,9 @@ import rocks.xmpp.addr.Jid;
 
 public abstract class AbstractParser {
 
-	protected XmppConnectionService mXmppConnectionService;
+	final XmppConnectionService mXmppConnectionService;
 
-	protected AbstractParser(XmppConnectionService service) {
+	AbstractParser(XmppConnectionService service) {
 		this.mXmppConnectionService = service;
 	}
 
@@ -30,7 +30,7 @@ public abstract class AbstractParser {
 		return parseTimestamp(element,d,false);
 	}
 
-	public static Long parseTimestamp(Element element, Long d, boolean ignoreCsiAndSm) {
+	static Long parseTimestamp(Element element, Long d, boolean ignoreCsiAndSm) {
 		long min = Long.MAX_VALUE;
 		boolean returnDefault = true;
 		final Jid to;
@@ -63,11 +63,11 @@ public abstract class AbstractParser {
 		}
 	}
 
-	public static long parseTimestamp(Element element) {
+	static long parseTimestamp(Element element) {
 		return parseTimestamp(element, System.currentTimeMillis());
 	}
 
-	public static long parseTimestamp(String timestamp) throws ParseException {
+	static long parseTimestamp(String timestamp) throws ParseException {
 		timestamp = timestamp.replace("Z", "+0000");
 		SimpleDateFormat dateFormat;
 		long ms;
@@ -82,17 +82,17 @@ public abstract class AbstractParser {
 		} else {
 			ms = 0;
 		}
-		timestamp = timestamp.substring(0,19)+timestamp.substring(timestamp.length() -5,timestamp.length());
+		timestamp = timestamp.substring(0,19)+timestamp.substring(timestamp.length() -5);
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ",Locale.US);
 		return Math.min(dateFormat.parse(timestamp).getTime()+ms, System.currentTimeMillis());
 	}
 
-	protected void updateLastseen(final Account account, final Jid from) {
+	void updateLastseen(final Account account, final Jid from) {
 		final Contact contact = account.getRoster().getContact(from);
 		contact.setLastResource(from.isBareJid() ? "" : from.getResource());
 	}
 
-	protected String avatarData(Element items) {
+	String avatarData(Element items) {
 		Element item = items.findChild("item");
 		if (item == null) {
 			return null;
@@ -104,7 +104,7 @@ public abstract class AbstractParser {
 		return parseItem(conference,item, null);
 	}
 
-	public static MucOptions.User parseItem(Conversation conference, Element item, Jid fullJid) {
+	static MucOptions.User parseItem(Conversation conference, Element item, Jid fullJid) {
 		final String local = conference.getJid().getLocal();
 		final String domain = conference.getJid().getDomain();
 		String affiliation = item.getAttribute("affiliation");

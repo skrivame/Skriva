@@ -64,7 +64,7 @@ public class GridManager {
         }
     }
 
-    public static class ColumnInfo {
+    static class ColumnInfo {
         private final int count;
         private final int width;
 

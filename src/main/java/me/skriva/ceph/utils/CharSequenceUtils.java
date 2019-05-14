@@ -34,7 +34,7 @@ import android.text.Spannable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CharSequenceUtils {
+class CharSequenceUtils {
 
 	private static int getStartIndex(CharSequence input) {
 		int length = input.length();

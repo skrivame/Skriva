@@ -55,7 +55,7 @@ public class TrustKeysActivity extends OmemoActivity implements OnKeyStatusUpdat
 		commitTrusts();
 		finishOk(false);
 	};
-	private AtomicBoolean mUseCameraHintShown = new AtomicBoolean(false);
+	private final AtomicBoolean mUseCameraHintShown = new AtomicBoolean(false);
 	private AxolotlService.FetchStatus lastFetchReport = AxolotlService.FetchStatus.SUCCESS;
 	private Toast mUseCameraHintToast = null;
 	private ActivityTrustKeysBinding binding;
@@ -113,15 +113,14 @@ public class TrustKeysActivity extends OmemoActivity implements OnKeyStatusUpdat
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.action_scan_qr_code:
-				if (hasPendingKeyFetches()) {
-					Toast.makeText(this, R.string.please_wait_for_keys_to_be_fetched, Toast.LENGTH_SHORT).show();
-				} else {
-					ScanActivity.scan(this);
-					//new IntentIntegrator(this).initiateScan(Arrays.asList("AZTEC","QR_CODE"));
-					return true;
-				}
+		if (item.getItemId() == R.id.action_scan_qr_code) {
+			if (hasPendingKeyFetches()) {
+				Toast.makeText(this, R.string.please_wait_for_keys_to_be_fetched, Toast.LENGTH_SHORT).show();
+			} else {
+				ScanActivity.scan(this);
+				//new IntentIntegrator(this).initiateScan(Arrays.asList("AZTEC","QR_CODE"));
+				return true;
+			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -151,7 +150,7 @@ public class TrustKeysActivity extends OmemoActivity implements OnKeyStatusUpdat
 			}
 		} else {
 			reloadFingerprints();
-			Log.d(Config.LOGTAG, "xmpp uri was: " + uri.getJid() + " has Fingerprints: " + Boolean.toString(uri.hasFingerprints()));
+			Log.d(Config.LOGTAG, "xmpp uri was: " + uri.getJid() + " has Fingerprints: " + uri.hasFingerprints());
 			Toast.makeText(this, R.string.barcode_does_not_contain_fingerprints_for_this_conversation, Toast.LENGTH_SHORT).show();
 		}
 		populateView();

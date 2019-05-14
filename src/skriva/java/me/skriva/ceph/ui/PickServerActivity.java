@@ -8,11 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import java.util.List;
-
 import me.skriva.ceph.R;
 import me.skriva.ceph.databinding.ActivityPickServerBinding;
-import me.skriva.ceph.entities.Account;
 
 public class PickServerActivity extends XmppActivity {
 
@@ -76,7 +73,7 @@ public class PickServerActivity extends XmppActivity {
         });
     }
 
-    public void addInviteUri(Intent intent) {
+    private void addInviteUri(Intent intent) {
         StartConversationActivity.addInviteUri(intent, getIntent());
     }
 

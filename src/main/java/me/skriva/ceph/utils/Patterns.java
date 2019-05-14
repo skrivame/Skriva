@@ -124,7 +124,7 @@ public class Patterns {
      *
      *  @hide
      */
-    static final String IANA_TOP_LEVEL_DOMAINS =
+    private static final String IANA_TOP_LEVEL_DOMAINS =
             "(?:"
                     + "(?:aaa|aarp|abb|abbott|abogado|academy|accenture|accountant|accountants|aco|active"
                     + "|actor|ads|adult|aeg|aero|afl|agency|aig|airforce|airtel|allfinanz|alsace|amica|amsterdam"
@@ -248,7 +248,7 @@ public class Patterns {
     @Deprecated
     public static final String GOOD_IRI_CHAR =
             "a-zA-Z0-9\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF";
-    public static final Pattern IP_ADDRESS
+    private static final Pattern IP_ADDRESS
             = Pattern.compile(
             "((25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(25[0-5]|2[0-4]"
                     + "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(25[0-5]|2[0-4][0-9]|[0-1]"
@@ -295,7 +295,7 @@ public class Patterns {
     private static final String PUNYCODE_TLD = "xn\\-\\-[\\w\\-]{0,58}\\w";
     private static final String TLD = "(" + PUNYCODE_TLD + "|" + "[" + TLD_CHAR + "]{2,63}" +")";
     private static final String HOST_NAME = "(" + IRI_LABEL + "\\.)+" + TLD;
-    public static final Pattern DOMAIN_NAME
+    private static final Pattern DOMAIN_NAME
             = Pattern.compile("(" + HOST_NAME + "|" + IP_ADDRESS + ")");
     private static final String PROTOCOL = "(?i:http|https|rtsp):\\/\\/";
     /* A word boundary or end of input.  This is to stop foo.sure from matching as foo.su */
@@ -441,7 +441,7 @@ public class Patterns {
      *  @return             A String comprising all of the non-null matched
      *                      groups concatenated together
      */
-    public static final String concatGroups(Matcher matcher) {
+    public static String concatGroups(Matcher matcher) {
         StringBuilder b = new StringBuilder();
         final int numGroups = matcher.groupCount();
         for (int i = 1; i <= numGroups; i++) {
@@ -462,7 +462,7 @@ public class Patterns {
      * @return             A String comprising all of the digits and plus in
      *                     the match
      */
-    public static final String digitsAndPlusOnly(Matcher matcher) {
+    public static String digitsAndPlusOnly(Matcher matcher) {
         StringBuilder buffer = new StringBuilder();
         String matchingRegion = matcher.group();
         for (int i = 0, size = matchingRegion.length(); i < size; i++) {

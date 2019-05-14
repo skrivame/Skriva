@@ -27,7 +27,7 @@ import me.skriva.ceph.utils.Android360pFormatStrategy;
 import me.skriva.ceph.utils.Android720pFormatStrategy;
 import me.skriva.ceph.utils.MimeUtils;
 
-public class AttachFileToConversationRunnable implements Runnable, MediaTranscoder.Listener {
+class AttachFileToConversationRunnable implements Runnable, MediaTranscoder.Listener {
 
 	private final XmppConnectionService mXmppConnectionService;
 	private final Message message;

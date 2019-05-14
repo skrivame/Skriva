@@ -1,6 +1,6 @@
 package me.skriva.ceph.crypto.axolotl;
 
-public class CryptoFailedException extends Exception {
+class CryptoFailedException extends Exception {
 
 	public CryptoFailedException(String msg) {
 		super(msg);

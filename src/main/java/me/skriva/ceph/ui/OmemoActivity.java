@@ -25,7 +25,7 @@ public abstract class OmemoActivity extends XmppActivity {
 	private Account mSelectedAccount;
 	private String mSelectedFingerprint;
 
-	protected XmppUri mPendingFingerprintVerificationUri = null;
+	XmppUri mPendingFingerprintVerificationUri = null;
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -33,10 +33,7 @@ public abstract class OmemoActivity extends XmppActivity {
 		Object account = v.getTag(R.id.TAG_ACCOUNT);
 		Object fingerprint = v.getTag(R.id.TAG_FINGERPRINT);
 		Object fingerprintStatus = v.getTag(R.id.TAG_FINGERPRINT_STATUS);
-		if (account != null
-				&& fingerprint != null
-				&& account instanceof Account
-				&& fingerprintStatus != null
+		if (account instanceof Account
 				&& fingerprint instanceof String
 				&& fingerprintStatus instanceof FingerprintStatus) {
 			getMenuInflater().inflate(R.menu.omemo_key_context, menu);
@@ -89,7 +86,7 @@ public abstract class OmemoActivity extends XmppActivity {
 
 	protected abstract void processFingerprintVerification(XmppUri uri);
 
-	protected void copyOmemoFingerprint(String fingerprint) {
+	void copyOmemoFingerprint(String fingerprint) {
 		if (copyTextToClipboard(CryptoHelper.prettifyFingerprint(fingerprint.substring(2)), R.string.omemo_fingerprint)) {
 			Toast.makeText(
 					this,
@@ -98,7 +95,7 @@ public abstract class OmemoActivity extends XmppActivity {
 		}
 	}
 
-	protected void addFingerprintRow(LinearLayout keys, final XmppAxolotlSession session, boolean highlight) {
+	void addFingerprintRow(LinearLayout keys, final XmppAxolotlSession session, boolean highlight) {
 		final Account account = session.getAccount();
 		final String fingerprint = session.getFingerprint();
 		addFingerprintRowWithListeners(keys,
@@ -111,14 +108,14 @@ public abstract class OmemoActivity extends XmppActivity {
 				(buttonView, isChecked) -> account.getAxolotlService().setFingerprintTrust(fingerprint, FingerprintStatus.createActive(isChecked)));
 	}
 
-	protected void addFingerprintRowWithListeners(LinearLayout keys, final Account account,
-	                                              final String fingerprint,
-	                                              boolean highlight,
-	                                              FingerprintStatus status,
-	                                              boolean showTag,
-	                                              boolean undecidedNeedEnablement,
-	                                              CompoundButton.OnCheckedChangeListener
-			                                              onCheckedChangeListener) {
+	void addFingerprintRowWithListeners(LinearLayout keys, final Account account,
+                                        final String fingerprint,
+                                        boolean highlight,
+                                        FingerprintStatus status,
+                                        boolean showTag,
+                                        boolean undecidedNeedEnablement,
+                                        CompoundButton.OnCheckedChangeListener
+                                                onCheckedChangeListener) {
 		ContactKeyBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.contact_key, keys, true);
 		binding.tglTrust.setVisibility(View.VISIBLE);
 		registerForContextMenu(binding.getRoot());
@@ -190,7 +187,7 @@ public abstract class OmemoActivity extends XmppActivity {
 		binding.key.setText(CryptoHelper.prettifyFingerprint(fingerprint.substring(2)));
 	}
 
-	public void showPurgeKeyDialog(final Account account, final String fingerprint) {
+	private void showPurgeKeyDialog(final Account account, final String fingerprint) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.distrust_omemo_key);
 		builder.setMessage(R.string.distrust_omemo_key_text);

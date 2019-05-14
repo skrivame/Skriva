@@ -8,7 +8,7 @@ import me.skriva.ceph.xmpp.forms.Field;
 
 
 
-public class FormFieldFactory {
+class FormFieldFactory {
 
 	private static final Hashtable<String, Class> typeTable = new Hashtable<>();
 
@@ -20,7 +20,7 @@ public class FormFieldFactory {
 		typeTable.put("boolean", FormBooleanFieldWrapper.class);
 	}
 
-	protected static FormFieldWrapper createFromField(Context context, Field field) {
+	static FormFieldWrapper createFromField(Context context, Field field) {
 		Class clazz = typeTable.get(field.getType());
 		if (clazz == null) {
 			clazz = FormTextFieldWrapper.class;

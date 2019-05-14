@@ -23,7 +23,7 @@ import rocks.xmpp.addr.Jid;
 
 public class UriHandlerActivity extends AppCompatActivity {
 
-    public static final String ACTION_SCAN_QR_CODE = "scan_qr_code";
+    private static final String ACTION_SCAN_QR_CODE = "scan_qr_code";
     private static final int REQUEST_SCAN_QR_CODE = 0x1234;
     private static final int REQUEST_CAMERA_PERMISSIONS_TO_SCAN = 0x6789;
 

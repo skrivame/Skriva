@@ -548,7 +548,7 @@ public final class MimeUtils {
         return extractRelevantExtension(path, false);
     }
 
-    public static String extractRelevantExtension(final String path, final boolean ignoreCryptoExtension) {
+    private static String extractRelevantExtension(final String path, final boolean ignoreCryptoExtension) {
         if (path == null || path.isEmpty()) {
             return null;
         }

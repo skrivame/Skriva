@@ -182,7 +182,7 @@ public class NotificationService {
         notificationManager.createNotificationChannel(quietHoursChannel);
     }
 
-    public boolean notify(final Message message) {
+    private boolean notify(final Message message) {
         final Conversation conversation = (Conversation) message.getConversation();
         return message.getStatus() == Message.STATUS_RECEIVED
                 && !conversation.isMuted()
@@ -275,8 +275,8 @@ public class NotificationService {
         return count;
     }
 
-    void finishBacklog(boolean notify) {
-        finishBacklog(notify, null);
+    void finishBacklog() {
+        finishBacklog(false, null);
     }
 
     private void pushToStack(final Message message) {
@@ -319,36 +319,9 @@ public class NotificationService {
             final Account account = conversation.getAccount();
             final boolean doNotify = (!(this.mIsInForeground && this.mOpenConversation == null) || !isScreenOn)
                     && !account.inGracePeriod()
-                    && !this.inMiniGracePeriod(account)
-                    && notifyAgain((Conversation) conversation);
+                    && !this.inMiniGracePeriod(account);
             updateNotification(doNotify, Collections.singletonList(conversation.getUuid()));
         }
-    }
-
-    /**
-     * This method should be used only by a method like {@link #push(Message)} for checking
-     * if the user should be notified for an incoming message while Conversations is not open
-     * or the screen off.
-     * Checks whether a recent receiving of a message inside the given conversation has already led to a notification.
-     * Multiple notifications for multiple incoming messages of one conversation closely following each other
-     * can be avoided by using this method when checking for the need of a new notification.
-     * @param conversation conversation which contains the incoming message maybe triggering a notification.
-     * @return true if the user should be notified or false otherwise
-     */
-    public boolean notifyAgain(Conversation conversation) {
-        // This is true if enough time has passed after the last receiving of a message.
-        boolean timePassed = System.currentTimeMillis() - conversation.getLastPossibleNotificationTime() > 1000;
-
-        boolean notifyAgain = timePassed;
-        if (!notifyAgain) {
-            Log.d(Config.LOGTAG, conversation.getAccount().getJid().asBareJid()
-                    + ": suppressing notification because time difference to messsage received before is less than "
-                    + Config.MESSAGE_MERGE_WINDOW + "ms and ConversationFragment object"
-                    + "has not been resumed after receiving that message");
-        }
-        conversation.resetResumed();
-        conversation.updateLastPossibleNotificationTime();
-        return notifyAgain;
     }
 
     public void clear() {
@@ -368,7 +341,7 @@ public class NotificationService {
         synchronized (notifications) {
             markAsReadIfHasDirectReply(conversation);
             if (notifications.remove(conversation.getUuid()) != null) {
-                cancel(conversation.getUuid(), NOTIFICATION_ID);
+                cancel(conversation.getUuid());
                 updateNotification(false, null, true);
             }
         }
@@ -443,7 +416,7 @@ public class NotificationService {
                         modifyForSoundVibrationAndLight(singleBuilder, notifyThis, quiteHours, preferences);
                         singleBuilder.setGroup(CONVERSATIONS_GROUP);
                         setNotificationColor(singleBuilder);
-                        notify(entry.getKey(), NOTIFICATION_ID, singleBuilder.build());
+                        notify(entry.getKey(), singleBuilder.build());
                     }
                 }
                 notify(NOTIFICATION_ID, mBuilder.build());
@@ -637,7 +610,7 @@ public class NotificationService {
     private void modifyForImage(final Builder builder, final UnreadConversation.Builder uBuilder,
                                 final Message message, final ArrayList<Message> messages) {
         try {
-            final Bitmap bitmap = mXmppConnectionService.getFileBackend().getThumbnail(message, getPixel(288), false);
+            final Bitmap bitmap = mXmppConnectionService.getFileBackend().getThumbnail(message, getPixel(), false);
             final ArrayList<Message> tmp = new ArrayList<>();
             for (final Message msg : messages) {
                 if (msg.getType() == Message.TYPE_TEXT
@@ -907,10 +880,10 @@ public class NotificationService {
         this.mIsInForeground = foreground;
     }
 
-    private int getPixel(final int dp) {
+    private int getPixel() {
         final DisplayMetrics metrics = mXmppConnectionService.getResources()
                 .getDisplayMetrics();
-        return ((int) (dp * metrics.density));
+        return ((int) (288 * metrics.density));
     }
 
     private void markLastNotification() {
@@ -1030,10 +1003,10 @@ public class NotificationService {
         cancel(FOREGROUND_NOTIFICATION_ID);
     }
 
-    private void notify(String tag, int id, Notification notification) {
+    private void notify(String tag, Notification notification) {
         final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mXmppConnectionService);
         try {
-            notificationManager.notify(tag, id, notification);
+            notificationManager.notify(tag, NotificationService.NOTIFICATION_ID, notification);
         } catch (RuntimeException e) {
             Log.d(Config.LOGTAG, "unable to make notification", e);
         }
@@ -1057,10 +1030,10 @@ public class NotificationService {
         }
     }
 
-    private void cancel(String tag, int id) {
+    private void cancel(String tag) {
         final NotificationManagerCompat notificationManager = NotificationManagerCompat.from(mXmppConnectionService);
         try {
-            notificationManager.cancel(tag, id);
+            notificationManager.cancel(tag, NotificationService.NOTIFICATION_ID);
         } catch (RuntimeException e) {
             Log.d(Config.LOGTAG, "unable to cancel notification", e);
         }

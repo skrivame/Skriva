@@ -73,7 +73,7 @@ public class FileBackend {
 
     private static final String FILE_PROVIDER = ".files";
 
-    private XmppConnectionService mXmppConnectionService;
+    private final XmppConnectionService mXmppConnectionService;
 
     private static final float IGNORE_PADDING = 0.15f;
 
@@ -149,7 +149,7 @@ public class FileBackend {
         }
     }
 
-    public static String getAppMediaDirectory(Context context) {
+    private static String getAppMediaDirectory(Context context) {
         return Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + context.getString(R.string.app_name) + "/Media/";
     }
 
@@ -161,11 +161,11 @@ public class FileBackend {
         return Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+app+"/Backup/";
     }
 
-    public static boolean deleteDir(File dir) {
+    private static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
+            for (String child : children) {
+                boolean success = deleteDir(new File(dir, child));
                 if (!success) {
                     return false;
                 }
@@ -178,17 +178,16 @@ public class FileBackend {
         }
     }
 
-    public static boolean cleanCache(Context context) {
+    public static void cleanCache(Context context) {
         try {
             File dir = context.getCacheDir();
             deleteDir(dir);
         } catch (Throwable e) {
             Log.e("cleanCache", e.toString());
         }
-        return true;
     }
 
-    public static boolean cleanPrivateStorage(Context context) {
+    public static void cleanPrivateStorage(Context context) {
         try {
             for(String type : Arrays.asList("Images", "Videos", "Files", "Recordings")) {
                 File dir = new File(context.getFilesDir().getAbsolutePath(), "/" + type + "/");
@@ -197,7 +196,6 @@ public class FileBackend {
         } catch (Throwable e) {
             Log.e("cleanPrivateStorage", e.toString());
         }
-        return true;
     }
 
     private static Bitmap rotate(Bitmap bitmap, int degree) {
@@ -289,7 +287,7 @@ public class FileBackend {
     }
 
     public Bitmap getPreviewForUri(Attachment attachment, int size, boolean cacheOnly) {
-        final String key = "attachment_"+attachment.getUuid().toString()+"_"+String.valueOf(size);
+        final String key = "attachment_"+attachment.getUuid().toString()+"_"+ size;
         final LruCache<String, Bitmap> cache = mXmppConnectionService.getBitmapCache();
         Bitmap bitmap = cache.get(key);
         if (bitmap != null || cacheOnly) {
@@ -333,7 +331,6 @@ public class FileBackend {
         } finally {
             if (bitmap != null) {
                 bitmap.recycle();
-                ;
             }
         }
     }
@@ -528,7 +525,7 @@ public class FileBackend {
         return getFileForPath(path,MimeUtils.guessMimeTypeFromExtension(MimeUtils.extractRelevantExtension(path)));
     }
 
-    public DownloadableFile getFileForPath(String path, String mime) {
+    private DownloadableFile getFileForPath(String path, String mime) {
         final DownloadableFile file;
         if (path.startsWith("/")) {
             file = new DownloadableFile(path);
@@ -772,7 +769,7 @@ public class FileBackend {
         }
     }
 
-    public void removeImageFromCameraCache(Uri image) {
+    private void removeImageFromCameraCache(Uri image) {
         if (Config.ONLY_INTERNAL_STORAGE &&
                 image.toString().startsWith("content://"
                         + mXmppConnectionService.getPackageName() + ".files/camera")) {
@@ -781,7 +778,7 @@ public class FileBackend {
         }
     }
 
-    public void copyImageToPrivateStorage(File file, Uri image) throws FileCopyException {
+    private void copyImageToPrivateStorage(File file, Uri image) throws FileCopyException {
         Log.d(Config.LOGTAG, "copy image (" + image.toString() + ") to private storage " + file.getAbsolutePath());
         copyImageToPrivateStorage(file, image, 0);
         removeImageFromCameraCache(image);
@@ -837,7 +834,7 @@ public class FileBackend {
         // If only the UUID were used, the first loaded thumbnail would be cached and the next loading
         // would get that thumbnail which would have the size of the first cached thumbnail
         // possibly leading to undesirable appearance of the displayed thumbnail.
-        final String key = message.getUuid() + String.valueOf(size);
+        final String key = message.getUuid() + size;
 
         final LruCache<String, Bitmap> cache = mXmppConnectionService.getBitmapCache();
         Bitmap thumbnail = cache.get(key);
@@ -947,9 +944,9 @@ public class FileBackend {
     public Uri getTakePhotoUri() {
         File file;
         if (Config.ONLY_INTERNAL_STORAGE) {
-            file = new File(mXmppConnectionService.getCacheDir().getAbsolutePath(), "Camera/IMG_" + this.IMAGE_DATE_FORMAT.format(new Date()) + ".jpg");
+            file = new File(mXmppConnectionService.getCacheDir().getAbsolutePath(), "Camera/IMG_" + IMAGE_DATE_FORMAT.format(new Date()) + ".jpg");
         } else {
-            file = new File(getTakePhotoPath() + "IMG_" + this.IMAGE_DATE_FORMAT.format(new Date()) + ".jpg");
+            file = new File(getTakePhotoPath() + "IMG_" + IMAGE_DATE_FORMAT.format(new Date()) + ".jpg");
         }
         file.getParentFile().mkdirs();
         return getUriForFile(mXmppConnectionService, file);
@@ -1202,7 +1199,7 @@ public class FileBackend {
         }
     }
 
-    public Bitmap cropCenterSquare(Bitmap input, int size) {
+    private Bitmap cropCenterSquare(Bitmap input, int size) {
         int w = input.getWidth();
         int h = input.getHeight();
 
@@ -1312,38 +1309,38 @@ public class FileBackend {
     }
 
     private static class Dimensions {
-        public final int width;
-        public final int height;
+        final int width;
+        final int height;
 
         Dimensions(int height, int width) {
             this.width = width;
             this.height = height;
         }
 
-        public int getMin() {
+        int getMin() {
             return Math.min(width, height);
         }
 
-        public boolean valid() {
+        boolean valid() {
             return width > 0 && height > 0;
         }
     }
 
     private static class NotAVideoFile extends Exception {
-        public NotAVideoFile(Throwable t) {
+        NotAVideoFile(Throwable t) {
             super(t);
         }
 
-        public NotAVideoFile() {
+        NotAVideoFile() {
             super();
         }
     }
 
     public class FileCopyException extends Exception {
         private static final long serialVersionUID = -1010013599132881427L;
-        private int resId;
+        private final int resId;
 
-        public FileCopyException(int resId) {
+        FileCopyException(int resId) {
             this.resId = resId;
         }
 

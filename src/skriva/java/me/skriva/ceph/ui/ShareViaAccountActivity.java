@@ -13,12 +13,12 @@ import me.skriva.ceph.ui.adapter.AccountAdapter;
 import rocks.xmpp.addr.Jid;
 
 public class ShareViaAccountActivity extends XmppActivity {
-    public static final String EXTRA_CONTACT = "contact";
-    public static final String EXTRA_BODY = "body";
+    private static final String EXTRA_CONTACT = "contact";
+    private static final String EXTRA_BODY = "body";
 
-    protected final List<Account> accountList = new ArrayList<>();
-    protected ListView accountListView;
-    protected AccountAdapter mAccountAdapter;
+    private final List<Account> accountList = new ArrayList<>();
+    private ListView accountListView;
+    private AccountAdapter mAccountAdapter;
 
     @Override
     protected void refreshUiReal() {

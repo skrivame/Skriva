@@ -9,7 +9,6 @@ import android.os.Build;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.support.annotation.BoolRes;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -42,7 +41,7 @@ public class Compatibility {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
 
-    public static boolean runsTwentyFour() {
+    private static boolean runsTwentyFour() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
     }
 
@@ -50,8 +49,8 @@ public class Compatibility {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P;
     }
 
-    private static boolean getBooleanPreference(Context context, String name, @BoolRes int res) {
-        return getPreferences(context).getBoolean(name, context.getResources().getBoolean(res));
+    private static boolean getBooleanPreference(Context context) {
+        return getPreferences(context).getBoolean(SettingsActivity.KEEP_FOREGROUND_SERVICE, context.getResources().getBoolean(R.bool.enable_foreground_service));
     }
 
     private static SharedPreferences getPreferences(final Context context) {
@@ -87,7 +86,7 @@ public class Compatibility {
     }
 
     public static boolean keepForegroundService(Context context) {
-        return runsAndTargetsTwentySix(context) || getBooleanPreference(context, SettingsActivity.KEEP_FOREGROUND_SERVICE, R.bool.enable_foreground_service);
+        return runsAndTargetsTwentySix(context) || getBooleanPreference(context);
     }
 
     public static void removeUnusedPreferences(SettingsFragment settingsFragment) {

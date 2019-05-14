@@ -73,7 +73,7 @@ public final class ScanActivity extends Activity implements SurfaceTextureListen
 
 	private static final long VIBRATE_DURATION = 50L;
 	private static final long AUTO_FOCUS_INTERVAL_MS = 2500L;
-	private static boolean DISABLE_CONTINUOUS_AUTOFOCUS = Build.MODEL.equals("GT-I9100") // Galaxy S2
+	private static final boolean DISABLE_CONTINUOUS_AUTOFOCUS = Build.MODEL.equals("GT-I9100") // Galaxy S2
 			|| Build.MODEL.equals("SGH-T989") // Galaxy S2
 			|| Build.MODEL.equals("SGH-T989D") // Galaxy S2 X
 			|| Build.MODEL.equals("SAMSUNG-SGH-I727") // Galaxy S2 Skyrocket
@@ -95,7 +95,7 @@ public final class ScanActivity extends Activity implements SurfaceTextureListen
 	};
 	private final Runnable fetchAndDecodeRunnable = new Runnable() {
 		private final QRCodeReader reader = new QRCodeReader();
-		private final Map<DecodeHintType, Object> hints = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
+		private final Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
 
 		@Override
 		public void run() {
@@ -255,7 +255,7 @@ public final class ScanActivity extends Activity implements SurfaceTextureListen
 		return super.onKeyDown(keyCode, event);
 	}
 
-	public void handleResult(final Result scanResult) {
+	private void handleResult(final Result scanResult) {
 		vibrator.vibrate(VIBRATE_DURATION);
 
 		scannerView.setIsResult(true);
@@ -303,7 +303,7 @@ public final class ScanActivity extends Activity implements SurfaceTextureListen
 			}
 		};
 
-		public AutoFocusRunnable(final Camera camera) {
+		AutoFocusRunnable(final Camera camera) {
 			this.camera = camera;
 		}
 

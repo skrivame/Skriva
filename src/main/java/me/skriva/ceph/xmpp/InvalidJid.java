@@ -139,7 +139,7 @@ public class InvalidJid implements Jid {
 	}
 
 	public static Jid getNullForInvalid(Jid jid) {
-		if (jid != null && jid instanceof InvalidJid) {
+		if (jid instanceof InvalidJid) {
 			return null;
 		} else {
 			return jid;
@@ -147,7 +147,7 @@ public class InvalidJid implements Jid {
 	}
 
 	public static boolean isValid(Jid jid) {
-		return !(jid != null && jid instanceof InvalidJid);
+		return !(jid instanceof InvalidJid);
 	}
 
 	public static boolean hasValidFrom(AbstractStanza stanza) {

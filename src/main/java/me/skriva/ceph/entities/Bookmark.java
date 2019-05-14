@@ -17,7 +17,7 @@ import rocks.xmpp.addr.Jid;
 
 public class Bookmark extends Element implements ListItem {
 
-	private Account account;
+	private final Account account;
 	private WeakReference<Conversation> conversation;
 	private Jid jid;
 

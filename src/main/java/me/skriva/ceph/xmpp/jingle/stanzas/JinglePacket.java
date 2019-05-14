@@ -7,13 +7,13 @@ import me.skriva.ceph.xmpp.stanzas.IqPacket;
 import rocks.xmpp.addr.Jid;
 
 public class JinglePacket extends IqPacket {
-	Content content = null;
-	Reason reason = null;
-	Element checksum = null;
-	Element jingle = new Element("jingle");
+	private Content content = null;
+	private Reason reason = null;
+	private Element checksum = null;
+	private final Element jingle = new Element("jingle");
 
 	@Override
-	public Element addChild(Element child) {
+	public void addChild(Element child) {
 		if ("jingle".equals(child.getName())) {
 			Element contentElement = child.findChild("content");
 			if (contentElement != null) {
@@ -30,12 +30,10 @@ public class JinglePacket extends IqPacket {
 			this.checksum = child.findChild("checksum");
 			this.jingle.setAttributes(child.getAttributes());
 		}
-		return child;
 	}
 
-	public JinglePacket setContent(Content content) {
+	public void setContent(Content content) {
 		this.content = content;
-		return this;
 	}
 
 	public Content getJingleContent() {
@@ -45,9 +43,8 @@ public class JinglePacket extends IqPacket {
 		return this.content;
 	}
 
-	public JinglePacket setReason(Reason reason) {
+	public void setReason(Reason reason) {
 		this.reason = reason;
-		return this;
 	}
 
 	public Reason getReason() {

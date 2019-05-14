@@ -28,10 +28,10 @@ public class ServiceDiscoveryResult {
 	public static final String HASH = "hash";
 	public static final String VER = "ver";
 	public static final String RESULT = "result";
-	protected final String hash;
-	protected final byte[] ver;
-	protected final List<String> features;
-	protected final List<Data> forms;
+	private final String hash;
+	private final byte[] ver;
+	final List<String> features;
+	final List<Data> forms;
 	private final List<Identity> identities;
 	public ServiceDiscoveryResult(final IqPacket packet) {
 		this.identities = new ArrayList<>();
@@ -266,9 +266,9 @@ public class ServiceDiscoveryResult {
 	}
 
 	public static class Identity implements Comparable {
-		protected final String type;
-		protected final String lang;
-		protected final String name;
+		final String type;
+		final String lang;
+		final String name;
 		final String category;
 
 		Identity(final String category, final String type, final String lang, final String name) {
@@ -305,7 +305,7 @@ public class ServiceDiscoveryResult {
 			return this.type;
 		}
 
-		public String getLang() {
+		String getLang() {
 			return this.lang;
 		}
 

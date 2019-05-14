@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import me.skriva.ceph.Config;
@@ -37,7 +38,7 @@ public class MucOptions {
     private final Conversation conversation;
     public OnRenameListener onRenameListener = null;
     private boolean mAutoPushConfiguration = true;
-    private Account account;
+    private final Account account;
     private ServiceDiscoveryResult serviceDiscoveryResult;
     private boolean isOnline = false;
     private Error error = Error.NONE;
@@ -625,15 +626,15 @@ public class MucOptions {
         OUTCAST(0, R.string.outcast),
         NONE(1, R.string.no_affiliation);
 
-        private int resId;
-        private int rank;
+        private final int resId;
+        private final int rank;
 
         Affiliation(int rank, int resId) {
             this.resId = resId;
             this.rank = rank;
         }
 
-        public static Affiliation of(@Nullable String value) {
+        static Affiliation of(@Nullable String value) {
             if (value == null) {
                 return NONE;
             }
@@ -668,15 +669,15 @@ public class MucOptions {
         PARTICIPANT(R.string.participant, 2),
         NONE(R.string.no_role, 0);
 
-        private int resId;
-        private int rank;
+        private final int resId;
+        private final int rank;
 
         Role(int resId, int rank) {
             this.resId = resId;
             this.rank = rank;
         }
 
-        public static Role of(@Nullable String value) {
+        static Role of(@Nullable String value) {
             if (value == null) {
                 return NONE;
             }
@@ -736,7 +737,7 @@ public class MucOptions {
         private Jid fullJid;
         private long pgpKeyId = 0;
         private Avatar avatar;
-        private MucOptions options;
+        private final MucOptions options;
         private ChatState chatState = Config.DEFAULT_CHATSTATE;
 
         public User(MucOptions options, Jid fullJid) {
@@ -764,7 +765,7 @@ public class MucOptions {
             this.affiliation = Affiliation.of(affiliation);
         }
 
-        public long getPgpKeyId() {
+        long getPgpKeyId() {
             if (this.pgpKeyId != 0) {
                 return this.pgpKeyId;
             } else if (realJid != null) {
@@ -826,13 +827,13 @@ public class MucOptions {
 
             if (role != user.role) return false;
             if (affiliation != user.affiliation) return false;
-            if (realJid != null ? !realJid.equals(user.realJid) : user.realJid != null)
+            if (!Objects.equals(realJid, user.realJid))
                 return false;
-            return fullJid != null ? fullJid.equals(user.fullJid) : user.fullJid == null;
+            return Objects.equals(fullJid, user.fullJid);
 
         }
 
-        public boolean isDomain() {
+        boolean isDomain() {
             return realJid != null && realJid.getLocal() == null && role == Role.NONE;
         }
 
@@ -847,7 +848,7 @@ public class MucOptions {
 
         @Override
         public String toString() {
-            return "[fulljid:" + String.valueOf(fullJid) + ",realjid:" + String.valueOf(realJid) + ",affiliation" + affiliation.toString() + "]";
+            return "[fulljid:" + fullJid + ",realjid:" + realJid + ",affiliation" + affiliation.toString() + "]";
         }
 
         public boolean realJidMatchesAccount() {

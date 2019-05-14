@@ -60,29 +60,29 @@ public class Account extends AbstractEntity implements AvatarService.Avatarable 
     private static final String KEY_PGP_SIGNATURE = "pgp_signature";
     private static final String KEY_PGP_ID = "pgp_id";
     public final HashSet<Pair<String, String>> inProgressDiscoFetches = new HashSet<>();
-    protected final JSONObject keys;
+    private final JSONObject keys;
     private final Roster roster = new Roster(this);
     private final Collection<Jid> blocklist = new CopyOnWriteArraySet<>();
-    public List<Conversation> pendingConferenceJoins = new CopyOnWriteArrayList<>();
-    public List<Conversation> pendingConferenceLeaves = new CopyOnWriteArrayList<>();
-    protected Jid jid;
-    protected String password;
-    protected int options = 0;
-    protected State status = State.OFFLINE;
+    public final List<Conversation> pendingConferenceJoins = new CopyOnWriteArrayList<>();
+    public final List<Conversation> pendingConferenceLeaves = new CopyOnWriteArrayList<>();
+    private Jid jid;
+    private String password;
+    private int options;
+    private State status = State.OFFLINE;
     private State lastErrorStatus = State.OFFLINE;
     protected String resource;
-    protected String avatar;
-    protected String hostname = null;
-    protected int port = 5222;
+    private String avatar;
+    private String hostname;
+    private int port;
     protected boolean online = false;
     private String rosterVersion;
-    private String displayName = null;
+    private String displayName;
     private AxolotlService axolotlService = null;
     private XmppConnection xmppConnection = null;
     private long mEndGracePeriod = 0L;
     private List<Bookmark> bookmarks = new CopyOnWriteArrayList<>();
-    private Presence.Status presenceStatus = Presence.Status.ONLINE;
-    private String presenceStatusMessage = null;
+    private Presence.Status presenceStatus;
+    private String presenceStatusMessage;
 
     public Account(final Jid jid, final String password) {
         this(java.util.UUID.randomUUID().toString(), jid,
@@ -340,8 +340,8 @@ public class Account extends AbstractEntity implements AvatarService.Avatarable 
         }
     }
 
-    public boolean setPrivateKeyAlias(String alias) {
-        return setKey("private_key_alias", alias);
+    public void setPrivateKeyAlias(String alias) {
+        setKey("private_key_alias", alias);
     }
 
     public String getPrivateKeyAlias() {
@@ -409,13 +409,13 @@ public class Account extends AbstractEntity implements AvatarService.Avatarable 
         return getKey(KEY_PGP_SIGNATURE);
     }
 
-    public boolean setPgpSignature(String signature) {
-        return setKey(KEY_PGP_SIGNATURE, signature);
+    public void setPgpSignature(String signature) {
+        setKey(KEY_PGP_SIGNATURE, signature);
     }
 
-    public boolean unsetPgpSignature() {
+    public void unsetPgpSignature() {
         synchronized (this.keys) {
-            return keys.remove(KEY_PGP_SIGNATURE) != null;
+            keys.remove(KEY_PGP_SIGNATURE);
         }
     }
 

@@ -17,11 +17,11 @@ import java.util.List;
 import de.measite.minidns.dnsserverlookup.AbstractDNSServerLookupMechanism;
 import de.measite.minidns.dnsserverlookup.AndroidUsingExec;
 
-public class AndroidUsingLinkProperties extends AbstractDNSServerLookupMechanism {
+class AndroidUsingLinkProperties extends AbstractDNSServerLookupMechanism {
 
     private final Context context;
 
-    protected AndroidUsingLinkProperties(Context context) {
+    AndroidUsingLinkProperties(Context context) {
         super(AndroidUsingLinkProperties.class.getSimpleName(), AndroidUsingExec.PRIORITY - 1);
         this.context = context;
     }
@@ -59,7 +59,7 @@ public class AndroidUsingLinkProperties extends AbstractDNSServerLookupMechanism
                 servers.addAll(getIPv4First(linkProperties.getDnsServers()));
             }
         }
-        return servers.toArray(new String[servers.size()]);
+        return servers.toArray(new String[0]);
     }
 
     @TargetApi(23)

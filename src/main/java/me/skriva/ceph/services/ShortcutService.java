@@ -37,12 +37,7 @@ public class ShortcutService {
 
     public void refresh(final boolean forceUpdate) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-            final Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    refreshImpl(forceUpdate);
-                }
-            };
+            final Runnable r = () -> refreshImpl(forceUpdate);
             replacingSerialSingleThreadExecutor.execute(r);
         }
     }
@@ -108,7 +103,7 @@ public class ShortcutService {
     @TargetApi(25)
     private static boolean contactExists(Contact needle, List<ShortcutInfo> haystack) {
         for(ShortcutInfo shortcutInfo : haystack) {
-            if (getShortcutId(needle).equals(shortcutInfo.getId()) && needle.getDisplayName().equals(shortcutInfo.getShortLabel())) {
+            if (getShortcutId(needle).equals(shortcutInfo.getId()) && needle.getDisplayName().contentEquals(shortcutInfo.getShortLabel())) {
                 return true;
             }
         }

@@ -33,7 +33,7 @@ public class PresenceParser extends AbstractParser implements
 		super(service);
 	}
 
-	public void parseConferencePresence(PresencePacket packet, Account account) {
+	private void parseConferencePresence(PresencePacket packet, Account account) {
 		final Conversation conversation = packet.getFrom() == null ? null : mXmppConnectionService.find(account, packet.getFrom().asBareJid());
 		if (conversation != null) {
 			final MucOptions mucOptions = conversation.getMucOptions();

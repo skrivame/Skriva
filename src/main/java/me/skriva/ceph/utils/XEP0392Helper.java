@@ -6,7 +6,7 @@ import org.hsluv.HUSLColorConverter;
 
 import java.security.MessageDigest;
 
-public class XEP0392Helper {
+class XEP0392Helper {
 
     private static double angle(String nickname) {
         try {

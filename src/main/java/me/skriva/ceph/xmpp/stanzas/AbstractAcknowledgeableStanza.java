@@ -5,7 +5,7 @@ import me.skriva.ceph.xmpp.InvalidJid;
 
 abstract public class AbstractAcknowledgeableStanza extends AbstractStanza {
 
-	protected AbstractAcknowledgeableStanza(String name) {
+	AbstractAcknowledgeableStanza(String name) {
 		super(name);
 	}
 

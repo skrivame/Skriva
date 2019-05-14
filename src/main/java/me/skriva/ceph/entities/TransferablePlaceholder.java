@@ -2,7 +2,7 @@ package me.skriva.ceph.entities;
 
 public class TransferablePlaceholder implements Transferable {
 
-	private int status;
+	private final int status;
 
 	public TransferablePlaceholder(int status) {
 		this.status = status;

@@ -45,7 +45,7 @@ public class SQLiteAxolotlStore implements SignalProtocolStore {
 	public static final String CERTIFICATE = "certificate";
 
 	public static final String JSONKEY_REGISTRATION_ID = "axolotl_reg_id";
-	public static final String JSONKEY_CURRENT_PREKEY_ID = "axolotl_cur_prekey_id";
+	private static final String JSONKEY_CURRENT_PREKEY_ID = "axolotl_cur_prekey_id";
 
 	private static final int NUM_TRUSTS_TO_CACHE = 100;
 
@@ -54,7 +54,7 @@ public class SQLiteAxolotlStore implements SignalProtocolStore {
 
 	private IdentityKeyPair identityKeyPair;
 	private int localRegistrationId;
-	private int currentPreKeyId = 0;
+	private int currentPreKeyId;
 
 	private final HashSet<Integer> preKeysMarkedForRemoval = new HashSet<>();
 

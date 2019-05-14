@@ -53,16 +53,12 @@ public class OmemoSetting {
 
 	public static void load(final Context context, final SharedPreferences sharedPreferences) {
 		final String value = sharedPreferences.getString(SettingsActivity.OMEMO_SETTING, context.getResources().getString(R.string.omemo_setting_default));
-		switch (value) {
-			case "always":
-				always = true;
-				encryption = Message.ENCRYPTION_AXOLOTL;
-				break;
-			default:
-				always = true;
-				encryption = Message.ENCRYPTION_AXOLOTL;
-				break;
-
+		if ("always".equals(value)) {
+			always = true;
+			encryption = Message.ENCRYPTION_AXOLOTL;
+		} else {
+			always = true;
+			encryption = Message.ENCRYPTION_AXOLOTL;
 		}
 	}
 

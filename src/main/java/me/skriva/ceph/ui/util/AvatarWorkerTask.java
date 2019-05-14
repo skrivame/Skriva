@@ -17,9 +17,10 @@ import me.skriva.ceph.ui.XmppActivity;
 public class AvatarWorkerTask extends AsyncTask<AvatarService.Avatarable, Void, Bitmap> {
     private final WeakReference<ImageView> imageViewReference;
     private AvatarService.Avatarable avatarable = null;
-    private @DimenRes int size;
+    private @DimenRes
+    final int size;
 
-    public AvatarWorkerTask(ImageView imageView, @DimenRes int size) {
+    private AvatarWorkerTask(ImageView imageView, @DimenRes int size) {
         imageViewReference = new WeakReference<>(imageView);
         this.size = size;
     }
@@ -45,7 +46,7 @@ public class AvatarWorkerTask extends AsyncTask<AvatarService.Avatarable, Void, 
         }
     }
 
-    public static boolean cancelPotentialWork(AvatarService.Avatarable avatarable, ImageView imageView) {
+    private static boolean cancelPotentialWork(AvatarService.Avatarable avatarable, ImageView imageView) {
         final AvatarWorkerTask workerTask = getBitmapWorkerTask(imageView);
 
         if (workerTask != null) {
@@ -59,7 +60,7 @@ public class AvatarWorkerTask extends AsyncTask<AvatarService.Avatarable, Void, 
         return true;
     }
 
-    public static AvatarWorkerTask getBitmapWorkerTask(ImageView imageView) {
+    private static AvatarWorkerTask getBitmapWorkerTask(ImageView imageView) {
         if (imageView != null) {
             final Drawable drawable = imageView.getDrawable();
             if (drawable instanceof AsyncDrawable) {
@@ -85,7 +86,7 @@ public class AvatarWorkerTask extends AsyncTask<AvatarService.Avatarable, Void, 
                 imageView.setBackgroundColor(avatarable.getAvatarBackgroundColor());
                 imageView.setImageDrawable(null);
                 final AvatarWorkerTask task = new AvatarWorkerTask(imageView, size);
-                final AsyncDrawable asyncDrawable = new AsyncDrawable(activity.getResources(), null, task);
+                final AsyncDrawable asyncDrawable = new AsyncDrawable(activity.getResources(), task);
                 imageView.setImageDrawable(asyncDrawable);
                 try {
                     task.execute(avatarable);
@@ -98,8 +99,8 @@ public class AvatarWorkerTask extends AsyncTask<AvatarService.Avatarable, Void, 
     static class AsyncDrawable extends BitmapDrawable {
         private final WeakReference<AvatarWorkerTask> avatarWorkerTaskReference;
 
-        AsyncDrawable(Resources res, Bitmap bitmap, AvatarWorkerTask workerTask) {
-            super(res, bitmap);
+        AsyncDrawable(Resources res, AvatarWorkerTask workerTask) {
+            super(res, (Bitmap) null);
             avatarWorkerTaskReference = new WeakReference<>(workerTask);
         }
 

@@ -48,7 +48,7 @@ import me.skriva.ceph.utils.MimeUtils;
 
 public class Attachment implements Parcelable {
 
-    Attachment(Parcel in) {
+    private Attachment(Parcel in) {
         uri = in.readParcelable(Uri.class.getClassLoader());
         mime = in.readString();
         uuid = UUID.fromString(in.readString());

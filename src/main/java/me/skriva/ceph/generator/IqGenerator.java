@@ -96,7 +96,7 @@ public class IqGenerator extends AbstractGenerator {
 		return packet;
 	}
 
-	protected IqPacket publish(final String node, final Element item, final Bundle options) {
+	private IqPacket publish(final String node, final Element item, final Bundle options) {
 		final IqPacket packet = new IqPacket(IqPacket.TYPE.SET);
 		final Element pubsub = packet.addChild("pubsub", Namespace.PUBSUB);
 		final Element publish = pubsub.addChild("publish");
@@ -109,7 +109,7 @@ public class IqGenerator extends AbstractGenerator {
 		return packet;
 	}
 
-	protected IqPacket publish(final String node, final Element item) {
+	private IqPacket publish(final String node, final Element item) {
 		return publish(node, item, null);
 	}
 
@@ -400,7 +400,7 @@ public class IqGenerator extends AbstractGenerator {
 				ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
 				bb.putLong(uuid.getMostSignificantBits());
 				bb.putLong(uuid.getLeastSignificantBits());
-				return Base64.encodeToString(bb.array(), Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP) + name.substring(pos, name.length());
+				return Base64.encodeToString(bb.array(), Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP) + name.substring(pos);
 			} catch (Exception e) {
 				return name;
 			}

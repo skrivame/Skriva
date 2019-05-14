@@ -138,7 +138,7 @@ public final class CryptoHelper {
         return builder.toString();
     }
 
-    public static String prettifyFingerprintCert(String fingerprint) {
+    private static String prettifyFingerprintCert(String fingerprint) {
         StringBuilder builder = new StringBuilder(fingerprint);
         for (int i = 2; i < builder.length(); i += 3) {
             builder.insert(i, ':');
@@ -153,7 +153,7 @@ public final class CryptoHelper {
         cipherSuites.addAll(platformCiphers);
         filterWeakCipherSuites(cipherSuites);
         cipherSuites.remove("TLS_FALLBACK_SCSV");
-        return cipherSuites.toArray(new String[cipherSuites.size()]);
+        return cipherSuites.toArray(new String[0]);
     }
 
     private static void filterWeakCipherSuites(final Collection<String> cipherSuites) {

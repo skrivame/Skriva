@@ -52,7 +52,7 @@ public class ExportBackupService extends Service {
 
     private static final int NOTIFICATION_ID = 19;
     private static final int PAGE_SIZE = 20;
-    private static AtomicBoolean running = new AtomicBoolean(false);
+    private static final AtomicBoolean running = new AtomicBoolean(false);
     private DatabaseBackend mDatabaseBackend;
     private List<Account> mAccounts;
     private NotificationManager notificationManager;
@@ -125,7 +125,7 @@ public class ExportBackupService extends Service {
     private static void simpleExport(SQLiteDatabase db, String table, String column, String uuid, PrintWriter writer) {
         final Cursor cursor = db.query(table, null, column + "=?", new String[]{uuid}, null, null, null);
         while (cursor != null && cursor.moveToNext()) {
-            writer.write(cursorToString(table, cursor, PAGE_SIZE));
+            writer.write(cursorToString(table, cursor));
         }
         if (cursor != null) {
             cursor.close();
@@ -141,8 +141,8 @@ public class ExportBackupService extends Service {
         }
     }
 
-    private static String cursorToString(String tablename, Cursor cursor, int max) {
-        return cursorToString(tablename, cursor, max, false);
+    private static String cursorToString(String tablename, Cursor cursor) {
+        return cursorToString(tablename, cursor, ExportBackupService.PAGE_SIZE, false);
     }
 
     private static String cursorToString(final String tablename, final Cursor cursor, int max, boolean ignore) {

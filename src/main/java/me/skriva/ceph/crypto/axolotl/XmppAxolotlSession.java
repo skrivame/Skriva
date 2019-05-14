@@ -74,7 +74,7 @@ public class XmppAxolotlSession implements Comparable<XmppAxolotlSession> {
 		this.fresh = false;
 	}
 
-	protected void setTrust(FingerprintStatus status) {
+	void setTrust(FingerprintStatus status) {
 		sqLiteAxolotlStore.setFingerprintStatus(getFingerprint(), status);
 	}
 

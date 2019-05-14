@@ -43,15 +43,15 @@ import rocks.xmpp.addr.Jid;
 
 public class JingleConnection implements Transferable {
 
-	private JingleConnectionManager mJingleConnectionManager;
-	private XmppConnectionService mXmppConnectionService;
+	private final JingleConnectionManager mJingleConnectionManager;
+	private final XmppConnectionService mXmppConnectionService;
 
 	private static final int JINGLE_STATUS_OFFERED = -1;
-	protected static final int JINGLE_STATUS_INITIATED = 0;
-	protected static final int JINGLE_STATUS_ACCEPTED = 1;
-	protected static final int JINGLE_STATUS_FINISHED = 4;
-	protected static final int JINGLE_STATUS_TRANSMITTING = 5;
-	protected static final int JINGLE_STATUS_FAILED = 99;
+	private static final int JINGLE_STATUS_INITIATED = 0;
+	private static final int JINGLE_STATUS_ACCEPTED = 1;
+	private static final int JINGLE_STATUS_FINISHED = 4;
+	static final int JINGLE_STATUS_TRANSMITTING = 5;
+	private static final int JINGLE_STATUS_FAILED = 99;
 
 	private Content.Version ftVersion = Content.Version.FT_3;
 
@@ -64,8 +64,8 @@ public class JingleConnection implements Transferable {
 	private Account account;
 	private Jid initiator;
 	private Jid responder;
-	private List<JingleCandidate> candidates = new ArrayList<>();
-	private ConcurrentHashMap<String, JingleSocks5Transport> connections = new ConcurrentHashMap<>();
+	private final List<JingleCandidate> candidates = new ArrayList<>();
+	private final ConcurrentHashMap<String, JingleSocks5Transport> connections = new ConcurrentHashMap<>();
 
 	private String transportId;
 	private Element fileOffer;
@@ -89,7 +89,7 @@ public class JingleConnection implements Transferable {
 	private OutputStream mFileOutputStream;
 	private InputStream mFileInputStream;
 
-	private OnIqPacketReceived responseListener = (account, packet) -> {
+	private final OnIqPacketReceived responseListener = (account, packet) -> {
 		if (packet.getType() != IqPacket.TYPE.RESULT) {
 			fail(IqParser.extractErrorMessage(packet));
 		}
@@ -104,7 +104,7 @@ public class JingleConnection implements Transferable {
 		return initiator.equals(account.getJid());
 	}
 
-	final OnFileTransmissionStatusChanged onFileTransmissionStatusChanged = new OnFileTransmissionStatusChanged() {
+	private final OnFileTransmissionStatusChanged onFileTransmissionStatusChanged = new OnFileTransmissionStatusChanged() {
 
 		@Override
 		public void onFileTransmitted(DownloadableFile file) {
@@ -159,7 +159,7 @@ public class JingleConnection implements Transferable {
 		return this.mFileOutputStream;
 	}
 
-	private OnProxyActivated onProxyActivated = new OnProxyActivated() {
+	private final OnProxyActivated onProxyActivated = new OnProxyActivated() {
 
 		@Override
 		public void success() {
@@ -255,14 +255,11 @@ public class JingleConnection implements Transferable {
 	public void init(final Message message) {
 		if (message.getEncryption() == Message.ENCRYPTION_AXOLOTL) {
 			Conversation conversation = (Conversation) message.getConversation();
-			conversation.getAccount().getAxolotlService().prepareKeyTransportMessage(conversation, new OnMessageCreatedCallback() {
-				@Override
-				public void run(XmppAxolotlMessage xmppAxolotlMessage) {
-					if (xmppAxolotlMessage != null) {
-						init(message, xmppAxolotlMessage);
-					} else {
-						fail();
-					}
+			conversation.getAccount().getAxolotlService().prepareKeyTransportMessage(conversation, xmppAxolotlMessage -> {
+				if (xmppAxolotlMessage != null) {
+					init(message, xmppAxolotlMessage);
+				} else {
+					fail();
 				}
 			});
 		} else {
@@ -287,39 +284,34 @@ public class JingleConnection implements Transferable {
 			this.sendInitRequest();
 		} else {
 			this.mJingleConnectionManager.getPrimaryCandidate(account,
-					new OnPrimaryCandidateFound() {
+					(success, candidate) -> {
+						if (success) {
+							final JingleSocks5Transport socksConnection = new JingleSocks5Transport(
+									JingleConnection.this, candidate);
+							connections.put(candidate.getCid(),
+									socksConnection);
+							socksConnection
+									.connect(new OnTransportConnected() {
 
-						@Override
-						public void onPrimaryCandidateFound(boolean success,
-															final JingleCandidate candidate) {
-							if (success) {
-								final JingleSocks5Transport socksConnection = new JingleSocks5Transport(
-										JingleConnection.this, candidate);
-								connections.put(candidate.getCid(),
-										socksConnection);
-								socksConnection
-										.connect(new OnTransportConnected() {
+										@Override
+										public void failed() {
+											Log.d(Config.LOGTAG,
+													"connection to our own primary candidete failed");
+											sendInitRequest();
+										}
 
-											@Override
-											public void failed() {
-												Log.d(Config.LOGTAG,
-														"connection to our own primary candidete failed");
-												sendInitRequest();
-											}
-
-											@Override
-											public void established() {
-												Log.d(Config.LOGTAG,
-														"successfully connected to our own primary candidate");
-												mergeCandidate(candidate);
-												sendInitRequest();
-											}
-										});
-								mergeCandidate(candidate);
-							} else {
-								Log.d(Config.LOGTAG, "no primary candidate of our own was found");
-								sendInitRequest();
-							}
+										@Override
+										public void established() {
+											Log.d(Config.LOGTAG,
+													"successfully connected to our own primary candidate");
+											mergeCandidate(candidate);
+											sendInitRequest();
+										}
+									});
+							mergeCandidate(candidate);
+						} else {
+							Log.d(Config.LOGTAG, "no primary candidate of our own was found");
+							sendInitRequest();
 						}
 					});
 		}
@@ -483,21 +475,17 @@ public class JingleConnection implements Transferable {
 			content.setTransportId(this.transportId);
 			content.socks5transport().setChildren(getCandidatesAsElements());
 			packet.setContent(content);
-			this.sendJinglePacket(packet,new OnIqPacketReceived() {
-
-				@Override
-				public void onIqPacketReceived(Account account, IqPacket packet) {
-					if (packet.getType() == IqPacket.TYPE.RESULT) {
-						Log.d(Config.LOGTAG,account.getJid().asBareJid()+": other party received offer");
-						if (mJingleStatus == JINGLE_STATUS_OFFERED) {
-							mJingleStatus = JINGLE_STATUS_INITIATED;
-							mXmppConnectionService.markMessage(message, Message.STATUS_OFFERED);
-						} else {
-							Log.d(Config.LOGTAG,"received ack for offer when status was "+mJingleStatus);
-						}
+			this.sendJinglePacket(packet, (account, packet1) -> {
+				if (packet1.getType() == IqPacket.TYPE.RESULT) {
+					Log.d(Config.LOGTAG,account.getJid().asBareJid()+": other party received offer");
+					if (mJingleStatus == JINGLE_STATUS_OFFERED) {
+						mJingleStatus = JINGLE_STATUS_INITIATED;
+						mXmppConnectionService.markMessage(message, Message.STATUS_OFFERED);
 					} else {
-						fail(IqParser.extractErrorMessage(packet));
+						Log.d(Config.LOGTAG,"received ack for offer when status was "+mJingleStatus);
 					}
+				} else {
+					fail(IqParser.extractErrorMessage(packet1));
 				}
 			});
 
@@ -524,46 +512,43 @@ public class JingleConnection implements Transferable {
 		mJingleStatus = JINGLE_STATUS_ACCEPTED;
 		this.mStatus = Transferable.STATUS_DOWNLOADING;
 		this.mJingleConnectionManager.updateConversationUi(true);
-		this.mJingleConnectionManager.getPrimaryCandidate(this.account, new OnPrimaryCandidateFound() {
-			@Override
-			public void onPrimaryCandidateFound(boolean success, final JingleCandidate candidate) {
-				final JinglePacket packet = bootstrapPacket("session-accept");
-				final Content content = new Content(contentCreator,contentName);
-				content.setFileOffer(fileOffer, ftVersion);
-				content.setTransportId(transportId);
-				if (success && candidate != null && !equalCandidateExists(candidate)) {
-					final JingleSocks5Transport socksConnection = new JingleSocks5Transport(
-							JingleConnection.this,
-							candidate);
-					connections.put(candidate.getCid(), socksConnection);
-					socksConnection.connect(new OnTransportConnected() {
+		this.mJingleConnectionManager.getPrimaryCandidate(this.account, (success, candidate) -> {
+			final JinglePacket packet = bootstrapPacket("session-accept");
+			final Content content = new Content(contentCreator,contentName);
+			content.setFileOffer(fileOffer, ftVersion);
+			content.setTransportId(transportId);
+			if (success && candidate != null && !equalCandidateExists(candidate)) {
+				final JingleSocks5Transport socksConnection = new JingleSocks5Transport(
+						JingleConnection.this,
+						candidate);
+				connections.put(candidate.getCid(), socksConnection);
+				socksConnection.connect(new OnTransportConnected() {
 
-						@Override
-						public void failed() {
-							Log.d(Config.LOGTAG,"connection to our own primary candidate failed");
-							content.socks5transport().setChildren(getCandidatesAsElements());
-							packet.setContent(content);
-							sendJinglePacket(packet);
-							connectNextCandidate();
-						}
+					@Override
+					public void failed() {
+						Log.d(Config.LOGTAG,"connection to our own primary candidate failed");
+						content.socks5transport().setChildren(getCandidatesAsElements());
+						packet.setContent(content);
+						sendJinglePacket(packet);
+						connectNextCandidate();
+					}
 
-						@Override
-						public void established() {
-							Log.d(Config.LOGTAG, "connected to primary candidate");
-							mergeCandidate(candidate);
-							content.socks5transport().setChildren(getCandidatesAsElements());
-							packet.setContent(content);
-							sendJinglePacket(packet);
-							connectNextCandidate();
-						}
-					});
-				} else {
-					Log.d(Config.LOGTAG,"did not find a primary candidate for ourself");
-					content.socks5transport().setChildren(getCandidatesAsElements());
-					packet.setContent(content);
-					sendJinglePacket(packet);
-					connectNextCandidate();
-				}
+					@Override
+					public void established() {
+						Log.d(Config.LOGTAG, "connected to primary candidate");
+						mergeCandidate(candidate);
+						content.socks5transport().setChildren(getCandidatesAsElements());
+						packet.setContent(content);
+						sendJinglePacket(packet);
+						connectNextCandidate();
+					}
+				});
+			} else {
+				Log.d(Config.LOGTAG,"did not find a primary candidate for ourself");
+				content.socks5transport().setChildren(getCandidatesAsElements());
+				packet.setContent(content);
+				sendJinglePacket(packet);
+				connectNextCandidate();
 			}
 		});
 	}
@@ -641,7 +626,7 @@ public class JingleConnection implements Transferable {
 					if (mJingleStatus == JINGLE_STATUS_ACCEPTED && this.sentCandidate) {
 						this.connect();
 					} else {
-						Log.d(Config.LOGTAG, "ignoring because file is already in transmission or we haven't sent our candidate yet status="+mJingleStatus+" sentCandidate="+Boolean.toString(sentCandidate));
+						Log.d(Config.LOGTAG, "ignoring because file is already in transmission or we haven't sent our candidate yet status="+mJingleStatus+" sentCandidate="+ sentCandidate);
 					}
 					return true;
 				} else {
@@ -685,17 +670,12 @@ public class JingleConnection implements Transferable {
 					activation.query().addChild("activate")
 							.setContent(this.getCounterPart().toString());
 					mXmppConnectionService.sendIqPacket(account,activation,
-							new OnIqPacketReceived() {
-
-								@Override
-								public void onIqPacketReceived(Account account,
-										IqPacket packet) {
-									if (packet.getType() != IqPacket.TYPE.RESULT) {
-										onProxyActivated.failed();
-									} else {
-										onProxyActivated.success();
-										sendProxyActivated(connection.getCandidate().getCid());
-									}
+							(account, packet) -> {
+								if (packet.getType() != IqPacket.TYPE.RESULT) {
+									onProxyActivated.failed();
+								} else {
+									onProxyActivated.success();
+									sendProxyActivated(connection.getCandidate().getCid());
 								}
 							});
 				} else {
@@ -777,7 +757,7 @@ public class JingleConnection implements Transferable {
 		this.sendJinglePacket(packet);
 	}
 
-	OnTransportConnected onIbbTransportConnected = new OnTransportConnected() {
+	private final OnTransportConnected onIbbTransportConnected = new OnTransportConnected() {
 		@Override
 		public void failed() {
 			Log.d(Config.LOGTAG, "ibb open failed");
@@ -810,13 +790,10 @@ public class JingleConnection implements Transferable {
 
 
 		if (initiating()) {
-			this.sendJinglePacket(answer, new OnIqPacketReceived() {
-				@Override
-				public void onIqPacketReceived(Account account, IqPacket packet) {
-					if (packet.getType() == IqPacket.TYPE.RESULT) {
-						Log.d(Config.LOGTAG, account.getJid().asBareJid() + " recipient ACKed our transport-accept. creating ibb");
-						transport.connect(onIbbTransportConnected);
-					}
+			this.sendJinglePacket(answer, (account, packet1) -> {
+				if (packet1.getType() == IqPacket.TYPE.RESULT) {
+					Log.d(Config.LOGTAG, account.getJid().asBareJid() + " recipient ACKed our transport-accept. creating ibb");
+					transport.connect(onIbbTransportConnected);
 				}
 			});
 		} else {
@@ -1075,13 +1052,7 @@ public class JingleConnection implements Transferable {
 	public boolean start() {
 		if (account.getStatus() == Account.State.ONLINE) {
 			if (mJingleStatus == JINGLE_STATUS_INITIATED) {
-				new Thread(new Runnable() {
-
-					@Override
-					public void run() {
-						sendAccept();
-					}
-				}).start();
+				new Thread(() -> sendAccept()).start();
 			}
 			return true;
 		} else {

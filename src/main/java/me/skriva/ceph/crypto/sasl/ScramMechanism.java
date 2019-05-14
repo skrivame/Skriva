@@ -50,7 +50,7 @@ abstract class ScramMechanism extends SaslMechanism {
     }
 
     private final String clientNonce;
-    protected State state = State.INITIAL;
+    private State state = State.INITIAL;
     private String clientFirstMessageBare;
     private byte[] serverSignature = null;
 
@@ -62,8 +62,7 @@ abstract class ScramMechanism extends SaslMechanism {
         clientFirstMessageBare = "";
     }
 
-    private static synchronized byte[] hmac(final byte[] key, final byte[] input)
-            throws InvalidKeyException {
+    private static synchronized byte[] hmac(final byte[] key, final byte[] input) {
         HMAC.init(new KeyParameter(key));
         HMAC.update(input, 0, input.length);
         final byte[] out = new byte[HMAC.getMacSize()];
@@ -71,7 +70,7 @@ abstract class ScramMechanism extends SaslMechanism {
         return out;
     }
 
-    public static synchronized byte[] digest(byte[] bytes) {
+    private static synchronized byte[] digest(byte[] bytes) {
         DIGEST.reset();
         DIGEST.update(bytes, 0, bytes.length);
         final byte[] out = new byte[DIGEST.getDigestSize()];
@@ -175,22 +174,17 @@ abstract class ScramMechanism extends SaslMechanism {
                         CryptoHelper.bytesToHex(account.getJid().asBareJid().toString().getBytes()) + ","
                                 + CryptoHelper.bytesToHex(account.getPassword().getBytes()) + ","
                                 + CryptoHelper.bytesToHex(salt.getBytes()) + ","
-                                + String.valueOf(iterationCount) + ","
+                                + iterationCount + ","
                                 + getMechanism()
                 );
                 if (keys == null) {
                     throw new AuthenticationException("Invalid keys generated");
                 }
                 final byte[] clientSignature;
-                try {
-                    serverSignature = hmac(keys.serverKey, authMessage);
-                    final byte[] storedKey = digest(keys.clientKey);
+                serverSignature = hmac(keys.serverKey, authMessage);
+                final byte[] storedKey = digest(keys.clientKey);
 
-                    clientSignature = hmac(storedKey, authMessage);
-
-                } catch (final InvalidKeyException e) {
-                    throw new AuthenticationException(e);
-                }
+                clientSignature = hmac(storedKey, authMessage);
 
                 final byte[] clientProof = new byte[keys.clientKey.length];
 

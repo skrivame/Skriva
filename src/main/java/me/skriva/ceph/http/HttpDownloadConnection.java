@@ -33,8 +33,8 @@ import rocks.xmpp.addr.Jid;
 
 public class HttpDownloadConnection implements Transferable {
 
-	private HttpConnectionManager mHttpConnectionManager;
-	private XmppConnectionService mXmppConnectionService;
+	private final HttpConnectionManager mHttpConnectionManager;
+	private final XmppConnectionService mXmppConnectionService;
 
 	private URL mUrl;
 	private final Message message;
@@ -268,7 +268,7 @@ public class HttpDownloadConnection implements Transferable {
 
 		private long retrieveFileSize() throws IOException {
 			try {
-				Log.d(Config.LOGTAG, "retrieve file size. interactive:" + String.valueOf(interactive));
+				Log.d(Config.LOGTAG, "retrieve file size. interactive:" + interactive);
 				changeStatus(STATUS_CHECKING);
 				HttpURLConnection connection;
 				if (mUseTor || message.getConversation().getAccount().isOnion()) {
@@ -324,7 +324,7 @@ public class HttpDownloadConnection implements Transferable {
 
 		private OutputStream os;
 
-		public FileDownloader(boolean interactive) {
+		FileDownloader(boolean interactive) {
 			this.interactive = interactive;
 		}
 

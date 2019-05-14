@@ -78,7 +78,7 @@ public class MediaPreviewAdapter extends RecyclerView.Adapter<MediaPreviewAdapte
                 imageView.setBackgroundColor(0xff333333);
                 imageView.setImageDrawable(null);
                 final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-                final AsyncDrawable asyncDrawable = new AsyncDrawable(conversationFragment.getActivity().getResources(), null, task);
+                final AsyncDrawable asyncDrawable = new AsyncDrawable(conversationFragment.getActivity().getResources(), task);
                 imageView.setImageDrawable(asyncDrawable);
                 try {
                     task.execute(attachment);
@@ -143,8 +143,8 @@ public class MediaPreviewAdapter extends RecyclerView.Adapter<MediaPreviewAdapte
     static class AsyncDrawable extends BitmapDrawable {
         private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
 
-        AsyncDrawable(Resources res, Bitmap bitmap, BitmapWorkerTask bitmapWorkerTask) {
-            super(res, bitmap);
+        AsyncDrawable(Resources res, BitmapWorkerTask bitmapWorkerTask) {
+            super(res, (Bitmap) null);
             bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
         }
 

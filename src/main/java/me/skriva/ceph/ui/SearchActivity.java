@@ -62,7 +62,6 @@ import me.skriva.ceph.ui.util.ListViewUtils;
 import me.skriva.ceph.ui.util.PendingItem;
 import me.skriva.ceph.ui.util.ShareUtil;
 import me.skriva.ceph.utils.FtsUtils;
-import me.skriva.ceph.utils.MessageUtils;
 
 import static me.skriva.ceph.ui.util.SoftKeyboardUtils.hideSoftKeyboard;
 import static me.skriva.ceph.ui.util.SoftKeyboardUtils.showKeyboard;

@@ -26,13 +26,13 @@ public class GeoHelper {
 	private static final String SHARE_LOCATION_PACKAGE_NAME = "me.skriva.ceph.location.request";
 	private static final String SHOW_LOCATION_PACKAGE_NAME = "me.skriva.ceph.location.show";
 
-	public static Pattern GEO_URI = Pattern.compile("geo:(-?\\d+(?:\\.\\d+)?),(-?\\d+(?:\\.\\d+)?)(?:,-?\\d+(?:\\.\\d+)?)?(?:;crs=[\\w-]+)?(?:;u=\\d+(?:\\.\\d+)?)?(?:;[\\w-]+=(?:[\\w-_.!~*'()]|%[\\da-f][\\da-f])+)*", Pattern.CASE_INSENSITIVE);
+	public static final Pattern GEO_URI = Pattern.compile("geo:(-?\\d+(?:\\.\\d+)?),(-?\\d+(?:\\.\\d+)?)(?:,-?\\d+(?:\\.\\d+)?)?(?:;crs=[\\w-]+)?(?:;u=\\d+(?:\\.\\d+)?)?(?:;[\\w-]+=(?:[\\w-_.!~*'()]|%[\\da-f][\\da-f])+)*", Pattern.CASE_INSENSITIVE);
 
 	public static boolean isLocationPluginInstalled(Context context) {
 		return new Intent(SHARE_LOCATION_PACKAGE_NAME).resolveActivity(context.getPackageManager()) != null;
 	}
 
-	public static boolean isLocationPluginInstalledAndDesired(Context context) {
+	private static boolean isLocationPluginInstalledAndDesired(Context context) {
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		final boolean configured = preferences.getBoolean("use_share_location_plugin", context.getResources().getBoolean(R.bool.use_share_location_plugin));
 		return configured && isLocationPluginInstalled(context);
@@ -107,7 +107,7 @@ public class GeoHelper {
 		intents.add(geoIntent(geoPoint, label));
 
 		Intent httpIntent = new Intent(Intent.ACTION_VIEW);
-		httpIntent.setData(Uri.parse("https://maps.google.com/maps?q=loc:"+String.valueOf(geoPoint.getLatitude()) + "," + String.valueOf(geoPoint.getLongitude()) +label));
+		httpIntent.setData(Uri.parse("https://maps.google.com/maps?q=loc:"+ geoPoint.getLatitude() + "," + geoPoint.getLongitude() +label));
 		intents.add(httpIntent);
 		return intents;
 	}
@@ -120,7 +120,7 @@ public class GeoHelper {
 
 	private static Intent geoIntent(GeoPoint geoPoint, String label) {
 		Intent geoIntent = new Intent(Intent.ACTION_VIEW);
-		geoIntent.setData(Uri.parse("geo:" + String.valueOf(geoPoint.getLatitude()) + "," + String.valueOf(geoPoint.getLongitude()) + "?q=" + String.valueOf(geoPoint.getLatitude()) + "," + String.valueOf(geoPoint.getLongitude()) + "("+ label+")"));
+		geoIntent.setData(Uri.parse("geo:" + geoPoint.getLatitude() + "," + geoPoint.getLongitude() + "?q=" + geoPoint.getLatitude() + "," + geoPoint.getLongitude() + "("+ label+")"));
 		return geoIntent;
 	}
 

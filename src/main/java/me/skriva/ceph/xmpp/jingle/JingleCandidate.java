@@ -9,13 +9,13 @@ import rocks.xmpp.addr.Jid;
 
 public class JingleCandidate {
 
-	public static int TYPE_UNKNOWN;
-	public static int TYPE_DIRECT = 0;
-	public static int TYPE_PROXY = 1;
+	private static int TYPE_UNKNOWN;
+	private static final int TYPE_DIRECT = 0;
+	public static final int TYPE_PROXY = 1;
 
-	private boolean ours;
+	private final boolean ours;
 	private boolean usedByCounterpart = false;
-	private String cid;
+	private final String cid;
 	private String host;
 	private int port;
 	private int type;
@@ -59,7 +59,7 @@ public class JingleCandidate {
 		this.type = type;
 	}
 
-	public void setType(String type) {
+	private void setType(String type) {
         switch (type) {
             case "proxy":
                 this.type = TYPE_PROXY;
@@ -105,7 +105,7 @@ public class JingleCandidate {
 		return parsedCandidates;
 	}
 
-	public static JingleCandidate parse(Element candidate) {
+	private static JingleCandidate parse(Element candidate) {
 		JingleCandidate parsedCandidate = new JingleCandidate(
 				candidate.getAttribute("cid"), false);
 		parsedCandidate.setHost(candidate.getAttribute("host"));

@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageManager;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.File;
 import java.security.KeyStoreException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +56,7 @@ public class SettingsActivity extends XmppActivity implements
 	public static final String SHOW_DYNAMIC_TAGS = "show_dynamic_tags";
 	public static final String OMEMO_SETTING = "omemo";
 
-	public static final int REQUEST_CREATE_BACKUP = 0xbf8701;
+	private static final int REQUEST_CREATE_BACKUP = 0xbf8701;
 	private SettingsFragment mSettingsFragment;
 
 	@Override
@@ -152,8 +150,8 @@ public class SettingsActivity extends XmppActivity implements
 				entries.remove(index);
 				entryValues.remove(index);
 			}
-			quickAction.setEntries(entries.toArray(new CharSequence[entries.size()]));
-			quickAction.setEntryValues(entryValues.toArray(new CharSequence[entryValues.size()]));
+			quickAction.setEntries(entries.toArray(new CharSequence[0]));
+			quickAction.setEntryValues(entryValues.toArray(new CharSequence[0]));
 		}
 
 		final Preference removeCertsPreference = mSettingsFragment.findPreference("remove_trusted_certificates");
@@ -168,7 +166,7 @@ public class SettingsActivity extends XmppActivity implements
 				final ArrayList<Integer> selectedItems = new ArrayList<>();
 				final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
 				dialogBuilder.setTitle(getResources().getString(R.string.dialog_manage_certs_title));
-				dialogBuilder.setMultiChoiceItems(aliases.toArray(new CharSequence[aliases.size()]), null,
+				dialogBuilder.setMultiChoiceItems(aliases.toArray(new CharSequence[0]), null,
 						(dialog, indexSelected, isChecked) -> {
 							if (isChecked) {
 								selectedItems.add(indexSelected);
@@ -295,7 +293,7 @@ public class SettingsActivity extends XmppActivity implements
 			}
 		}
 		final boolean[] checkedItems = new boolean[accounts.size()];
-		builder.setMultiChoiceItems(accounts.toArray(new CharSequence[accounts.size()]), checkedItems, (dialog, which, isChecked) -> {
+		builder.setMultiChoiceItems(accounts.toArray(new CharSequence[0]), checkedItems, (dialog, which, isChecked) -> {
 			checkedItems[which] = isChecked;
 			final AlertDialog alertDialog = (AlertDialog) dialog;
 			for (boolean item : checkedItems) {

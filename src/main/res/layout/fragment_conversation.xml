@@ -83,7 +83,6 @@
 
             </android.support.v7.widget.RecyclerView>
 
-
             <me.skriva.ceph.ui.widget.EditMessage
                 android:id="@+id/textinput"
                 style="@style/Widget.Conversations.EditText"

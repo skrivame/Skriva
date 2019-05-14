@@ -7,9 +7,9 @@ import me.skriva.ceph.xml.TagWriter;
 
 public abstract class SaslMechanism {
 
-	final protected TagWriter tagWriter;
-	final protected Account account;
-	final protected SecureRandom rng;
+	private final TagWriter tagWriter;
+	final Account account;
+	final SecureRandom rng;
 
 	protected enum State {
 		INITIAL,
@@ -19,25 +19,25 @@ public abstract class SaslMechanism {
 	}
 
 	public static class AuthenticationException extends Exception {
-		public AuthenticationException(final String message) {
+		AuthenticationException(final String message) {
 			super(message);
 		}
 
-		public AuthenticationException(final Exception inner) {
+		AuthenticationException(final Exception inner) {
 			super(inner);
 		}
 
-		public AuthenticationException(final String message, final Exception exception) {
+		AuthenticationException(final String message, final Exception exception) {
 			super(message,exception);
 		}
 	}
 
 	public static class InvalidStateException extends AuthenticationException {
-		public InvalidStateException(final String message) {
+		InvalidStateException(final String message) {
 			super(message);
 		}
 
-		public InvalidStateException(final State state) {
+		InvalidStateException(final State state) {
 			this("Invalid state: " + state.toString());
 		}
 	}

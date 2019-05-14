@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ImStyleParser {
+class ImStyleParser {
 
     private final static List<Character> KEYWORDS = Arrays.asList('*', '_', '~', '`');
     private final static List<Character> NO_SUB_PARSING_KEYWORDS = Collections.singletonList('`');
@@ -54,7 +54,7 @@ public class ImStyleParser {
                 if (BLOCK_KEYWORDS.contains(c) && isCharRepeatedTwoTimes(text, c, i + 1, end)) {
                     int to = seekEndBlock(text, c, i + 3, end);
                     if (to != -1 && (to != i + 5 || ALLOW_EMPTY)) {
-                        String keyword = String.valueOf(c) + String.valueOf(c) + String.valueOf(c);
+                        String keyword = String.valueOf(c) + c + c;
                         styles.add(new Style(keyword, i, to));
                         i = to;
                         continue;
@@ -135,11 +135,11 @@ public class ImStyleParser {
         private final int start;
         private final int end;
 
-        public Style(char character, int start, int end) {
+        Style(char character, int start, int end) {
             this(String.valueOf(character), start, end);
         }
 
-        public Style(String keyword, int start, int end) {
+        Style(String keyword, int start, int end) {
             this.keyword = keyword;
             this.start = start;
             this.end = end;

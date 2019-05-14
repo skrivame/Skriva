@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import rocks.xmpp.addr.Jid;
@@ -23,9 +24,9 @@ public class ReadByMarker {
 
 		ReadByMarker marker = (ReadByMarker) o;
 
-		if (fullJid != null ? !fullJid.equals(marker.fullJid) : marker.fullJid != null)
+		if (!Objects.equals(fullJid, marker.fullJid))
 			return false;
-		return realJid != null ? realJid.equals(marker.realJid) : marker.realJid == null;
+		return Objects.equals(realJid, marker.realJid);
 
 	}
 
@@ -47,7 +48,7 @@ public class ReadByMarker {
 		return realJid;
 	}
 
-	public JSONObject toJson() {
+	private JSONObject toJson() {
 		JSONObject jsonObject = new JSONObject();
 		if (fullJid != null) {
 			try {
@@ -66,7 +67,7 @@ public class ReadByMarker {
 		return jsonObject;
 	}
 
-	public static Set<ReadByMarker> fromJson(JSONArray jsonArray) {
+	private static Set<ReadByMarker> fromJson(JSONArray jsonArray) {
 		HashSet<ReadByMarker> readByMarkers = new HashSet<>();
 		for(int i = 0; i < jsonArray.length(); ++i) {
 			try {
@@ -92,7 +93,7 @@ public class ReadByMarker {
 		return marker;
 	}
 
-	public static ReadByMarker from(MucOptions.User user) {
+	private static ReadByMarker from(MucOptions.User user) {
 		final ReadByMarker marker = new ReadByMarker();
 		marker.fullJid = user.getFullJid();
 		marker.realJid = user.getRealJid();
@@ -107,7 +108,7 @@ public class ReadByMarker {
 		return markers;
 	}
 
-	public static ReadByMarker fromJson(JSONObject jsonObject) {
+	private static ReadByMarker fromJson(JSONObject jsonObject) {
 		ReadByMarker marker = new ReadByMarker();
 		try {
 			marker.fullJid = Jid.of(jsonObject.getString("fullJid"));

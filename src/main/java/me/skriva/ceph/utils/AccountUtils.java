@@ -42,7 +42,7 @@ public class AccountUtils {
         return null;
     }
 
-    public static Account getFirst(XmppConnectionService service) {
+    private static Account getFirst(XmppConnectionService service) {
         final List<Account> accounts = service.getAccounts();
         for(Account account : accounts) {
             return account;

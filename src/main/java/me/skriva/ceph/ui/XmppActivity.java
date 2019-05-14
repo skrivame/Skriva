@@ -12,11 +12,9 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
@@ -88,24 +86,24 @@ import rocks.xmpp.addr.Jid;
 public abstract class XmppActivity extends ActionBarActivity {
 
 	public static final String EXTRA_ACCOUNT = "account";
-	protected static final int REQUEST_INVITE_TO_CONVERSATION = 0x0102;
-	protected static final int REQUEST_BATTERY_OP = 0x49ff;
+	static final int REQUEST_INVITE_TO_CONVERSATION = 0x0102;
+	static final int REQUEST_BATTERY_OP = 0x49ff;
 
-	public static final int BITMAP_SCALE = 260;
-	public static final int BITMAP_SCALE_FOR_QUOTED_IMAGE = 60;
+	private static final int BITMAP_SCALE = 260;
+	private static final int BITMAP_SCALE_FOR_QUOTED_IMAGE = 60;
 
 	public XmppConnectionService xmppConnectionService;
-	public boolean xmppConnectionServiceBound = false;
+	boolean xmppConnectionServiceBound = false;
 
-	protected static final String FRAGMENT_TAG_DIALOG = "dialog";
+	static final String FRAGMENT_TAG_DIALOG = "dialog";
 
 	private boolean isCameraFeatureAvailable = false;
 
-	protected int mTheme;
-	protected boolean mUsingEnterKey = false;
-	protected Toast mToast;
-	protected ConferenceInvite mPendingConferenceInvite = null;
-	protected ServiceConnection mConnection = new ServiceConnection() {
+	int mTheme;
+	private boolean mUsingEnterKey = false;
+	Toast mToast;
+	ConferenceInvite mPendingConferenceInvite = null;
+	private final ServiceConnection mConnection = new ServiceConnection() {
 
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
@@ -123,12 +121,12 @@ public abstract class XmppActivity extends ActionBarActivity {
 	};
 	private DisplayMetrics metrics;
 	private long mLastUiRefresh = 0;
-	private Handler mRefreshUiHandler = new Handler();
-	private Runnable mRefreshUiRunnable = () -> {
+	private final Handler mRefreshUiHandler = new Handler();
+	private final Runnable mRefreshUiRunnable = () -> {
 		mLastUiRefresh = SystemClock.elapsedRealtime();
 		refreshUiReal();
 	};
-	private UiCallback<Conversation> adhocCallback = new UiCallback<Conversation>() {
+	private final UiCallback<Conversation> adhocCallback = new UiCallback<Conversation>() {
 		@Override
 		public void success(final Conversation conversation) {
 			runOnUiThread(() -> {
@@ -147,9 +145,9 @@ public abstract class XmppActivity extends ActionBarActivity {
 
 		}
 	};
-	public boolean mSkipBackgroundBinding = false;
+	boolean mSkipBackgroundBinding = false;
 
-	public static boolean cancelPotentialWork(Message message, ImageView imageView) {
+	private static boolean cancelPotentialWork(Message message, ImageView imageView) {
 		final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
 
 		if (bitmapWorkerTask != null) {
@@ -174,23 +172,23 @@ public abstract class XmppActivity extends ActionBarActivity {
 		return null;
 	}
 
-	protected void hideToast() {
+	void hideToast() {
 		if (mToast != null) {
 			mToast.cancel();
 		}
 	}
 
-	protected void replaceToast(String msg) {
+	void replaceToast(String msg) {
 		replaceToast(msg, true);
 	}
 
-	protected void replaceToast(String msg, boolean showlong) {
+	void replaceToast(String msg, boolean showlong) {
 		hideToast();
 		mToast = Toast.makeText(this, msg, showlong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
 		mToast.show();
 	}
 
-	protected final void refreshUi() {
+	final void refreshUi() {
 		final long diff = SystemClock.elapsedRealtime() - mLastUiRefresh;
 		if (diff > Config.REFRESH_UI_INTERVAL) {
 			mRefreshUiHandler.removeCallbacks(mRefreshUiRunnable);
@@ -219,7 +217,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	public void connectToBackend() {
+	private void connectToBackend() {
 		Intent intent = new Intent(this, XmppConnectionService.class);
 		intent.setAction("ui");
 		try {
@@ -242,7 +240,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 
 	abstract void onBackendConnected();
 
-	protected void registerListeners() {
+	private void registerListeners() {
 		if (this instanceof XmppConnectionService.OnConversationUpdate) {
 			this.xmppConnectionService.setOnConversationListChangedListener((XmppConnectionService.OnConversationUpdate) this);
 		}
@@ -269,7 +267,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	protected void unregisterListeners() {
+	private void unregisterListeners() {
 		if (this instanceof XmppConnectionService.OnConversationUpdate) {
 			this.xmppConnectionService.removeOnConversationListChangedListener((XmppConnectionService.OnConversationUpdate) this);
 		}
@@ -370,7 +368,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		this.mUsingEnterKey = usingEnterKey();
 	}
 
-	protected boolean isCameraFeatureAvailable() {
+	boolean isCameraFeatureAvailable() {
 		return this.isCameraFeatureAvailable;
 	}
 
@@ -388,7 +386,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		return res;
 	}
 
-	protected boolean isOptimizingBattery() {
+	boolean isOptimizingBattery() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			final PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
 			return pm != null
@@ -398,7 +396,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	protected boolean isAffectedByDataSaver() {
+	boolean isAffectedByDataSaver() {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			final ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 			return cm != null
@@ -409,15 +407,15 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	protected boolean usingEnterKey() {
+	private boolean usingEnterKey() {
 		return getBooleanPreference("display_enter_key", R.bool.display_enter_key);
 	}
 
-	protected SharedPreferences getPreferences() {
+	SharedPreferences getPreferences() {
 		return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	}
 
-	protected boolean getBooleanPreference(String name, @BoolRes int res) {
+	boolean getBooleanPreference(String name, @BoolRes int res) {
 		return getPreferences().getBoolean(name, getResources().getBoolean(res));
 	}
 
@@ -425,15 +423,15 @@ public abstract class XmppActivity extends ActionBarActivity {
 		switchToConversation(conversation, null);
 	}
 
-	public void switchToConversationAndCommentMessage(Conversation conversation, String messageReference, boolean quoteMessage) {
+	void switchToConversationAndCommentMessage(Conversation conversation, String messageReference, boolean quoteMessage) {
 		switchToConversation(conversation, null, messageReference, quoteMessage, null, false, false);
 	}
 
-	public void switchToConversation(Conversation conversation, String text) {
+	void switchToConversation(Conversation conversation, String text) {
 		switchToConversation(conversation, text, null, false, null, false, false);
 	}
 
-	public void switchToConversationDoNotAppend(Conversation conversation, String text) {
+	void switchToConversationDoNotAppend(Conversation conversation, String text) {
 		switchToConversation(conversation, text, null , false, null, false, true);
 	}
 
@@ -491,7 +489,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		switchToAccount(account, false, null);
 	}
 
-	public void switchToAccount(Account account, boolean init, String fingerprint) {
+	private void switchToAccount(Account account, boolean init, String fingerprint) {
 		Intent intent = new Intent(this, EditAccountActivity.class);
 		intent.putExtra("jid", account.getJid().asBareJid().toString());
 		intent.putExtra("init", init);
@@ -507,7 +505,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	protected void delegateUriPermissionsToService(Uri uri) {
+	void delegateUriPermissionsToService(Uri uri) {
 		Intent intent = new Intent(this, XmppConnectionService.class);
 		intent.setAction(Intent.ACTION_SEND);
 		intent.setData(uri);
@@ -519,7 +517,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	protected void inviteToConversation(Conversation conversation) {
+	void inviteToConversation(Conversation conversation) {
 		startActivityForResult(ChooseContactActivity.create(this,conversation), REQUEST_INVITE_TO_CONVERSATION);
 	}
 
@@ -546,7 +544,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 
 	}
 
-	protected void showAddToRosterDialog(final Contact contact) {
+	void showAddToRosterDialog(final Contact contact) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(contact.getJid().toString());
 		builder.setMessage(getString(R.string.not_in_roster));
@@ -572,15 +570,15 @@ public abstract class XmppActivity extends ActionBarActivity {
 		builder.create().show();
 	}
 
-	protected void quickEdit(String previousValue, @StringRes int hint, OnValueEdited callback) {
-		quickEdit(previousValue, callback, hint, false, false);
+	void quickEdit(String previousValue, OnValueEdited callback) {
+		quickEdit(previousValue, callback, R.string.nickname, false, false);
 	}
 
-	protected void quickEdit(String previousValue, @StringRes int hint, OnValueEdited callback, boolean permitEmpty) {
-		quickEdit(previousValue, callback, hint, false, permitEmpty);
+	void quickEdit(String previousValue, @StringRes int hint, OnValueEdited callback) {
+		quickEdit(previousValue, callback, hint, false, true);
 	}
 
-	protected void quickPasswordEdit(String previousValue, OnValueEdited callback) {
+	void quickPasswordEdit(String previousValue, OnValueEdited callback) {
 		quickEdit(previousValue, callback, R.string.password, true, false);
 	}
 
@@ -626,12 +624,10 @@ public abstract class XmppActivity extends ActionBarActivity {
 			dialog.dismiss();
 		}));
 		dialog.setCanceledOnTouchOutside(false);
-		dialog.setOnDismissListener(dialog1 -> {
-			SoftKeyboardUtils.hideSoftKeyboard(binding.inputEditText);
-        });
+		dialog.setOnDismissListener(dialog1 -> SoftKeyboardUtils.hideSoftKeyboard(binding.inputEditText));
 	}
 
-	protected boolean hasStoragePermission(int requestCode) {
+	boolean hasStoragePermission(int requestCode) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 				requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
@@ -673,15 +669,15 @@ public abstract class XmppActivity extends ActionBarActivity {
 		return getBooleanPreference(SettingsActivity.MANUALLY_CHANGE_PRESENCE, R.bool.manually_change_presence);
 	}
 
-	protected String getShareableUri() {
+	private String getShareableUri() {
 		return getShareableUri(false);
 	}
 
-	protected String getShareableUri(boolean http) {
+	String getShareableUri(boolean http) {
 		return null;
 	}
 
-	protected void shareLink(boolean http) {
+	void shareLink(boolean http) {
 		String uri = getShareableUri(http);
 		if (uri == null || uri.isEmpty()) {
 			return;
@@ -701,7 +697,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		super.onResume();
 	}
 
-	protected int findTheme() {
+	int findTheme() {
 		return ThemeHelper.find(this);
 	}
 
@@ -718,11 +714,11 @@ public abstract class XmppActivity extends ActionBarActivity {
 		return super.onMenuOpened(id, menu);
 	}
 
-	protected void showQrCode() {
+	private void showQrCode() {
 		showQrCode(getShareableUri());
 	}
 
-	protected void showQrCode(final String uri) {
+	void showQrCode(final String uri) {
 		if (uri == null || uri.isEmpty()) {
 			return;
 		}
@@ -738,7 +734,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		builder.create().show();
 	}
 
-	protected Account extractAccount(Intent intent) {
+	Account extractAccount(Intent intent) {
 		String jid = intent != null ? intent.getStringExtra(EXTRA_ACCOUNT) : null;
 		try {
 			return jid != null ? xmppConnectionService.findAccountByJid(Jid.of(jid)) : null;
@@ -759,7 +755,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		loadBitmap(referencedMessage, imageView, BITMAP_SCALE_FOR_QUOTED_IMAGE, false);
 	}
 
-	public void loadBitmap(Message message, ImageView imageView, int scale, boolean cacheOnly) {
+	private void loadBitmap(Message message, ImageView imageView, int scale, boolean cacheOnly) {
 		Bitmap bm;
 		try {
 			bm = xmppConnectionService.getFileBackend().getThumbnail(message, (int) (metrics.density * scale), cacheOnly);
@@ -776,7 +772,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 				imageView.setImageDrawable(null);
 				final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
 				final AsyncDrawable asyncDrawable = new AsyncDrawable(
-						getResources(), null, task);
+						getResources(), task);
 				imageView.setImageDrawable(asyncDrawable);
 				try {
 					task.execute(message);
@@ -787,13 +783,13 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 	}
 
-	protected interface OnValueEdited {
+	interface OnValueEdited {
 		String onValueEdited(String value);
 	}
 
 	public static class ConferenceInvite {
 		private String uuid;
-		private List<Jid> jids = new ArrayList<>();
+		private final List<Jid> jids = new ArrayList<>();
 
 		public static ConferenceInvite parse(Intent data) {
 			ConferenceInvite invite = new ConferenceInvite();
@@ -864,8 +860,8 @@ public abstract class XmppActivity extends ActionBarActivity {
 	private static class AsyncDrawable extends BitmapDrawable {
 		private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
 
-		private AsyncDrawable(Resources res, Bitmap bitmap, BitmapWorkerTask bitmapWorkerTask) {
-			super(res, bitmap);
+		private AsyncDrawable(Resources res, BitmapWorkerTask bitmapWorkerTask) {
+			super(res, (Bitmap) null);
 			bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
 		}
 

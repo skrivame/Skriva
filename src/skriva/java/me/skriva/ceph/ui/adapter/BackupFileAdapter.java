@@ -119,7 +119,7 @@ public class BackupFileAdapter extends RecyclerView.Adapter<BackupFileAdapter.Ba
             imageView.setBackgroundColor(UIHelper.getColorForName(jid.asBareJid().toString()));
             imageView.setImageDrawable(null);
             final BitmapWorkerTask task = new BitmapWorkerTask(imageView);
-            final AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), null, task);
+            final AsyncDrawable asyncDrawable = new AsyncDrawable(imageView.getContext().getResources(), task);
             imageView.setImageDrawable(asyncDrawable);
             try {
                 task.execute(jid);
@@ -156,8 +156,8 @@ public class BackupFileAdapter extends RecyclerView.Adapter<BackupFileAdapter.Ba
     static class AsyncDrawable extends BitmapDrawable {
         private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
 
-        AsyncDrawable(Resources res, Bitmap bitmap, BitmapWorkerTask bitmapWorkerTask) {
-            super(res, bitmap);
+        AsyncDrawable(Resources res, BitmapWorkerTask bitmapWorkerTask) {
+            super(res, (Bitmap) null);
             bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
         }
 

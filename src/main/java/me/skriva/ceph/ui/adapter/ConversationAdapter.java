@@ -26,8 +26,8 @@ import rocks.xmpp.addr.Jid;
 
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ConversationViewHolder> {
 
-    private XmppActivity activity;
-    private List<Conversation> conversations;
+    private final XmppActivity activity;
+    private final List<Conversation> conversations;
     private OnConversationClickListener listener;
 
     public ConversationAdapter(XmppActivity activity, List<Conversation> conversations) {

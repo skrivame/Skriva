@@ -28,11 +28,10 @@ public class Element {
 		this.setAttribute("xmlns", xmlns);
 	}
 
-	public Element addChild(Element child) {
+	public void addChild(Element child) {
 		this.content = null;
 		children.add(child);
-		return child;
-	}
+    }
 
 	public Element addChild(String name) {
 		this.content = null;
@@ -122,10 +121,9 @@ public class Element {
 		return this.children;
 	}
 
-	public Element setChildren(List<Element> children) {
+	public void setChildren(List<Element> children) {
 		this.children = children;
-		return this;
-	}
+    }
 
 	public final String getContent() {
 		return content;
@@ -138,15 +136,13 @@ public class Element {
 		return this;
 	}
 
-	public Element removeAttribute(String name) {
+	public void removeAttribute(String name) {
 		this.attributes.remove(name);
-		return this;
-	}
+    }
 
-	public Element setAttributes(Hashtable<String, String> attributes) {
+	public void setAttributes(Hashtable<String, String> attributes) {
 		this.attributes = attributes;
-		return this;
-	}
+    }
 
 	public String getAttribute(String name) {
 		if (this.attributes.containsKey(name)) {

@@ -22,18 +22,18 @@ import rocks.xmpp.addr.Jid;
 
 public class JingleInbandTransport extends JingleTransport {
 
-	private Account account;
-	private Jid counterpart;
-	private int blockSize;
+	private final Account account;
+	private final Jid counterpart;
+	private final int blockSize;
 	private int seq = 0;
-	private String sessionId;
+	private final String sessionId;
 
 	private boolean established = false;
 
 	private boolean connected = true;
 
 	private DownloadableFile file;
-	private JingleConnection connection;
+	private final JingleConnection connection;
 
 	private InputStream fileInputStream = null;
 	private InputStream innerInputStream = null;
@@ -44,13 +44,10 @@ public class JingleInbandTransport extends JingleTransport {
 
 	private OnFileTransmissionStatusChanged onFileTransmissionStatusChanged;
 
-	private OnIqPacketReceived onAckReceived = new OnIqPacketReceived() {
-		@Override
-		public void onIqPacketReceived(Account account, IqPacket packet) {
-			if (connected && packet.getType() == IqPacket.TYPE.RESULT) {
-				if (remainingSize > 0) {
-					sendNextBlock();
-				}
+	private final OnIqPacketReceived onAckReceived = (account, packet) -> {
+		if (connected && packet.getType() == IqPacket.TYPE.RESULT) {
+			if (remainingSize > 0) {
+				sendNextBlock();
 			}
 		}
 	};
@@ -80,16 +77,11 @@ public class JingleInbandTransport extends JingleTransport {
 		open.setAttribute("block-size", Integer.toString(this.blockSize));
 		this.connected = true;
 		this.account.getXmppConnection().sendIqPacket(iq,
-				new OnIqPacketReceived() {
-
-					@Override
-					public void onIqPacketReceived(Account account,
-							IqPacket packet) {
-						if (packet.getType() != IqPacket.TYPE.RESULT) {
-							callback.failed();
-						} else {
-							callback.established();
-						}
+				(account, packet) -> {
+					if (packet.getType() != IqPacket.TYPE.RESULT) {
+						callback.failed();
+					} else {
+						callback.established();
 					}
 				});
 	}

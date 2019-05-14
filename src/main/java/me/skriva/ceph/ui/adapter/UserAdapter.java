@@ -1,7 +1,5 @@
 package me.skriva.ceph.ui.adapter;
 
-import android.app.PendingIntent;
-import android.content.IntentSender;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
@@ -16,7 +14,6 @@ import me.skriva.ceph.R;
 import me.skriva.ceph.databinding.ContactBinding;
 import me.skriva.ceph.entities.Contact;
 import me.skriva.ceph.entities.MucOptions;
-import me.skriva.ceph.services.XmppConnectionService;
 import me.skriva.ceph.ui.ConferenceDetailsActivity;
 import me.skriva.ceph.ui.XmppActivity;
 import me.skriva.ceph.ui.util.AvatarWorkerTask;

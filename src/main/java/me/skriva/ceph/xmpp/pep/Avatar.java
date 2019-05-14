@@ -7,7 +7,7 @@ import rocks.xmpp.addr.Jid;
 
 public class Avatar {
 
-	public enum Origin { PEP, VCARD };
+	public enum Origin { PEP, VCARD }
 
 	public String type;
 	public String sha1sum;
@@ -74,7 +74,7 @@ public class Avatar {
 
 	@Override
 	public boolean equals(Object object) {
-		if (object != null && object instanceof Avatar) {
+		if (object instanceof Avatar) {
 			Avatar other = (Avatar) object;
 			return other.getFilename().equals(this.getFilename());
 		} else {

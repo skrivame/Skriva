@@ -21,7 +21,6 @@ import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -97,7 +96,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 	private final ListSelectionManager listSelectionManager = new ListSelectionManager();
 	private final AudioPlayer audioPlayer;
 	private List<String> highlightedTerm = null;
-	private DisplayMetrics metrics;
+	private final DisplayMetrics metrics;
 	private OnContactPictureClicked mOnContactPictureClickedListener;
 	private OnContactPictureLongClicked mOnContactPictureLongClickedListener;
 	private boolean mIndicateReceived = false;
@@ -168,11 +167,11 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		return this.getItemViewType(getItem(position));
 	}
 
-	private int getMessageTextColor(boolean onDark, boolean primary) {
+	private int getMessageTextColor(boolean onDark) {
 		if (onDark) {
-			return ContextCompat.getColor(activity, primary ? R.color.white : R.color.white70);
+			return ContextCompat.getColor(activity, false ? R.color.white : R.color.white70);
 		} else {
-			return ContextCompat.getColor(activity, primary ? R.color.black87 : R.color.black54);
+			return ContextCompat.getColor(activity, false ? R.color.black87 : R.color.black54);
 		}
 	}
 
@@ -234,13 +233,10 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				} else if (errorMessage != null) {
 					final String[] errorParts = errorMessage.split("\\u001f", 2);
 					if (errorParts.length == 2) {
-						switch (errorParts[0]) {
-							case "file-too-large":
-								info = getContext().getString(R.string.file_too_large);
-								break;
-							default:
-								info = getContext().getString(R.string.send_failed);
-								break;
+						if ("file-too-large".equals(errorParts[0])) {
+							info = getContext().getString(R.string.file_too_large);
+						} else {
+							info = getContext().getString(R.string.send_failed);
 						}
 					} else {
 						info = getContext().getString(R.string.send_failed);
@@ -268,7 +264,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			} else {
 				viewHolder.time.setTextAppearance(getContext(), R.style.TextAppearance_Conversations_Caption);
 			}
-			viewHolder.time.setTextColor(this.getMessageTextColor(darkBackground, false));
+			viewHolder.time.setTextColor(this.getMessageTextColor(darkBackground));
 		}
 		if (message.getEncryption() == Message.ENCRYPTION_NONE) {
 			viewHolder.indicator.setVisibility(View.GONE);
@@ -367,7 +363,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			body.insert(end, "\n");
 			body.setSpan(new DividerSpan(false), end, end + 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 		}
-		int color = darkBackground ? this.getMessageTextColor(darkBackground, false)
+		int color = darkBackground ? this.getMessageTextColor(darkBackground)
 				: ContextCompat.getColor(activity, R.color.green700_desaturated);
 		DisplayMetrics metrics = getContext().getResources().getDisplayMetrics();
 		body.setSpan(new QuoteSpan(color, metrics), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -495,7 +491,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				} else {
 					body.insert(privateMarkerIndex, " ");
 				}
-				body.setSpan(new ForegroundColorSpan(getMessageTextColor(darkBackground, false)), 0, privateMarkerIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+				body.setSpan(new ForegroundColorSpan(getMessageTextColor(darkBackground)), 0, privateMarkerIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				body.setSpan(new StyleSpan(Typeface.BOLD), 0, privateMarkerIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 				if (hasMeCommand) {
 					body.setSpan(new StyleSpan(Typeface.BOLD_ITALIC), privateMarkerIndex + 1,
@@ -593,13 +589,13 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		double target;
 		String mime = file.getMimeType();
 		if (mime != null && mime.equals("image/gif")) {
+			target = metrics.density * 288;
 			Log.d(Config.LOGTAG, "GIF Image");
-			target = metrics.density * 800;
 			viewHolder.image.setVisibility(View.GONE);
 			viewHolder.gifImage.setVisibility(View.VISIBLE);
 		} else {
+			target = metrics.density * 288;
 			Log.d(Config.LOGTAG, "Image");
-			target = metrics.density * 200;
 			viewHolder.image.setVisibility(View.VISIBLE);
 			viewHolder.gifImage.setVisibility(View.GONE);
 			viewHolder.gif_btn.setVisibility(View.GONE);
@@ -610,7 +606,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		if (Math.max(params.height, params.width) * metrics.density <= target) {
 			scaledW = (int) (params.width * metrics.density);
 			scaledH = (int) (params.height * metrics.density);
-		} else if (Math.max(params.height, params.width) <= target) {
+		} else if (!mime.equals("image/gif") && Math.max(params.height, params.width) <= target) {
 			scaledW = params.width;
 			scaledH = params.height;
 		} else if (params.width <= params.height) {
@@ -648,7 +644,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				});
 			}
 		} else {
-			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(scaledW, scaledH);
+			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(scaledW, scaledH);
 			layoutParams.setMargins(0, (int) (metrics.density * 4), 0, (int) (metrics.density * 4));
 			viewHolder.image.setLayoutParams(layoutParams);
 			activity.loadBitmap(message, viewHolder.image);
@@ -670,7 +666,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 				privateMarker = activity.getString(R.string.private_message_to, Strings.nullToEmpty(cp == null ? null : cp.getResource()));
 			}
 			final SpannableString body = new SpannableString(privateMarker);
-			body.setSpan(new ForegroundColorSpan(getMessageTextColor(darkBackground, false)), 0, privateMarker.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			body.setSpan(new ForegroundColorSpan(getMessageTextColor(darkBackground)), 0, privateMarker.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			body.setSpan(new StyleSpan(Typeface.BOLD), 0, privateMarker.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 			viewHolder.messageBody.setText(body);
 			viewHolder.messageBody.setVisibility(View.VISIBLE);
@@ -1034,22 +1030,22 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 
 	private static class ViewHolder {
 
-		public Button load_more_messages;
-		public ImageView edit_indicator;
-		public RelativeLayout audioPlayer;
-		protected LinearLayout message_box;
-		protected MessageReferenceBinding messageReferenceBinding;
-		protected Button download_button;
-		protected ImageView image;
-		protected GifImageView gifImage;
-		protected ImageView gif_btn;
-		protected ImageView indicator;
-		protected ImageView indicatorReceived;
-		protected TextView time;
-		protected CopyTextView messageBody;
-		protected ImageView contact_picture;
-		protected TextView status_message;
-		protected TextView encryption;
+		Button load_more_messages;
+		ImageView edit_indicator;
+		RelativeLayout audioPlayer;
+		LinearLayout message_box;
+		MessageReferenceBinding messageReferenceBinding;
+		Button download_button;
+		ImageView image;
+		GifImageView gifImage;
+		ImageView gif_btn;
+		ImageView indicator;
+		ImageView indicatorReceived;
+		TextView time;
+		CopyTextView messageBody;
+		ImageView contact_picture;
+		TextView status_message;
+		TextView encryption;
 	}
 
 
@@ -1058,7 +1054,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 		private final Message message;
 		private final TextView textView;
 
-		public MessageBodyActionModeCallback(Message message, TextView textView) {
+		MessageBodyActionModeCallback(Message message, TextView textView) {
 			this.message = message;
 			this.textView = textView;
 		}

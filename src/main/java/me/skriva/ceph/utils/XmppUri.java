@@ -14,8 +14,8 @@ import rocks.xmpp.addr.Jid;
 
 public class XmppUri {
 
-	protected Uri uri;
-	protected String jid;
+	private Uri uri;
+	private String jid;
 	private List<Fingerprint> fingerprints = new ArrayList<>();
 	private String body;
 	private String name;
@@ -43,7 +43,7 @@ public class XmppUri {
 		parse(uri);
 	}
 
-	public XmppUri(Uri uri, boolean safeSource) {
+	protected XmppUri(Uri uri, boolean safeSource) {
 		this.safeSource = safeSource;
 		parse(uri);
 	}
@@ -52,7 +52,7 @@ public class XmppUri {
 		return safeSource;
 	}
 
-	protected void parse(final Uri uri) {
+	private void parse(final Uri uri) {
 		if (uri == null) {
 			return;
 		}
@@ -249,7 +249,7 @@ public class XmppUri {
 
 		@Override
 		public String toString() {
-			return type.toString() + ": " + fingerprint + (deviceId != 0 ? " " + String.valueOf(deviceId) : "");
+			return type.toString() + ": " + fingerprint + (deviceId != 0 ? " " + deviceId : "");
 		}
 	}
 

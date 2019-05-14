@@ -34,16 +34,16 @@ public class ShareWithActivity extends XmppActivity implements XmppConnectionSer
 
     private class Share {
         ArrayList<Uri> uris = new ArrayList<>();
-        public String account;
-        public String contact;
-        public String text;
+        String account;
+        String contact;
+        String text;
     }
 
     private Share share;
 
     private static final int REQUEST_START_NEW_CONVERSATION = 0x0501;
     private ConversationAdapter mAdapter;
-    private List<Conversation> mConversations = new ArrayList<>();
+    private final List<Conversation> mConversations = new ArrayList<>();
 
 
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
@@ -106,12 +106,11 @@ public class ShareWithActivity extends XmppActivity implements XmppConnectionSer
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_add:
-                final Intent intent = new Intent(getApplicationContext(), ChooseContactActivity.class);
-                intent.putExtra("direct_search",true);
-                startActivityForResult(intent, REQUEST_START_NEW_CONVERSATION);
-                return true;
+        if (item.getItemId() == R.id.action_add) {
+            final Intent intent = new Intent(getApplicationContext(), ChooseContactActivity.class);
+            intent.putExtra("direct_search", true);
+            startActivityForResult(intent, REQUEST_START_NEW_CONVERSATION);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -191,7 +190,7 @@ public class ShareWithActivity extends XmppActivity implements XmppConnectionSer
         finish();
     }
 
-    public void refreshUiReal() {
+    protected void refreshUiReal() {
         //TODO inject desired order to not resort on refresh
         xmppConnectionService.populateWithOrderedConversations(mConversations, this.share != null && this.share.uris.size() == 0, false);
         mAdapter.notifyDataSetChanged();

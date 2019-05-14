@@ -44,9 +44,9 @@ public class MemorizingActivity extends AppCompatActivity implements OnClickList
 
 	private final static Logger LOGGER = Logger.getLogger(MemorizingActivity.class.getName());
 
-	int decisionId;
+	private int decisionId;
 
-	AlertDialog dialog;
+	private AlertDialog dialog;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class MemorizingActivity extends AppCompatActivity implements OnClickList
 		super.onPause();
 	}
 
-	void sendDecision(int decision) {
+	private void sendDecision(int decision) {
 		LOGGER.log(Level.FINE, "Sending decision: " + decision);
 		MemorizingTrustManager.interactResult(decisionId, decision);
 		finish();

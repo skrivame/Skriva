@@ -34,9 +34,9 @@ public class AbstractConnectionManager {
     private static final String PROVIDER = "BC";
     private static final int UI_REFRESH_THRESHOLD = 250;
     private static final AtomicLong LAST_UI_UPDATE_CALL = new AtomicLong(0);
-    protected XmppConnectionService mXmppConnectionService;
+    protected final XmppConnectionService mXmppConnectionService;
 
-    public AbstractConnectionManager(XmppConnectionService service) {
+    protected AbstractConnectionManager(XmppConnectionService service) {
         this.mXmppConnectionService = service;
     }
 

@@ -41,15 +41,15 @@ public class ManageAccountActivity extends XmppActivity implements OnAccountUpda
 
     private static final int REQUEST_IMPORT_BACKUP = 0x63fb;
 
-    protected Account selectedAccount = null;
-    protected Jid selectedAccountJid = null;
+    private Account selectedAccount = null;
+    private Jid selectedAccountJid = null;
 
-    protected final List<Account> accountList = new ArrayList<>();
-    protected ListView accountListView;
-    protected AccountAdapter mAccountAdapter;
-    protected AtomicBoolean mInvokedAddAccount = new AtomicBoolean(false);
+    private final List<Account> accountList = new ArrayList<>();
+    private ListView accountListView;
+    private AccountAdapter mAccountAdapter;
+    private final AtomicBoolean mInvokedAddAccount = new AtomicBoolean(false);
 
-    protected Pair<Integer, Intent> mPostponedActivityResult = null;
+    private Pair<Integer, Intent> mPostponedActivityResult = null;
 
     @Override
     public void onAccountUpdate() {
@@ -217,10 +217,8 @@ public class ManageAccountActivity extends XmppActivity implements OnAccountUpda
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (grantResults.length > 0) {
             if (allGranted(grantResults)) {
-                switch (requestCode) {
-                    case REQUEST_IMPORT_BACKUP:
-                        startActivity(new Intent(this, ImportBackupActivity.class));
-                        break;
+                if (requestCode == REQUEST_IMPORT_BACKUP) {
+                    startActivity(new Intent(this, ImportBackupActivity.class));
                 }
             } else {
                 Toast.makeText(this, R.string.no_storage_permission, Toast.LENGTH_SHORT).show();

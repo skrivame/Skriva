@@ -113,9 +113,7 @@ public class MessageReferenceUtils {
                     });
 
                     // Jump to the referenced message when the message reference preview is clicked.
-                    messageReferenceBinding.messageReferenceContainer.setOnClickListener(v -> {
-                        conversationFragment.setSelection(jumpingPosition, false);
-                    });
+                    messageReferenceBinding.messageReferenceContainer.setOnClickListener(v -> conversationFragment.setSelection(jumpingPosition, false));
                 } else {
                     // Jump to the referenced message when the message reference is clicked.
                     messageReferenceBinding.messageReferenceContainer.setOnClickListener(v -> {
@@ -138,7 +136,7 @@ public class MessageReferenceUtils {
      * @param messageReferenceBinding data binding that holds the message reference views
      * @param referencedMessage referenced message for that the info text is generated
      */
-    public static void createInfo(final XmppActivity activity, final MessageReferenceBinding messageReferenceBinding, final Message referencedMessage) {
+    private static void createInfo(final XmppActivity activity, final MessageReferenceBinding messageReferenceBinding, final Message referencedMessage) {
         String info;
 
         if (referencedMessage == null) {
@@ -166,7 +164,7 @@ public class MessageReferenceUtils {
      * @param defaultDrawable drawable that will be used as the message reference icon if its background is light
      * @param drawableForDarkBackground drawable that will be used as the message reference icon if its background is dark
      */
-    public static void setMessageReferenceIcon(final boolean darkBackground, final MessageReferenceBinding messageReferenceBinding, final Drawable defaultDrawable, final Drawable drawableForDarkBackground) {
+    private static void setMessageReferenceIcon(final boolean darkBackground, final MessageReferenceBinding messageReferenceBinding, final Drawable defaultDrawable, final Drawable drawableForDarkBackground) {
         if (darkBackground) {
             messageReferenceBinding.messageReferenceIcon.setBackground(drawableForDarkBackground);
         } else {
@@ -177,7 +175,7 @@ public class MessageReferenceUtils {
     /**
      * Displays a thumbnail for the image or video of the referenced message.
      */
-    public static void displayReferencedImageMessage(final XmppActivity activity, final MessageReferenceBinding messageReferenceBinding, final Message referencedMessage, final boolean messageReferencePreview) {
+    private static void displayReferencedImageMessage(final XmppActivity activity, final MessageReferenceBinding messageReferenceBinding, final Message referencedMessage, final boolean messageReferencePreview) {
         if (messageReferencePreview) {
             // Set the scale type manually only for the message reference preview since a common scale type cannot be used.
             messageReferenceBinding.messageReferenceImageThumbnail.setScaleType(ImageView.ScaleType.FIT_START);
@@ -197,10 +195,10 @@ public class MessageReferenceUtils {
      * @param indexOfLastLineToTake position (exclusive) of the last string to be taken for the newly created string
      * @return string with the desired lines
      */
-    public static String createStringWithLinesOutOfStringArray(final String[] allLines, final int indexOfFirstLineToTake, final int indexOfLastLineToTake) {
+    private static String createStringWithLinesOutOfStringArray(final String[] allLines, final int indexOfFirstLineToTake, final int indexOfLastLineToTake) {
         StringBuilder takingBuilder = new StringBuilder();
         for (String line : Arrays.copyOfRange(allLines, indexOfFirstLineToTake, indexOfLastLineToTake)) {
-            takingBuilder.append("\n" + line);
+            takingBuilder.append("\n").append(line);
         }
 
         // Delete the first newline ("\n") because it is not needed.
@@ -219,7 +217,7 @@ public class MessageReferenceUtils {
      * @param linesToBeExtracted number of lines to be extracted
      * @return extracted lines
      */
-    public static String extractFirstLinesOfBody(final Message message, int linesToBeExtracted) {
+    private static String extractFirstLinesOfBody(final Message message, int linesToBeExtracted) {
         String[] bodyLines = message.getBody().split("\n");
 
         // Reduce the number of lines to be extracted if the body has less lines than that number.
@@ -241,7 +239,7 @@ public class MessageReferenceUtils {
      * @param message message for that the first lines of its body will be extracted
      * @return extracted lines
      */
-    public static String extractFirstTwoLinesOfBody(final Message message) {
+    private static String extractFirstTwoLinesOfBody(final Message message) {
         return extractFirstLinesOfBody(message, 2);
     }
 
