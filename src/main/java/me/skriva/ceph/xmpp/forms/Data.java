@@ -102,7 +102,7 @@ public class Data extends Element {
 		return type == null ? "" : type;
 	}
 
-	private String getValue(String name) {
+	public String getValue(String name) {
 		Field field = this.getFieldByName(name);
 		return field == null ? null : field.getValue();
 	}
