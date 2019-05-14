@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
 import me.skriva.ceph.Config;
 
 public class XmlReader {
-	private XmlPullParser parser;
+	private final XmlPullParser parser;
 	private InputStream is;
 
 	public XmlReader() {
@@ -81,7 +81,7 @@ public class XmlReader {
 		return null;
 	}
 
-	public Element readElement(Tag currentTag) throws XmlPullParserException,
+	public Element readElement(Tag currentTag) throws
 			IOException {
 		Element element = new Element(currentTag.getName());
 		element.setAttributes(currentTag.getAttributes());

@@ -43,7 +43,7 @@ public class Edited {
         return false;
     }
 
-    public static Edited fromJson(JSONObject jsonObject) throws JSONException {
+    private static Edited fromJson(JSONObject jsonObject) throws JSONException {
         String edited = jsonObject.getString("edited_id");
         String serverMsgId = jsonObject.getString("server_msg_id");
         return new Edited(edited, serverMsgId);
@@ -67,7 +67,7 @@ public class Edited {
         return list;
     }
 
-    public JSONObject toJson() throws JSONException {
+    private JSONObject toJson() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("edited_id", editedId);
         jsonObject.put("server_msg_id", serverMsgId);

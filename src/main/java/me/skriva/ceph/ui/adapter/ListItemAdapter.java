@@ -27,10 +27,10 @@ import rocks.xmpp.addr.Jid;
 
 public class ListItemAdapter extends ArrayAdapter<ListItem> {
 
-	protected XmppActivity activity;
+	private final XmppActivity activity;
 	private boolean showDynamicTags = false;
 	private OnTagClickedListener mOnTagClickedListener = null;
-	private View.OnClickListener onTagTvClick = view -> {
+	private final View.OnClickListener onTagTvClick = view -> {
 		if (view instanceof TextView && mOnTagClickedListener != null) {
 			TextView tv = (TextView) view;
 			final String tag = tv.getText().toString();
@@ -108,7 +108,7 @@ public class ListItemAdapter extends ArrayAdapter<ListItem> {
 
 		}
 
-		public static ViewHolder get(ContactBinding binding) {
+		static ViewHolder get(ContactBinding binding) {
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.name = binding.contactDisplayName;
 			viewHolder.jid = binding.contactJid;

@@ -20,7 +20,7 @@ public class Data extends Element {
 	}
 
 	public List<Field> getFields() {
-		ArrayList<Field> fields = new ArrayList<Field>();
+		ArrayList<Field> fields = new ArrayList<>();
 		for(Element child : getChildren()) {
 			if (child.getName().equals("field")
 					&& !FORM_TYPE.equals(child.getAttribute("var"))) {
@@ -102,7 +102,7 @@ public class Data extends Element {
 		return type == null ? "" : type;
 	}
 
-	public String getValue(String name) {
+	private String getValue(String name) {
 		Field field = this.getFieldByName(name);
 		return field == null ? null : field.getValue();
 	}

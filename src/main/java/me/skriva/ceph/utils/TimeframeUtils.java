@@ -63,8 +63,8 @@ public class TimeframeUtils {
 
 
 	private static class Timeframe {
-		public final long duration;
-		public final int name;
+		final long duration;
+		final int name;
 
 		private Timeframe(long duration, @PluralsRes int name) {
 			this.duration = duration;

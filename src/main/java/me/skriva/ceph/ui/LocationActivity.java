@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.BoolRes;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MenuItem;
@@ -42,23 +41,23 @@ import me.skriva.ceph.ui.widget.MyLocation;
 import me.skriva.ceph.utils.ThemeHelper;
 
 public abstract class LocationActivity extends ActionBarActivity implements LocationListener {
-	protected LocationManager locationManager;
-	protected boolean hasLocationFeature;
+	private LocationManager locationManager;
+	boolean hasLocationFeature;
 
-	public static final int REQUEST_CODE_CREATE = 0;
-	public static final int REQUEST_CODE_FAB_PRESSED = 1;
-	public static final int REQUEST_CODE_SNACKBAR_PRESSED = 2;
+	private static final int REQUEST_CODE_CREATE = 0;
+	static final int REQUEST_CODE_FAB_PRESSED = 1;
+	static final int REQUEST_CODE_SNACKBAR_PRESSED = 2;
 
-	protected static final String KEY_LOCATION = "loc";
-	protected static final String KEY_ZOOM_LEVEL = "zoom";
+	private static final String KEY_LOCATION = "loc";
+	private static final String KEY_ZOOM_LEVEL = "zoom";
 
-	protected Location myLoc = null;
+	Location myLoc = null;
 	private MapView map = null;
-	protected IMapController mapController = null;
+	IMapController mapController = null;
 
-	protected Bitmap marker_icon;
+	Bitmap marker_icon;
 
-	protected void clearMarkers() {
+	private void clearMarkers() {
 		synchronized (this.map.getOverlays()) {
 			for (final Overlay overlay : this.map.getOverlays()) {
 				if (overlay instanceof Marker || overlay instanceof MyLocation) {
@@ -68,11 +67,11 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 		}
 	}
 
-	protected void updateLocationMarkers() {
+	void updateLocationMarkers() {
 		clearMarkers();
 	}
 
-	protected XYTileSource tileSource() {
+	private XYTileSource tileSource() {
 		return new XYTileSource("OpenStreetMap",
 				0, 19, 256, ".png", new String[] {
 				"https://a.tile.openstreetmap.org/",
@@ -103,7 +102,7 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 		final IConfigurationProvider config = Configuration.getInstance();
 		config.load(ctx, getPreferences());
 		config.setUserAgentValue(BuildConfig.APPLICATION_ID + "_" + BuildConfig.VERSION_CODE);
-		if (QuickConversationsService.isConversations() && getBooleanPreference("use_tor", R.bool.use_tor)) {
+		if (QuickConversationsService.isConversations() && getBooleanPreference()) {
 			try {
 				config.setHttpProxy(HttpConnectionManager.getProxy());
 			} catch (IOException e) {
@@ -147,7 +146,7 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 		}
 	}
 
-	protected void setupMapView(MapView mapView, final GeoPoint pos) {
+	void setupMapView(MapView mapView, final GeoPoint pos) {
 		map = mapView;
 		map.setTileSource(tileSource());
 		map.setBuiltInZoomControls(false);
@@ -158,7 +157,7 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 		mapController.setCenter(pos);
 	}
 
-	protected void gotoLoc() {
+	void gotoLoc() {
 		gotoLoc(map.getZoomLevelDouble() == Config.Map.INITIAL_ZOOM_LEVEL);
 	}
 
@@ -166,7 +165,7 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 
 	protected abstract void setMyLoc(final Location location);
 
-	protected void requestLocationUpdates() {
+	private void requestLocationUpdates() {
 		if (!hasLocationFeature || locationManager == null) {
 			return;
 		}
@@ -208,7 +207,7 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 		}
 	}
 
-	protected void pauseLocationUpdates() throws SecurityException {
+	private void pauseLocationUpdates() throws SecurityException {
 		if (locationManager != null) {
 			locationManager.removeUpdates(this);
 		}
@@ -216,10 +215,9 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
-		switch (item.getItemId()) {
-			case android.R.id.home:
-				finish();
-				return true;
+		if (item.getItemId() == android.R.id.home) {
+			finish();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -237,7 +235,7 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 
 	protected abstract void updateUi();
 
-	protected boolean mapAtInitialLoc() {
+	private boolean mapAtInitialLoc() {
 		return map.getZoomLevelDouble() == Config.Map.INITIAL_ZOOM_LEVEL;
 	}
 
@@ -259,13 +257,13 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)
-	protected boolean hasLocationPermissions() {
+	boolean hasLocationPermissions() {
 		return (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
 				checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
 	}
 
 	@TargetApi(Build.VERSION_CODES.M)
-	protected void requestPermissions(final int request_code) {
+	void requestPermissions(final int request_code) {
 		if (!hasLocationPermissions()) {
 			requestPermissions(
 					new String[]{
@@ -292,15 +290,15 @@ public abstract class LocationActivity extends ActionBarActivity implements Loca
 		}
 	}
 
-	protected SharedPreferences getPreferences() {
+	private SharedPreferences getPreferences() {
 		return PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 	}
 
-	protected boolean getBooleanPreference(String name, @BoolRes int res) {
-		return getPreferences().getBoolean(name, getResources().getBoolean(res));
+	private boolean getBooleanPreference() {
+		return getPreferences().getBoolean("use_tor", getResources().getBoolean(R.bool.use_tor));
 	}
 
-	protected boolean isLocationEnabled() {
+	boolean isLocationEnabled() {
 		try {
 			final int locationMode = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
 			return locationMode != Settings.Secure.LOCATION_MODE_OFF;

@@ -198,7 +198,6 @@ public class IrregularUnicodeDetector {
 			if (pattern != null) {
 				return pattern;
 			}
-			;
 			pattern = PatternTuple.of(jid);
 			CACHE.put(jid, pattern);
 			return pattern;

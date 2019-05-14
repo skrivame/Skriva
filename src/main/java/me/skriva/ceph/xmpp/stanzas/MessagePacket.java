@@ -10,7 +10,7 @@ public class MessagePacket extends AbstractAcknowledgeableStanza {
 	public static final int TYPE_NORMAL = 2;
 	public static final int TYPE_GROUPCHAT = 3;
 	public static final int TYPE_ERROR = 4;
-	public static final int TYPE_HEADLINE = 5;
+	private static final int TYPE_HEADLINE = 5;
 
 	public MessagePacket() {
 		super("message");
@@ -87,7 +87,7 @@ public class MessagePacket extends AbstractAcknowledgeableStanza {
 		return new Pair(packet,timestamp);
 	}
 
-	public static MessagePacket create(Element element) {
+	private static MessagePacket create(Element element) {
 		if (element == null) {
 			return null;
 		}

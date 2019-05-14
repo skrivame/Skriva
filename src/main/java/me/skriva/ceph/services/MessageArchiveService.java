@@ -34,7 +34,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 		MAM_1("urn:xmpp:mam:1", false),
 		MAM_2("urn:xmpp:mam:2", false);
 
-		public final boolean legacy;
+		final boolean legacy;
 		public final String namespace;
 
 		Version(String namespace, boolean legacy) {
@@ -46,7 +46,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			return get(account,null);
 		}
 
-		public static Version get(Account account, Conversation conversation) {
+		static Version get(Account account, Conversation conversation) {
 			if (conversation == null || conversation.getMode() == Conversation.MODE_SINGLE) {
 				return get(account.getXmppConnection().getFeatures().getAccountFeatures());
 			} else {
@@ -87,7 +87,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			return null;
 		}
 
-	};
+	}
 
 	MessageArchiveService(final XmppConnectionService service) {
 		this.mXmppConnectionService = service;
@@ -119,9 +119,9 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 					this.query(conversation, startCatchup, true);
 				}
 			}
-			query = new Query(account, new MamReference(startCatchup), 0);
+			query = new Query(account, new MamReference(startCatchup));
 		} else {
-			query = new Query(account, mamReference, 0);
+			query = new Query(account, mamReference);
 		}
 		synchronized (this.queries) {
 			this.queries.add(query);
@@ -143,14 +143,14 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 		}
 	}
 
-	public Query query(final Conversation conversation) {
+	public void query(final Conversation conversation) {
 		if (conversation.getLastMessageTransmitted().getTimestamp() < 0 && conversation.countMessages() == 0) {
-			return query(conversation,
+			query(conversation,
 					new MamReference(0),
 					System.currentTimeMillis(),
 					false);
 		} else {
-			return query(conversation,
+			query(conversation,
 					conversation.getLastMessageTransmitted(),
 					conversation.getAccount().getXmppConnection().getLastSessionEstablished(),
 					false);
@@ -173,8 +173,8 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 		}
 	}
 
-	public Query query(final Conversation conversation, long end, boolean allowCatchup) {
-		return this.query(conversation, conversation.getLastMessageTransmitted(), end, allowCatchup);
+	public void query(final Conversation conversation, long end, boolean allowCatchup) {
+		this.query(conversation, conversation.getLastMessageTransmitted(), end, allowCatchup);
 	}
 
 	public Query query(Conversation conversation, MamReference start, long end, boolean allowCatchup) {
@@ -354,7 +354,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			done = done || (query.getActualMessageCount() == 0 && !query.isCatchup());
 			this.finalizeQuery(query, done);
 
-			Log.d(Config.LOGTAG, query.getAccount().getJid().asBareJid() + ": finished mam after " + query.getTotalCount() + "(" + query.getActualMessageCount() + ") messages. messages left=" + Boolean.toString(!done) + " count=" + count);
+			Log.d(Config.LOGTAG, query.getAccount().getJid().asBareJid() + ": finished mam after " + query.getTotalCount() + "(" + query.getActualMessageCount() + ") messages. messages left=" + !done + " count=" + count);
 			if (query.isCatchup() && query.getActualMessageCount() > 0) {
 				mXmppConnectionService.getNotificationService().finishBacklog(true, query.getAccount());
 			}
@@ -443,10 +443,10 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 		private int actualCount = 0;
 		private int actualInThisQuery = 0;
 		private long start;
-		private long end;
-		private String queryId;
+		private final long end;
+		private final String queryId;
 		private String reference = null;
-		private Account account;
+		private final Account account;
 		private Conversation conversation;
 		private PagingOrder pagingOrder = PagingOrder.NORMAL;
 		private XmppConnectionService.OnMoreMessagesLoaded callback = null;
@@ -461,8 +461,8 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			this.catchup = catchup;
 		}
 
-		Query(Account account, MamReference start, long end) {
-			this(account, Version.get(account), start, end);
+		Query(Account account, MamReference start) {
+			this(account, Version.get(account), start, (long) 0);
 		}
 
 		Query(Account account, Version version, MamReference start, long end) {
@@ -499,7 +499,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			this.pendingReceiptRequests.add(receiptRequest);
 		}
 
-		public boolean isLegacy() {
+		boolean isLegacy() {
 			return version.legacy;
 		}
 
@@ -507,7 +507,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			return muc() && !isLegacy();
 		}
 
-		public Query next(String reference) {
+		Query next(String reference) {
 			Query query = page(reference);
 			query.pagingOrder = PagingOrder.NORMAL;
 			return query;
@@ -551,7 +551,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			this.callback = callback;
 		}
 
-		public void callback(boolean done) {
+		void callback(boolean done) {
 			if (this.callback != null) {
 				this.callback.onMoreMessagesLoaded(actualCount, conversation);
 				if (done) {
@@ -568,7 +568,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 			return conversation;
 		}
 
-		public Account getAccount() {
+		Account getAccount() {
 			return this.account;
 		}
 
@@ -632,7 +632,7 @@ public class MessageArchiveService implements OnAdvancedStreamFeaturesLoaded {
 				}
 				builder.append(this.reference);
 			}
-			builder.append(", catchup=").append(Boolean.toString(catchup));
+			builder.append(", catchup=").append(catchup);
 			builder.append(", ns=").append(version.namespace);
 			return builder.toString();
 		}

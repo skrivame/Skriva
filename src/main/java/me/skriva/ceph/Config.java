@@ -2,10 +2,6 @@ package me.skriva.ceph;
 
 import android.graphics.Bitmap;
 
-import java.util.Collections;
-import java.util.List;
-
-import me.skriva.ceph.BuildConfig;
 import me.skriva.ceph.xmpp.chatstate.ChatState;
 import rocks.xmpp.addr.Jid;
 

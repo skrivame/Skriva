@@ -63,7 +63,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "history";
     private static final int DATABASE_VERSION = 45;
     private static DatabaseBackend instance = null;
-    private static String CREATE_CONTATCS_STATEMENT = "create table "
+    private static final String CREATE_CONTATCS_STATEMENT = "create table "
             + Contact.TABLENAME + "(" + Contact.ACCOUNT + " TEXT, "
             + Contact.SERVERNAME + " TEXT, " + Contact.SYSTEMNAME + " TEXT,"
             + Contact.JID + " TEXT," + Contact.KEYS + " TEXT,"
@@ -75,7 +75,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + ") ON DELETE CASCADE, UNIQUE(" + Contact.ACCOUNT + ", "
             + Contact.JID + ") ON CONFLICT REPLACE);";
 
-    private static String CREATE_DISCOVERY_RESULTS_STATEMENT = "create table "
+    private static final String CREATE_DISCOVERY_RESULTS_STATEMENT = "create table "
             + ServiceDiscoveryResult.TABLENAME + "("
             + ServiceDiscoveryResult.HASH + " TEXT, "
             + ServiceDiscoveryResult.VER + " TEXT, "
@@ -83,7 +83,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + "UNIQUE(" + ServiceDiscoveryResult.HASH + ", "
             + ServiceDiscoveryResult.VER + ") ON CONFLICT REPLACE);";
 
-    private static String CREATE_PRESENCE_TEMPLATES_STATEMENT = "CREATE TABLE "
+    private static final String CREATE_PRESENCE_TEMPLATES_STATEMENT = "CREATE TABLE "
             + PresenceTemplate.TABELNAME + "("
             + PresenceTemplate.UUID + " TEXT, "
             + PresenceTemplate.LAST_USED + " NUMBER,"
@@ -91,7 +91,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + PresenceTemplate.STATUS + " TEXT,"
             + "UNIQUE(" + PresenceTemplate.MESSAGE + "," + PresenceTemplate.STATUS + ") ON CONFLICT REPLACE);";
 
-    private static String CREATE_PREKEYS_STATEMENT = "CREATE TABLE "
+    private static final String CREATE_PREKEYS_STATEMENT = "CREATE TABLE "
             + SQLiteAxolotlStore.PREKEY_TABLENAME + "("
             + SQLiteAxolotlStore.ACCOUNT + " TEXT,  "
             + SQLiteAxolotlStore.ID + " INTEGER, "
@@ -103,7 +103,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + ") ON CONFLICT REPLACE"
             + ");";
 
-    private static String CREATE_SIGNED_PREKEYS_STATEMENT = "CREATE TABLE "
+    private static final String CREATE_SIGNED_PREKEYS_STATEMENT = "CREATE TABLE "
             + SQLiteAxolotlStore.SIGNED_PREKEY_TABLENAME + "("
             + SQLiteAxolotlStore.ACCOUNT + " TEXT,  "
             + SQLiteAxolotlStore.ID + " INTEGER, "
@@ -115,7 +115,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + ") ON CONFLICT REPLACE" +
             ");";
 
-    private static String CREATE_SESSIONS_STATEMENT = "CREATE TABLE "
+    private static final String CREATE_SESSIONS_STATEMENT = "CREATE TABLE "
             + SQLiteAxolotlStore.SESSION_TABLENAME + "("
             + SQLiteAxolotlStore.ACCOUNT + " TEXT,  "
             + SQLiteAxolotlStore.NAME + " TEXT, "
@@ -129,7 +129,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + ") ON CONFLICT REPLACE"
             + ");";
 
-    private static String CREATE_IDENTITIES_STATEMENT = "CREATE TABLE "
+    private static final String CREATE_IDENTITIES_STATEMENT = "CREATE TABLE "
             + SQLiteAxolotlStore.IDENTITIES_TABLENAME + "("
             + SQLiteAxolotlStore.ACCOUNT + " TEXT,  "
             + SQLiteAxolotlStore.NAME + " TEXT, "
@@ -148,9 +148,9 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + ") ON CONFLICT IGNORE"
             + ");";
 
-    private static String RESOLVER_RESULTS_TABLENAME = "resolver_results";
+    private static final String RESOLVER_RESULTS_TABLENAME = "resolver_results";
 
-    private static String CREATE_RESOLVER_RESULTS_TABLE = "create table " + RESOLVER_RESULTS_TABLENAME + "("
+    private static final String CREATE_RESOLVER_RESULTS_TABLE = "create table " + RESOLVER_RESULTS_TABLENAME + "("
             + Resolver.Result.DOMAIN + " TEXT,"
             + Resolver.Result.HOSTNAME + " TEXT,"
             + Resolver.Result.IP + " BLOB,"
@@ -161,16 +161,16 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             + "UNIQUE(" + Resolver.Result.DOMAIN + ") ON CONFLICT REPLACE"
             + ");";
 
-    private static String CREATE_MESSAGE_TIME_INDEX = "create INDEX message_time_index ON " + Message.TABLENAME + "(" + Message.TIME_SENT + ")";
-    private static String CREATE_MESSAGE_CONVERSATION_INDEX = "create INDEX message_conversation_index ON " + Message.TABLENAME + "(" + Message.CONVERSATION + ")";
-    private static String CREATE_MESSAGE_DELETED_INDEX = "create index message_deleted_index ON " + Message.TABLENAME + "(" + Message.DELETED + ")";
-    private static String CREATE_MESSAGE_RELATIVE_FILE_PATH_INDEX = "create INDEX message_file_path_index ON " + Message.TABLENAME + "(" + Message.RELATIVE_FILE_PATH + ")";
-    private static String CREATE_MESSAGE_TYPE_INDEX = "create INDEX message_type_index ON " + Message.TABLENAME + "(" + Message.TYPE + ")";
+    private static final String CREATE_MESSAGE_TIME_INDEX = "create INDEX message_time_index ON " + Message.TABLENAME + "(" + Message.TIME_SENT + ")";
+    private static final String CREATE_MESSAGE_CONVERSATION_INDEX = "create INDEX message_conversation_index ON " + Message.TABLENAME + "(" + Message.CONVERSATION + ")";
+    private static final String CREATE_MESSAGE_DELETED_INDEX = "create index message_deleted_index ON " + Message.TABLENAME + "(" + Message.DELETED + ")";
+    private static final String CREATE_MESSAGE_RELATIVE_FILE_PATH_INDEX = "create INDEX message_file_path_index ON " + Message.TABLENAME + "(" + Message.RELATIVE_FILE_PATH + ")";
+    private static final String CREATE_MESSAGE_TYPE_INDEX = "create INDEX message_type_index ON " + Message.TABLENAME + "(" + Message.TYPE + ")";
 
-    private static String CREATE_MESSAGE_INDEX_TABLE = "CREATE VIRTUAL TABLE messages_index USING FTS4(uuid TEXT PRIMARY KEY, body TEXT)";
-    private static String CREATE_MESSAGE_INSERT_TRIGGER = "CREATE TRIGGER after_message_insert AFTER INSERT ON " + Message.TABLENAME + " BEGIN INSERT INTO messages_index (uuid,body) VALUES (new.uuid,new.body); END;";
-    private static String CREATE_MESSAGE_UPDATE_TRIGGER = "CREATE TRIGGER after_message_update UPDATE of uuid,body ON " + Message.TABLENAME + " BEGIN update messages_index set body=new.body,uuid=new.uuid WHERE uuid=old.uuid; END;";
-    private static String COPY_PREEXISTING_ENTRIES = "INSERT into messages_index(uuid,body) select uuid,body FROM " + Message.TABLENAME + ";";
+    private static final String CREATE_MESSAGE_INDEX_TABLE = "CREATE VIRTUAL TABLE messages_index USING FTS4(uuid TEXT PRIMARY KEY, body TEXT)";
+    private static final String CREATE_MESSAGE_INSERT_TRIGGER = "CREATE TRIGGER after_message_insert AFTER INSERT ON " + Message.TABLENAME + " BEGIN INSERT INTO messages_index (uuid,body) VALUES (new.uuid,new.body); END;";
+    private static final String CREATE_MESSAGE_UPDATE_TRIGGER = "CREATE TRIGGER after_message_update UPDATE of uuid,body ON " + Message.TABLENAME + " BEGIN update messages_index set body=new.body,uuid=new.uuid WHERE uuid=old.uuid; END;";
+    private static final String COPY_PREEXISTING_ENTRIES = "INSERT into messages_index(uuid,body) select uuid,body FROM " + Message.TABLENAME + ";";
 
     private DatabaseBackend(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -733,11 +733,11 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return message;
     }
 
-    public Message getMessageByUUID(final Conversation conversation, final String uuid){
+    private Message getMessageByUUID(final Conversation conversation, final String uuid){
         return getMessage(conversation, Message.UUID, uuid);
     }
 
-    public Message getMessageByRemoteMsgId(final Conversation conversation, final String remoteMsgId){
+    private Message getMessageByRemoteMsgId(final Conversation conversation, final String remoteMsgId){
         return getMessage(conversation, Message.REMOTE_MSG_ID, remoteMsgId);
     }
 
@@ -799,7 +799,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
             selection += " and " + Message.TIME_SENT + "<?";
         }
 
-        cursor = db.query(Message.TABLENAME, null, selection, selectionArgs.toArray(new String[selectionArgs.size()]), null, null, Message.TIME_SENT + " DESC", limitation);
+        cursor = db.query(Message.TABLENAME, null, selection, selectionArgs.toArray(new String[0]), null, null, Message.TIME_SENT + " DESC", limitation);
 
 
         while (cursor.moveToNext()) {
@@ -862,7 +862,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return uuids;
     }
 
-    public void markFileAsDeleted(List<String> uuids) {
+    private void markFileAsDeleted(List<String> uuids) {
         SQLiteDatabase db = this.getReadableDatabase();
         final ContentValues contentValues = new ContentValues();
         final String where = Message.UUID + "=?";
@@ -957,7 +957,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         final String SQL = "select uuid,relativeFilePath from messages where type in (1,2,5) and deleted=0 and "+Message.RELATIVE_FILE_PATH+" is not null and conversationUuid=(select uuid from conversations where accountUuid=? and (contactJid=? or contactJid like ?)) order by timeSent desc";
         final String[] args = {account, jid.toEscapedString(), jid.toEscapedString() + "/%"};
-        Cursor cursor = db.rawQuery(SQL + (limit > 0 ? " limit " + String.valueOf(limit) : ""), args);
+        Cursor cursor = db.rawQuery(SQL + (limit > 0 ? " limit " + limit : ""), args);
         List<FilePath> filesPaths = new ArrayList<>();
         while (cursor.moveToNext()) {
             filesPaths.add(new FilePath(cursor.getString(0), cursor.getString(1)));
@@ -1030,18 +1030,13 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         final List<Jid> jids = new ArrayList<>();
         final String[] columns = new String[]{Account.USERNAME, Account.SERVER};
         String where = enabledOnly ? "not options & (1 <<1)" : null;
-        Cursor cursor = db.query(Account.TABLENAME, columns, where, null, null, null, null);
-        try {
+        try (Cursor cursor = db.query(Account.TABLENAME, columns, where, null, null, null, null)) {
             while (cursor.moveToNext()) {
                 jids.add(Jid.of(cursor.getString(0), cursor.getString(1), null));
             }
             return jids;
         } catch (Exception e) {
             return jids;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
@@ -1500,7 +1495,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         Cursor cursor = db.query(SQLiteAxolotlStore.IDENTITIES_TABLENAME,
                 columns,
                 selectionString,
-                selectionArgs.toArray(new String[selectionArgs.size()]),
+                selectionArgs.toArray(new String[0]),
                 null, null, null);
 
         return cursor;
@@ -1615,9 +1610,9 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return status;
     }
 
-    public boolean setIdentityKeyTrust(Account account, String fingerprint, FingerprintStatus fingerprintStatus) {
+    public void setIdentityKeyTrust(Account account, String fingerprint, FingerprintStatus fingerprintStatus) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return setIdentityKeyTrust(db, account, fingerprint, fingerprintStatus);
+        setIdentityKeyTrust(db, account, fingerprint, fingerprintStatus);
     }
 
     private boolean setIdentityKeyTrust(SQLiteDatabase db, Account account, String fingerprint, FingerprintStatus status) {
@@ -1632,7 +1627,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         return rows == 1;
     }
 
-    public boolean setIdentityKeyCertificate(Account account, String fingerprint, X509Certificate x509Certificate) {
+    public void setIdentityKeyCertificate(Account account, String fingerprint, X509Certificate x509Certificate) {
         SQLiteDatabase db = this.getWritableDatabase();
         String[] selectionArgs = {
                 account.getUuid(),
@@ -1641,13 +1636,12 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         try {
             ContentValues values = new ContentValues();
             values.put(SQLiteAxolotlStore.CERTIFICATE, x509Certificate.getEncoded());
-            return db.update(SQLiteAxolotlStore.IDENTITIES_TABLENAME, values,
+            db.update(SQLiteAxolotlStore.IDENTITIES_TABLENAME, values,
                     SQLiteAxolotlStore.ACCOUNT + " = ? AND "
                             + SQLiteAxolotlStore.FINGERPRINT + " = ? ",
-                    selectionArgs) == 1;
+                    selectionArgs);
         } catch (CertificateEncodingException e) {
             Log.d(Config.LOGTAG, "could not encode certificate");
-            return false;
         }
     }
 

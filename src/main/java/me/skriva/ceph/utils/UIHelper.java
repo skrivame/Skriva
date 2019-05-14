@@ -30,7 +30,7 @@ import rocks.xmpp.addr.Jid;
 
 public class UIHelper {
 
-	private static int[] UNSAFE_COLORS = {
+	private static final int[] UNSAFE_COLORS = {
 			0xFFF44336, //red 500
 			0xFFE53935, //red 600
 			0xFFD32F2F, //red 700
@@ -43,7 +43,7 @@ public class UIHelper {
 			0xFFD84315, //deep orange 800,
 	};
 
-	private static int[] SAFE_COLORS = {
+	private static final int[] SAFE_COLORS = {
 			0xFFE91E63, //pink 500
 			0xFFD81B60, //pink 600
 			0xFFC2185B, //pink 700
@@ -361,12 +361,8 @@ public class UIHelper {
 	 */
 	public static boolean isQuotationLine(String possibleQuotationLine) {
 		char firstCharacter = possibleQuotationLine.charAt(0);
-		if (firstCharacter == '>' && UIHelper.isPositionFollowedByQuoteableCharacter(possibleQuotationLine, 0)
-				|| (firstCharacter == '\u00bb' && !UIHelper.isPositionFollowedByQuote(possibleQuotationLine, 0))) {
-			return true;
-		} else{
-			return false;
-		}
+		return firstCharacter == '>' && UIHelper.isPositionFollowedByQuoteableCharacter(possibleQuotationLine, 0)
+				|| (firstCharacter == '\u00bb' && !UIHelper.isPositionFollowedByQuote(possibleQuotationLine, 0));
 	}
 
 	public static boolean isPositionFollowedByQuoteableCharacter(CharSequence body, int pos) {

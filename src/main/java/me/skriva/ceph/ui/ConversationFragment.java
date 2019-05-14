@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
@@ -21,7 +20,6 @@ import android.support.v7.app.AlertDialog;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
@@ -32,10 +30,8 @@ import android.support.v13.view.inputmethod.InputContentInfoCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -124,7 +120,6 @@ import me.skriva.ceph.xmpp.chatstate.ChatState;
 import me.skriva.ceph.xmpp.jingle.JingleConnection;
 import rocks.xmpp.addr.Jid;
 
-import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
 import static me.skriva.ceph.ui.XmppActivity.EXTRA_ACCOUNT;
@@ -137,33 +132,33 @@ import static me.skriva.ceph.utils.PermissionUtils.writeGranted;
 
 public class ConversationFragment extends XmppFragment implements EditMessage.KeyboardListener, MessageAdapter.OnContactPictureLongClicked, MessageAdapter.OnContactPictureClicked {
 
-    static final String TAG = "MainActivity";
-    EmojiPopup emojiPopup;
+    private static final String TAG = "MainActivity";
+    private EmojiPopup emojiPopup;
 
-    EditMessage editText;
-    ViewGroup rootView;
-    ImageView emojiButton;
+    private EditMessage editText;
+    private ViewGroup rootView;
+    private ImageView emojiButton;
 
     public static final int REQUEST_SEND_MESSAGE = 0x0201;
     public static final int REQUEST_ENCRYPT_MESSAGE = 0x0207;
-    public static final int REQUEST_TRUST_KEYS_TEXT = 0x0208;
-    public static final int REQUEST_TRUST_KEYS_ATTACHMENTS = 0x0209;
-    public static final int REQUEST_START_DOWNLOAD = 0x0210;
-    public static final int REQUEST_ADD_EDITOR_CONTENT = 0x0211;
-    public static final int REQUEST_COMMIT_ATTACHMENTS = 0x0212;
+    private static final int REQUEST_TRUST_KEYS_TEXT = 0x0208;
+    private static final int REQUEST_TRUST_KEYS_ATTACHMENTS = 0x0209;
+    private static final int REQUEST_START_DOWNLOAD = 0x0210;
+    private static final int REQUEST_ADD_EDITOR_CONTENT = 0x0211;
+    private static final int REQUEST_COMMIT_ATTACHMENTS = 0x0212;
     public static final int ATTACHMENT_CHOICE_CHOOSE_IMAGE = 0x0301;
     public static final int ATTACHMENT_CHOICE_TAKE_PHOTO = 0x0302;
-    public static final int ATTACHMENT_CHOICE_CHOOSE_FILE = 0x0303;
+    private static final int ATTACHMENT_CHOICE_CHOOSE_FILE = 0x0303;
     public static final int ATTACHMENT_CHOICE_RECORD_VOICE = 0x0304;
     public static final int ATTACHMENT_CHOICE_LOCATION = 0x0305;
     public static final int ATTACHMENT_CHOICE_INVALID = 0x0306;
     public static final int ATTACHMENT_CHOICE_RECORD_VIDEO = 0x0307;
 
     public static final String RECENTLY_USED_QUICK_ACTION = "recently_used_quick_action";
-    public static final String STATE_CONVERSATION_UUID = ConversationFragment.class.getName() + ".uuid";
-    public static final String STATE_SCROLL_POSITION = ConversationFragment.class.getName() + ".scroll_position";
-    public static final String STATE_PHOTO_URI = ConversationFragment.class.getName() + ".media_previews";
-    public static final String STATE_MEDIA_PREVIEWS = ConversationFragment.class.getName() + ".take_photo_uri";
+    private static final String STATE_CONVERSATION_UUID = ConversationFragment.class.getName() + ".uuid";
+    private static final String STATE_SCROLL_POSITION = ConversationFragment.class.getName() + ".scroll_position";
+    private static final String STATE_PHOTO_URI = ConversationFragment.class.getName() + ".media_previews";
+    private static final String STATE_MEDIA_PREVIEWS = ConversationFragment.class.getName() + ".take_photo_uri";
     private static final String STATE_LAST_MESSAGE_UUID = "state_last_message_uuid";
 
     private final List<Message> messageList = new ArrayList<>();
@@ -175,8 +170,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     private final PendingItem<ScrollState> pendingScrollState = new PendingItem<>();
     private final PendingItem<String> pendingLastMessageUuid = new PendingItem<>();
     private final PendingItem<Message> pendingMessage = new PendingItem<>();
-    public Uri mPendingEditorContent = null;
-    protected MessageAdapter messageListAdapter;
+    private Uri mPendingEditorContent = null;
+    private MessageAdapter messageListAdapter;
     private MediaPreviewAdapter mediaPreviewAdapter;
     private String lastMessageUuid = null;
     private Conversation conversation;
@@ -184,7 +179,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     private Toast messageLoaderToast;
     private ConversationsActivity activity;
     private boolean reInitRequiredOnStart = true;
-    private OnClickListener clickToMuc = new OnClickListener() {
+    private final OnClickListener clickToMuc = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -194,14 +189,14 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             startActivity(intent);
         }
     };
-    private OnClickListener leaveMuc = new OnClickListener() {
+    private final OnClickListener leaveMuc = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
             activity.xmppConnectionService.archiveConversation(conversation);
         }
     };
-    private OnClickListener joinMuc = new OnClickListener() {
+    private final OnClickListener joinMuc = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -209,7 +204,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     };
 
-    private OnClickListener acceptJoin = new OnClickListener() {
+    private final OnClickListener acceptJoin = new OnClickListener() {
         @Override
         public void onClick(View v) {
             conversation.setAttribute("accept_non_anonymous",true);
@@ -218,7 +213,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     };
 
-    private OnClickListener enterPassword = new OnClickListener() {
+    private final OnClickListener enterPassword = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -233,7 +228,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             });
         }
     };
-    private OnScrollListener mOnScrollListener = new OnScrollListener() {
+    private final OnScrollListener mOnScrollListener = new OnScrollListener() {
 
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -260,10 +255,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     };
 
     private class OnMoreMessagesLoadedImpl implements XmppConnectionService.OnMoreMessagesLoaded {
-        private AbsListView view;
-        private Message jumpToMessage;
+        private final AbsListView view;
+        private final Message jumpToMessage;
 
-        public OnMoreMessagesLoadedImpl(AbsListView view, Message jumpToMessage) {
+        OnMoreMessagesLoadedImpl(AbsListView view, Message jumpToMessage) {
             this.view = view;
             this.jumpToMessage = jumpToMessage;
         }
@@ -339,7 +334,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     }
 
 
-    private EditMessage.OnCommitContentListener mEditorContentListener = new EditMessage.OnCommitContentListener() {
+    private final EditMessage.OnCommitContentListener mEditorContentListener = new EditMessage.OnCommitContentListener() {
         @Override
         public boolean onCommitContent(InputContentInfoCompat inputContentInfo, int flags, Bundle opts, String[] contentMimeTypes) {
             // try to get permission to read the image, if applicable
@@ -362,7 +357,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     };
     private Message selectedMessage;
-    private OnClickListener mEnableAccountListener = new OnClickListener() {
+    private final OnClickListener mEnableAccountListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             final Account account = conversation == null ? null : conversation.getAccount();
@@ -372,7 +367,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             }
         }
     };
-    private OnClickListener mUnblockClickListener = new OnClickListener() {
+    private final OnClickListener mUnblockClickListener = new OnClickListener() {
         @Override
         public void onClick(final View v) {
             v.post(() -> v.setVisibility(View.INVISIBLE));
@@ -383,8 +378,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             }
         }
     };
-    private OnClickListener mBlockClickListener = this::showBlockSubmenu;
-    private OnClickListener mAddBackClickListener = new OnClickListener() {
+    private final OnClickListener mBlockClickListener = this::showBlockSubmenu;
+    private final OnClickListener mAddBackClickListener = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -395,8 +390,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             }
         }
     };
-    private View.OnLongClickListener mLongPressBlockListener = this::showBlockSubmenu;
-    private OnClickListener mAllowPresenceSubscription = new OnClickListener() {
+    private final View.OnLongClickListener mLongPressBlockListener = this::showBlockSubmenu;
+    private final OnClickListener mAllowPresenceSubscription = new OnClickListener() {
         @Override
         public void onClick(View v) {
             final Contact contact = conversation == null ? null : conversation.getContact();
@@ -415,8 +410,8 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             updateSnackBar(conversation);
         }
     };
-    private AtomicBoolean mSendingPgpMessage = new AtomicBoolean(false);
-    private OnEditorActionListener mEditorActionListener = (v, actionId, event) -> {
+    private final AtomicBoolean mSendingPgpMessage = new AtomicBoolean(false);
+    private final OnEditorActionListener mEditorActionListener = (v, actionId, event) -> {
         if (actionId == EditorInfo.IME_ACTION_SEND) {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm != null && imm.isFullscreenMode()) {
@@ -428,7 +423,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             return false;
         }
     };
-    private OnClickListener mScrollButtonListener = new OnClickListener() {
+    private final OnClickListener mScrollButtonListener = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -437,14 +432,14 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     };
 
-    private OnClickListener mToggleEmoji = new OnClickListener() {
+    private final OnClickListener mToggleEmoji = new OnClickListener() {
         @Override
         public void onClick(View v) {
             emojiPopup.toggle();
         }
     };
 
-    private OnClickListener mSendButtonListener = new OnClickListener() {
+    private final OnClickListener mSendButtonListener = new OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -540,7 +535,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
 
     private static Conversation getConversation(Activity activity, @IdRes int res) {
         final Fragment fragment = activity.getFragmentManager().findFragmentById(res);
-        if (fragment != null && fragment instanceof ConversationFragment) {
+        if (fragment instanceof ConversationFragment) {
             return ((ConversationFragment) fragment).getConversation();
         } else {
             return null;
@@ -550,11 +545,11 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     public static ConversationFragment get(Activity activity) {
         FragmentManager fragmentManager = activity.getFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.main_fragment);
-        if (fragment != null && fragment instanceof ConversationFragment) {
+        if (fragment instanceof ConversationFragment) {
             return (ConversationFragment) fragment;
         } else {
             fragment = fragmentManager.findFragmentById(R.id.secondary_fragment);
-            return fragment != null && fragment instanceof ConversationFragment ? (ConversationFragment) fragment : null;
+            return fragment instanceof ConversationFragment ? (ConversationFragment) fragment : null;
         }
     }
 
@@ -707,7 +702,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         });
     }
 
-    public void attachEditorContentToConversation(Uri uri) {
+    private void attachEditorContentToConversation(Uri uri) {
         mediaPreviewAdapter.addMediaPreviews(Attachment.of(getActivity(), uri, Attachment.Type.FILE));
         toggleInputMethod();
     }
@@ -792,13 +787,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             conversation.setCorrectingMessage(null);
             displayMessageReferencePreview();
         }
-        switch (conversation.getNextEncryption()) {
-            default:
-                sendMessage(message);
-        }
+        sendMessage(message);
     }
 
-    protected boolean trustKeysIfNeeded(int requestCode) {
+    private boolean trustKeysIfNeeded(int requestCode) {
         AxolotlService axolotlService = conversation.getAccount().getAxolotlService();
         final List<Jid> targets = axolotlService.getCryptoTargets(conversation);
         boolean hasUnaccepted = !conversation.getAcceptedCryptoTargets().containsAll(targets);
@@ -843,7 +835,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    public void setupIme() {
+    private void setupIme() {
         this.binding.textinput.refreshIme();
     }
 
@@ -888,7 +880,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             case ATTACHMENT_CHOICE_LOCATION:
                 double latitude = data.getDoubleExtra("latitude", 0);
                 double longitude = data.getDoubleExtra("longitude", 0);
-                Uri geo = Uri.parse("geo:" + String.valueOf(latitude) + "," + String.valueOf(longitude));
+                Uri geo = Uri.parse("geo:" + latitude + "," + longitude);
                 mediaPreviewAdapter.addMediaPreviews(Attachment.of(getActivity(), geo, Attachment.Type.LOCATION));
                 toggleInputMethod();
                 break;
@@ -947,12 +939,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     }
 
     private void handleNegativeActivityResult(int requestCode) {
-        switch (requestCode) {
-            case ATTACHMENT_CHOICE_TAKE_PHOTO:
-                if (pendingTakePhotoUri.clear()) {
-                    Log.d(Config.LOGTAG, "cleared pending photo uri after negative activity result");
-                }
-                break;
+        if (requestCode == ATTACHMENT_CHOICE_TAKE_PHOTO) {
+            if (pendingTakePhotoUri.clear()) {
+                Log.d(Config.LOGTAG, "cleared pending photo uri after negative activity result");
+            }
         }
     }
 
@@ -967,7 +957,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    public void unblockConversation(final Blockable conversation) {
+    private void unblockConversation(final Blockable conversation) {
         activity.xmppConnectionService.sendUnblockRequest(conversation);
     }
 
@@ -1398,16 +1388,13 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             return;
         }
         final boolean updated;
-        switch (item.getItemId()) {
-            case R.id.encryption_choice_axolotl:
-                Log.d(Config.LOGTAG, AxolotlService.getLogprefix(conversation.getAccount())
-                        + "Enabled axolotl for Contact " + conversation.getContact().getJid());
-                updated = conversation.setNextEncryption(Message.ENCRYPTION_AXOLOTL);
-                item.setChecked(true);
-                break;
-            default:
-                updated = conversation.setNextEncryption(Message.ENCRYPTION_NONE);
-                break;
+        if (item.getItemId() == R.id.encryption_choice_axolotl) {
+            Log.d(Config.LOGTAG, AxolotlService.getLogprefix(conversation.getAccount())
+                    + "Enabled axolotl for Contact " + conversation.getContact().getJid());
+            updated = conversation.setNextEncryption(Message.ENCRYPTION_AXOLOTL);
+            item.setChecked(true);
+        } else {
+            updated = conversation.setNextEncryption(Message.ENCRYPTION_NONE);
         }
         if (updated) {
             activity.xmppConnectionService.updateConversation(conversation);
@@ -1417,7 +1404,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         activity.refreshUi();
     }
 
-    public void attachFile(final int attachmentChoice) {
+    private void attachFile(final int attachmentChoice) {
         if (attachmentChoice == ATTACHMENT_CHOICE_RECORD_VOICE) {
             if (!hasPermissions(attachmentChoice, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO)) {
                 return;
@@ -1486,7 +1473,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    public void startDownloadable(Message message) {
+    private void startDownloadable(Message message) {
         if (!hasPermissions(REQUEST_START_DOWNLOAD, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             this.mPendingDownloadableMessage = message;
             return;
@@ -1515,7 +1502,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     }
 
     @SuppressLint("InflateParams")
-    protected void clearHistoryDialog(final Conversation conversation) {
+    private void clearHistoryDialog(final Conversation conversation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getString(R.string.clear_conversation_history));
         final View dialogView = getActivity().getLayoutInflater().inflate(R.layout.dialog_clear_history, null);
@@ -1535,7 +1522,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         builder.create().show();
     }
 
-    protected void muteConversationDialog(final Conversation conversation) {
+    private void muteConversationDialog(final Conversation conversation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.disable_notifications);
         final int[] durations = getResources().getIntArray(R.array.mute_options_durations);
@@ -1577,7 +1564,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             if (missingPermissions.size() == 0) {
                 return true;
             } else {
-                requestPermissions(missingPermissions.toArray(new String[missingPermissions.size()]), requestCode);
+                requestPermissions(missingPermissions.toArray(new String[0]), requestCode);
                 return false;
             }
         } else {
@@ -1585,7 +1572,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    public void unmuteConversation(final Conversation conversation) {
+    private void unmuteConversation(final Conversation conversation) {
         conversation.setMutedTill(0);
         this.activity.xmppConnectionService.updateConversation(conversation);
         this.activity.onConversationsListItemUpdated();
@@ -1593,7 +1580,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         getActivity().invalidateOptionsMenu();
     }
 
-    protected void invokeAttachFileIntent(final int attachmentChoice) {
+    private void invokeAttachFileIntent(final int attachmentChoice) {
         Intent intent = new Intent();
         boolean chooser = false;
         switch (attachmentChoice) {
@@ -1992,7 +1979,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
 
         stopScrolling();
-        Log.d(Config.LOGTAG, "reInit(hasExtras=" + Boolean.toString(hasExtras) + ")");
+        Log.d(Config.LOGTAG, "reInit(hasExtras=" + hasExtras + ")");
 
         if (this.conversation.isRead() && hasExtras) {
             Log.d(Config.LOGTAG, "trimming conversation");
@@ -2014,7 +2001,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         messageListAdapter.updatePreferences();
         refresh(false);
         this.conversation.messagesLoaded.set(true);
-        Log.d(Config.LOGTAG, "scrolledToBottomAndNoPending=" + Boolean.toString(scrolledToBottomAndNoPending));
+        Log.d(Config.LOGTAG, "scrolledToBottomAndNoPending=" + scrolledToBottomAndNoPending);
 
         if (hasExtras || scrolledToBottomAndNoPending) {
             resetUnreadMessagesCount();
@@ -2248,7 +2235,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     }
 
     @Override
-    public void refresh() {
+    void refresh() {
         if (this.binding == null) {
             Log.d(Config.LOGTAG, "ConversationFragment.refresh() skipped updated because view binding was null");
             return;
@@ -2284,7 +2271,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    protected void messageSent() {
+    private void messageSent() {
         mSendingPgpMessage.set(false);
         this.binding.textinput.setText("");
         if (conversation.setCorrectingMessage(null)) {
@@ -2320,7 +2307,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         mSendingPgpMessage.set(false);
     }
 
-    public long getMaxHttpUploadSize(Conversation conversation) {
+    private long getMaxHttpUploadSize(Conversation conversation) {
         final XmppConnection connection = conversation.getAccount().getXmppConnection();
         return connection == null ? -1 : connection.getFeatures().getMaxHttpUploadSize();
     }
@@ -2334,7 +2321,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         this.binding.textinput.setEnabled(canWrite);
     }
 
-    public void updateSendButton() {
+    private void updateSendButton() {
         boolean hasAttachments = mediaPreviewAdapter != null && mediaPreviewAdapter.hasAttachments();
         boolean useSendButtonToIndicateStatus = PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean("send_button_status", getResources().getBoolean(R.bool.send_button_status));
         final Conversation c = this.conversation;
@@ -2361,7 +2348,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         this.binding.textSendButton.setImageResource(SendButtonTool.getSendButtonImageResource(getActivity(), action, status));
     }
 
-    protected void updateStatusMessages() {
+    private void updateStatusMessages() {
         DateSeparator.addAll(this.messageList);
         if (showLoadMoreMessages(conversation)) {
             this.messageList.add(0, Message.createLoadMoreMessage(conversation));
@@ -2483,11 +2470,11 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         }
     }
 
-    protected void showSnackbar(final int message, final int action, final OnClickListener clickListener) {
+    private void showSnackbar(final int message, final int action, final OnClickListener clickListener) {
         showSnackbar(message, action, clickListener, null);
     }
 
-    protected void showSnackbar(final int message, final int action, final OnClickListener clickListener, final View.OnLongClickListener longClickListener) {
+    private void showSnackbar(final int message, final int action, final OnClickListener clickListener, final View.OnLongClickListener longClickListener) {
         this.binding.snackbar.setVisibility(View.VISIBLE);
         this.binding.snackbar.setOnClickListener(null);
         this.binding.snackbarMessage.setText(message);
@@ -2500,16 +2487,16 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         this.binding.snackbarAction.setOnLongClickListener(longClickListener);
     }
 
-    protected void hideSnackbar() {
+    private void hideSnackbar() {
         this.binding.snackbar.setVisibility(View.GONE);
     }
 
-    protected void sendMessage(Message message) {
+    private void sendMessage(Message message) {
         activity.xmppConnectionService.sendMessage(message);
         messageSent();
     }
 
-    public void appendText(String text, final boolean doNotAppend) {
+    private void appendText(String text, final boolean doNotAppend) {
         if (text == null) {
             return;
         }

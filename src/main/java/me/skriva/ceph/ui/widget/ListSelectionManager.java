@@ -47,13 +47,13 @@ public class ListSelectionManager {
 
 	private static class StartSelectionHolder {
 
-		public final ListSelectionManager listSelectionManager;
-		public final TextView textView;
-		public final int start;
-		public final int end;
+		final ListSelectionManager listSelectionManager;
+		final TextView textView;
+		final int start;
+		final int end;
 
-		public StartSelectionHolder(ListSelectionManager listSelectionManager, TextView textView,
-				int start, int end) {
+		StartSelectionHolder(ListSelectionManager listSelectionManager, TextView textView,
+							 int start, int end) {
 			this.listSelectionManager = listSelectionManager;
 			this.textView = textView;
 			this.start = start;
@@ -113,9 +113,9 @@ public class ListSelectionManager {
 
 		private final TextView textView;
 		private final ActionMode.Callback additionalCallback;
-		public Object identifier;
+		Object identifier;
 
-		public CustomCallback(TextView textView, ActionMode.Callback additionalCallback) {
+		CustomCallback(TextView textView, ActionMode.Callback additionalCallback) {
 			this.textView = textView;
 			this.additionalCallback = additionalCallback;
 		}
@@ -141,11 +141,8 @@ public class ListSelectionManager {
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			if (additionalCallback != null && additionalCallback.onActionItemClicked(mode, item)) {
-				return true;
-			}
-			return false;
-		}
+            return additionalCallback != null && additionalCallback.onActionItemClicked(mode, item);
+        }
 
 		@Override
 		public void onDestroyActionMode(ActionMode mode) {
@@ -194,7 +191,7 @@ public class ListSelectionManager {
 		return SUPPORTED;
 	}
 
-	public static void startSelection(TextView textView, int start, int end) {
+	private static void startSelection(TextView textView, int start, int end) {
 		final CharSequence text = textView.getText();
 		if (SUPPORTED && start >= 0 && end > start && textView.isTextSelectable() && text instanceof Spannable) {
 			final Spannable spannable = (Spannable) text;

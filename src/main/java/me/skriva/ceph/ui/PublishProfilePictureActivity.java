@@ -36,8 +36,8 @@ public class PublishProfilePictureActivity extends XmppActivity implements XmppC
     private Account account;
     private boolean support = false;
     private boolean publishing = false;
-    private AtomicBoolean handledExternalUri = new AtomicBoolean(false);
-    private OnLongClickListener backToDefaultListener = new OnLongClickListener() {
+    private final AtomicBoolean handledExternalUri = new AtomicBoolean(false);
+    private final OnLongClickListener backToDefaultListener = new OnLongClickListener() {
 
         @Override
         public boolean onLongClick(View v) {
@@ -192,7 +192,7 @@ public class PublishProfilePictureActivity extends XmppActivity implements XmppC
         configureActionBar(getSupportActionBar(), !this.mInitialAccountSetup && !handledExternalUri.get());
     }
 
-    protected void loadImageIntoPreview(Uri uri) {
+    private void loadImageIntoPreview(Uri uri) {
 
         Bitmap bm = null;
         if (uri == null) {
@@ -235,7 +235,7 @@ public class PublishProfilePictureActivity extends XmppActivity implements XmppC
         }
     }
 
-    protected void togglePublishButton(boolean enabled, @StringRes int res) {
+    private void togglePublishButton(boolean enabled, @StringRes int res) {
         final boolean status = enabled && !publishing;
         this.publishButton.setText(publishing ? R.string.publishing : res);
         this.publishButton.setEnabled(status);

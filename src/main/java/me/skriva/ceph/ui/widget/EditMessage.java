@@ -34,8 +34,8 @@ public class EditMessage extends EmojiWrapperEditText implements EmojiEditTextIn
 	private float emojiSize = 48;
 	private static final InputFilter SPAN_FILTER = (source, start, end, dest, dstart, dend) -> source instanceof Spanned ? source.toString() : source;
 	private final ExecutorService executor = Executors.newSingleThreadExecutor();
-	protected Handler mTypingHandler = new Handler();
-	protected KeyboardListener keyboardListener;
+	private final Handler mTypingHandler = new Handler();
+	private KeyboardListener keyboardListener;
 	private OnCommitContentListener mCommitContentListener = null;
 	private String[] mimeTypes = null;
 	private boolean isUserTyping = false;

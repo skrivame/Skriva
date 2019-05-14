@@ -25,7 +25,7 @@ import me.skriva.ceph.entities.ListItem;
 import me.skriva.ceph.ui.adapter.ListItemAdapter;
 
 public abstract class AbstractSearchableListItemActivity extends XmppActivity implements TextView.OnEditorActionListener {
-	protected ActivityChooseContactBinding binding;
+	ActivityChooseContactBinding binding;
 	private final List<ListItem> listItems = new ArrayList<>();
 	private ArrayAdapter<ListItem> mListItemsAdapter;
 
@@ -72,19 +72,19 @@ public abstract class AbstractSearchableListItemActivity extends XmppActivity im
 		}
 	};
 
-	public ListView getListView() {
+	ListView getListView() {
 		return binding.chooseContactList;
 	}
 
-	public List<ListItem> getListItems() {
+	List<ListItem> getListItems() {
 		return listItems;
 	}
 
-	public EditText getSearchEditText() {
+	EditText getSearchEditText() {
 		return mSearchEditText;
 	}
 
-	public ArrayAdapter<ListItem> getListItemAdapter() {
+	ArrayAdapter<ListItem> getListItemAdapter() {
 		return mListItemsAdapter;
 	}
 
@@ -112,7 +112,7 @@ public abstract class AbstractSearchableListItemActivity extends XmppActivity im
 		return true;
 	}
 
-	protected void filterContacts() {
+	void filterContacts() {
 		final String needle = mSearchEditText != null ? mSearchEditText.getText().toString() : null;
 		if (needle != null && !needle.isEmpty()) {
 			filterContacts(needle);

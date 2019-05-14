@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.inputmethod.InputMethodManager;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

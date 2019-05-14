@@ -194,7 +194,7 @@ public class ShowLocationActivity extends LocationActivity implements LocationLi
 	private void startNavigation() {
 		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(
 				"google.navigation:q=" +
-						String.valueOf(this.loc.getLatitude()) + "," + String.valueOf(this.loc.getLongitude())
+						this.loc.getLatitude() + "," + this.loc.getLongitude()
 		)));
 	}
 

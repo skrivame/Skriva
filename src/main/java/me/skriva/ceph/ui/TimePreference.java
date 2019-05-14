@@ -22,7 +22,7 @@ public class TimePreference extends DialogPreference implements Preference.OnPre
 		this.setOnPreferenceChangeListener(this);
 	}
 
-	protected void setTime(final long time) {
+	private void setTime(final long time) {
 		persistLong(time);
 		notifyDependencyChange(shouldDisableDependents());
 		notifyChanged();

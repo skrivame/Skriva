@@ -22,8 +22,8 @@ import me.skriva.ceph.utils.WakeLockHelper;
 import me.skriva.ceph.xmpp.jingle.stanzas.Content;
 
 public class JingleSocks5Transport extends JingleTransport {
-	private JingleCandidate candidate;
-	private JingleConnection connection;
+	private final JingleCandidate candidate;
+	private final JingleConnection connection;
 	private String destination;
 	private OutputStream outputStream;
 	private InputStream inputStream;
@@ -170,7 +170,7 @@ public class JingleSocks5Transport extends JingleTransport {
 		}).start();
 	}
 
-	public boolean isProxy() {
+	private boolean isProxy() {
 		return this.candidate.getType() == JingleCandidate.TYPE_PROXY;
 	}
 

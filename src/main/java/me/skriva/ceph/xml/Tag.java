@@ -1,23 +1,22 @@
 package me.skriva.ceph.xml;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import me.skriva.ceph.utils.XmlHelper;
 
 public class Tag {
-	public static final int NO = -1;
-	public static final int START = 0;
-	public static final int END = 1;
-	public static final int EMPTY = 2;
+	private static final int NO = -1;
+	private static final int START = 0;
+	private static final int END = 1;
+	private static final int EMPTY = 2;
 
-	protected int type;
-	protected String name;
-	protected Hashtable<String, String> attributes = new Hashtable<String, String>();
+	private final int type;
+	private final String name;
+	private Hashtable<String, String> attributes = new Hashtable<>();
 
-	protected Tag(int type, String name) {
+	private Tag(int type, String name) {
 		this.type = type;
 		this.name = name;
 	}
@@ -46,14 +45,12 @@ public class Tag {
 		return this.attributes.get(attrName);
 	}
 
-	public Tag setAttribute(String attrName, String attrValue) {
+	public void setAttribute(String attrName, String attrValue) {
 		this.attributes.put(attrName, attrValue);
-		return this;
 	}
 
-	public Tag setAtttributes(Hashtable<String, String> attributes) {
+	public void setAtttributes(Hashtable<String, String> attributes) {
 		this.attributes = attributes;
-		return this;
 	}
 
 	public boolean isStart(String needle) {
@@ -81,9 +78,7 @@ public class Tag {
 		tagOutput.append(name);
 		if (type != END) {
 			Set<Entry<String, String>> attributeSet = attributes.entrySet();
-			Iterator<Entry<String, String>> it = attributeSet.iterator();
-			while (it.hasNext()) {
-				Entry<String, String> entry = it.next();
+			for (Entry<String, String> entry : attributeSet) {
 				tagOutput.append(' ');
 				tagOutput.append(entry.getKey());
 				tagOutput.append("=\"");

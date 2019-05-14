@@ -60,7 +60,7 @@ public class BlocklistActivity extends AbstractSearchableListItemActivity implem
 		getListItemAdapter().notifyDataSetChanged();
 	}
 
-	protected void showEnterJidDialog() {
+	private void showEnterJidDialog() {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
 		if (prev != null) {

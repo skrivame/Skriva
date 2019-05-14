@@ -65,13 +65,11 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
 
     private boolean mAdvancedMode = false;
 
-    private UiCallback<Conversation> renameCallback = new UiCallback<Conversation>() {
+    private final UiCallback<Conversation> renameCallback = new UiCallback<Conversation>() {
         @Override
         public void success(Conversation object) {
             displayToast(getString(R.string.your_nick_has_been_changed));
-            runOnUiThread(() -> {
-                updateView();
-            });
+            runOnUiThread(() -> updateView());
 
         }
 
@@ -86,7 +84,7 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
         }
     };
 
-    private OnClickListener mNotifyStatusClickListener = new OnClickListener() {
+    private final OnClickListener mNotifyStatusClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             AlertDialog.Builder builder = new AlertDialog.Builder(ConferenceDetailsActivity.this);
@@ -118,7 +116,7 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
         }
     };
 
-    private OnClickListener mChangeConferenceSettings = new OnClickListener() {
+    private final OnClickListener mChangeConferenceSettings = new OnClickListener() {
         @Override
         public void onClick(View v) {
             final MucOptions mucOptions = mConversation.getMucOptions();
@@ -261,7 +259,7 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
         return true;
     }
 
-    public void onMucEditButtonClicked(View v) {
+    private void onMucEditButtonClicked(View v) {
         if (this.binding.mucEditor.getVisibility() == View.GONE) {
             final MucOptions mucOptions = mConversation.getMucOptions();
             this.binding.mucEditor.setVisibility(View.VISIBLE);
@@ -374,11 +372,11 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
     }
 
 
-    protected void saveAsBookmark() {
+    private void saveAsBookmark() {
         xmppConnectionService.saveConversationAsBookmark(mConversation, mConversation.getMucOptions().getName());
     }
 
-    protected void deleteBookmark() {
+    private void deleteBookmark() {
         Account account = mConversation.getAccount();
         Bookmark bookmark = mConversation.getBookmark();
         account.getBookmarks().remove(bookmark);
@@ -387,14 +385,12 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
         updateView();
     }
 
-    protected void destroyRoom() {
+    private void destroyRoom() {
         final boolean groupChat = mConversation != null && mConversation.isPrivateAndNonAnonymous();
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(groupChat ? R.string.destroy_room : R.string.destroy_channel);
         builder.setMessage(groupChat ? R.string.destroy_room_dialog : R.string.destroy_channel_dialog);
-        builder.setPositiveButton(R.string.ok, (dialog, which) -> {
-            xmppConnectionService.destroyRoom(mConversation, ConferenceDetailsActivity.this);
-        });
+        builder.setPositiveButton(R.string.ok, (dialog, which) -> xmppConnectionService.destroyRoom(mConversation, ConferenceDetailsActivity.this));
         builder.setNegativeButton(R.string.cancel, null);
         final AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);

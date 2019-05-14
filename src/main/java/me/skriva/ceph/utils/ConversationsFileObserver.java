@@ -43,7 +43,7 @@ public abstract class ConversationsFileObserver {
                 return;
             }
             String parent = stack.pop();
-            mObservers.add(new SingleFileObserver(parent, FileObserver.DELETE| FileObserver.MOVED_FROM));
+            mObservers.add(new SingleFileObserver(parent));
             final File path = new File(parent);
             final File[] files = path.listFiles();
             if (files == null) {
@@ -96,7 +96,7 @@ public abstract class ConversationsFileObserver {
         mObservers.clear();
     }
 
-    abstract public void onEvent(int event, String path);
+    protected abstract void onEvent(int event, String path);
 
     public void restartWatching() {
         stopWatching();
@@ -106,8 +106,8 @@ public abstract class ConversationsFileObserver {
     private class SingleFileObserver extends FileObserver {
         private final String path;
 
-        SingleFileObserver(String path, int mask) {
-            super(path, mask);
+        SingleFileObserver(String path) {
+            super(path, 576);
             this.path = path;
         }
 

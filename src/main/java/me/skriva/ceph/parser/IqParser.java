@@ -125,7 +125,6 @@ public class IqParser extends AbstractParser implements OnIqPacketReceived {
 						deviceIds.add(id);
 					} catch (NumberFormatException e) {
 						Log.e(Config.LOGTAG, AxolotlService.LOGPREFIX+" : "+"Encountered invalid <device> node in PEP ("+e.getMessage()+"):" + device.toString()+ ", skipping...");
-						continue;
 					}
 				}
 			}
@@ -133,7 +132,7 @@ public class IqParser extends AbstractParser implements OnIqPacketReceived {
 		return deviceIds;
 	}
 
-	public Integer signedPreKeyId(final Element bundle) {
+	private Integer signedPreKeyId(final Element bundle) {
 		final Element signedPreKeyPublic = bundle.findChild("signedPreKeyPublic");
 		if(signedPreKeyPublic == null) {
 			return null;
@@ -145,7 +144,7 @@ public class IqParser extends AbstractParser implements OnIqPacketReceived {
 		}
 	}
 
-	public ECPublicKey signedPreKeyPublic(final Element bundle) {
+	private ECPublicKey signedPreKeyPublic(final Element bundle) {
 		ECPublicKey publicKey = null;
 		final Element signedPreKeyPublic = bundle.findChild("signedPreKeyPublic");
 		if(signedPreKeyPublic == null) {
@@ -159,7 +158,7 @@ public class IqParser extends AbstractParser implements OnIqPacketReceived {
 		return publicKey;
 	}
 
-	public byte[] signedPreKeySignature(final Element bundle) {
+	private byte[] signedPreKeySignature(final Element bundle) {
 		final Element signedPreKeySignature = bundle.findChild("signedPreKeySignature");
 		if(signedPreKeySignature == null) {
 			return null;
@@ -172,7 +171,7 @@ public class IqParser extends AbstractParser implements OnIqPacketReceived {
 		}
 	}
 
-	public IdentityKey identityKey(final Element bundle) {
+	private IdentityKey identityKey(final Element bundle) {
 		IdentityKey identityKey = null;
 		final Element identityKeyElement = bundle.findChild("identityKey");
 		if(identityKeyElement == null) {

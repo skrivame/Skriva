@@ -3,6 +3,8 @@ package me.skriva.ceph.entities;
 import android.content.ContentValues;
 import android.database.Cursor;
 
+import java.util.Objects;
+
 
 public class PresenceTemplate extends AbstractEntity {
 
@@ -61,7 +63,7 @@ public class PresenceTemplate extends AbstractEntity {
 
 		PresenceTemplate template = (PresenceTemplate) o;
 
-		if (statusMessage != null ? !statusMessage.equals(template.statusMessage) : template.statusMessage != null)
+		if (!Objects.equals(statusMessage, template.statusMessage))
 			return false;
 		return status == template.status;
 

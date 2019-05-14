@@ -13,7 +13,7 @@ public class MucConfiguration {
     int title;
     public final String[] names;
     public final boolean[] values;
-    public final Option[] options;
+    private final Option[] options;
 
     private MucConfiguration(@StringRes int title, String[] names, boolean[] values, Option[] options) {
         this.title = title;
@@ -53,7 +53,7 @@ public class MucConfiguration {
                         mucOptions.moderated()
                 };
                 options = new Option[]{
-                        new Option("muc#roomconfig_whois", "anyone", "moderators"),
+                        new Option("muc#roomconfig_whois", "anyone"),
                         new Option("muc#roomconfig_changesubject"),
                         new Option("muc#roomconfig_moderatedroom")
                 };
@@ -67,7 +67,7 @@ public class MucConfiguration {
                         mucOptions.participantsCanChangeSubject()
                 };
                 options = new Option[]{
-                        new Option("muc#roomconfig_whois", "anyone", "moderators"),
+                        new Option("muc#roomconfig_whois", "anyone"),
                         new Option("muc#roomconfig_changesubject")
                 };
             }
@@ -115,17 +115,17 @@ public class MucConfiguration {
     }
 
     private static class Option {
-        public final String name;
-        public final String[] values;
+        final String name;
+        final String[] values;
 
         private Option(String name) {
             this.name = name;
             this.values = new String[]{"1","0"};
         }
 
-        private Option(String name, String on, String off) {
+        private Option(String name, String on) {
             this.name = name;
-            this.values = new String[]{on,off};
+            this.values = new String[]{on, "moderators"};
         }
     }
 

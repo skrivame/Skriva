@@ -34,7 +34,7 @@ public class SocksSocketFactory {
 		}
 	}
 
-	public static Socket createSocket(InetSocketAddress address, String destination, int port) throws IOException {
+	private static Socket createSocket(InetSocketAddress address, String destination, int port) throws IOException {
 		Socket socket = new Socket();
 		try {
 			socket.connect(address, Config.CONNECT_TIMEOUT * 1000);
@@ -49,7 +49,7 @@ public class SocksSocketFactory {
 		return createSocket(new InetSocketAddress(InetAddress.getByAddress(LOCALHOST), 9050), destination, port);
 	}
 
-	static class SocksConnectionException extends IOException {
+	public static class SocksConnectionException extends IOException {
 
 	}
 

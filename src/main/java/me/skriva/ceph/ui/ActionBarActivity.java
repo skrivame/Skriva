@@ -10,7 +10,7 @@ public abstract class ActionBarActivity extends AppCompatActivity {
         configureActionBar(actionBar, true);
     }
 
-    public static void configureActionBar(ActionBar actionBar, boolean upNavigation) {
+    static void configureActionBar(ActionBar actionBar, boolean upNavigation) {
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(upNavigation);
             actionBar.setDisplayHomeAsUpEnabled(upNavigation);
@@ -19,10 +19,8 @@ public abstract class ActionBarActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                break;
+        if (item.getItemId() == android.R.id.home) {
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }

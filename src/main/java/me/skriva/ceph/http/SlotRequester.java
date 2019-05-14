@@ -45,9 +45,9 @@ import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.xmpp.stanzas.IqPacket;
 import rocks.xmpp.addr.Jid;
 
-public class SlotRequester {
+class SlotRequester {
 
-	private XmppConnectionService service;
+	private final XmppConnectionService service;
 
 	public SlotRequester(XmppConnectionService service) {
 		this.service = service;

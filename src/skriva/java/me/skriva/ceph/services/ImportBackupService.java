@@ -109,7 +109,7 @@ public class ImportBackupService extends Service {
         executor.execute(() -> {
             List<Jid> accounts = mDatabaseBackend.getAccountJids(false);
             final ArrayList<BackupFile> backupFiles = new ArrayList<>();
-            final Set<String> apps = new HashSet<>(Collections.singletonList("Skriva"));
+            final Set<String> apps = new HashSet<>(Arrays.asList("Conversations", "Quicksy", getString(R.string.app_name)));
             for (String app : apps) {
                 final File directory = new File(FileBackend.getBackupDirectory(app));
                 if (!directory.exists() || !directory.isDirectory()) {

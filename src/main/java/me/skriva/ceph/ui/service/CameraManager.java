@@ -40,7 +40,6 @@ import me.skriva.ceph.Config;
 /**
  * @author Andreas Schildbach
  */
-@SuppressWarnings("deprecation")
 public final class CameraManager {
     private static final int MIN_FRAME_SIZE = 240;
     private static final int MAX_FRAME_SIZE = 600;
@@ -48,7 +47,7 @@ public final class CameraManager {
     private static final int MAX_PREVIEW_PIXELS = 1280 * 720;
 
     private Camera camera;
-    private CameraInfo cameraInfo = new CameraInfo();
+    private final CameraInfo cameraInfo = new CameraInfo();
     private Camera.Size cameraResolution;
     private Rect frame;
     private RectF framePreview;
@@ -178,19 +177,11 @@ public final class CameraManager {
         }
     }
 
-    private static final Comparator<Camera.Size> numPixelComparator = new Comparator<Camera.Size>() {
-        @Override
-        public int compare(final Camera.Size size1, final Camera.Size size2) {
-            final int pixels1 = size1.height * size1.width;
-            final int pixels2 = size2.height * size2.width;
+    private static final Comparator<Camera.Size> numPixelComparator = (size1, size2) -> {
+        final int pixels1 = size1.height * size1.width;
+        final int pixels2 = size2.height * size2.width;
 
-            if (pixels1 < pixels2)
-                return 1;
-            else if (pixels1 > pixels2)
-                return -1;
-            else
-                return 0;
-        }
+        return Integer.compare(pixels2, pixels1);
     };
 
     private static Camera.Size findBestPreviewSizeValue(final Camera.Parameters parameters, int width, int height) {
@@ -207,7 +198,7 @@ public final class CameraManager {
             return parameters.getPreviewSize();
 
         // sort by size, descending
-        final List<Camera.Size> supportedPreviewSizes = new ArrayList<Camera.Size>(rawSupportedSizes);
+        final List<Camera.Size> supportedPreviewSizes = new ArrayList<>(rawSupportedSizes);
         Collections.sort(supportedPreviewSizes, numPixelComparator);
 
         Camera.Size bestSize = null;

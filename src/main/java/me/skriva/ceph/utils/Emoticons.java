@@ -168,7 +168,7 @@ public class Emoticons {
 
 		private final String value;
 
-		public Symbol(List<Integer> codepoints) {
+		Symbol(List<Integer> codepoints) {
 			StringBuilder builder = new StringBuilder();
 			for(Integer codepoint : codepoints) {
 				builder.appendCodePoint(codepoint);
@@ -184,9 +184,9 @@ public class Emoticons {
 		}
 	}
 
-	public static class Emoji extends Symbol {
+	static class Emoji extends Symbol {
 
-		public Emoji(List<Integer> codepoints) {
+		Emoji(List<Integer> codepoints) {
 			super(codepoints);
 		}
 
@@ -196,9 +196,9 @@ public class Emoticons {
 		}
 	}
 
-	public static class Other extends Symbol {
+	static class Other extends Symbol {
 
-		public Other(List<Integer> codepoints) {
+		Other(List<Integer> codepoints) {
 			super(codepoints);
 		}
 
@@ -212,7 +212,7 @@ public class Emoticons {
 		private final List<Integer> codepoints = new ArrayList<>();
 
 
-		public boolean offer(int codepoint) {
+		boolean offer(int codepoint) {
 			boolean add = false;
 			if (this.codepoints.size() == 0) {
 				if (SYMBOLIZE.contains(codepoint)) {
@@ -256,7 +256,7 @@ public class Emoticons {
 			return codepoint == ZWJ || FITZPATRICK.contains(codepoint);
 		}
 
-		public Symbol build() {
+		Symbol build() {
 			if (codepoints.size() > 0 && SYMBOLIZE.contains(codepoints.get(codepoints.size() - 1))) {
 				return new Other(codepoints);
 			} else if (codepoints.size() > 1 && KEYCAP_COMBINEABLE.contains(codepoints.get(0)) && codepoints.get(codepoints.size() - 1) != COMBINING_ENCLOSING_KEYCAP) {
@@ -269,7 +269,7 @@ public class Emoticons {
 	public static class UnicodeBlocks implements UnicodeSet {
 		final UnicodeSet[] unicodeSets;
 
-		public UnicodeBlocks(UnicodeSet... sets) {
+		UnicodeBlocks(UnicodeSet... sets) {
 			this.unicodeSets = sets;
 		}
 
@@ -284,7 +284,7 @@ public class Emoticons {
 		}
 	}
 
-	public interface UnicodeSet {
+	interface UnicodeSet {
 		boolean contains(int codepoint);
 	}
 
@@ -292,7 +292,7 @@ public class Emoticons {
 
 		private final List<Integer> list;
 
-		public UnicodeList(Integer... codes) {
+		UnicodeList(Integer... codes) {
 			this.list = Arrays.asList(codes);
 		}
 

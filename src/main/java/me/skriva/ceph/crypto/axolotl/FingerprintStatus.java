@@ -154,13 +154,7 @@ public class FingerprintStatus implements Comparable<FingerprintStatus> {
     @Override
     public int compareTo(FingerprintStatus o) {
         if (active == o.active) {
-            if (lastActivation > o.lastActivation) {
-                return -1;
-            } else if (lastActivation < o.lastActivation) {
-                return 1;
-            } else {
-                return 0;
-            }
+            return Long.compare(o.lastActivation, lastActivation);
         } else if (active){
             return -1;
         } else {

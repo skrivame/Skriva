@@ -7,10 +7,10 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.Thread.UncaughtExceptionHandler;
 
-public class ExceptionHandler implements UncaughtExceptionHandler {
+class ExceptionHandler implements UncaughtExceptionHandler {
 
-	private UncaughtExceptionHandler defaultHandler;
-	private Context context;
+	private final UncaughtExceptionHandler defaultHandler;
+	private final Context context;
 
 	public ExceptionHandler(Context context) {
 		this.context = context;

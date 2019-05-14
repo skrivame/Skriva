@@ -48,15 +48,15 @@ public class ChooseContactActivity extends AbstractSearchableListItemActivity im
     public static final String EXTRA_SHOW_ENTER_JID = "extra_show_enter_jid";
     public static final String EXTRA_CONVERSATION = "extra_conversation";
     private static final String EXTRA_FILTERED_CONTACTS = "extra_filtered_contacts";
-    private List<String> mActivatedAccounts = new ArrayList<>();
-    private Set<String> selected = new HashSet<>();
+    private final List<String> mActivatedAccounts = new ArrayList<>();
+    private final Set<String> selected = new HashSet<>();
     private Set<String> filterContacts;
 
     private boolean showEnterJid = false;
     private boolean startSearching = false;
     private boolean multiple = false;
 
-    private PendingItem<ActivityResult> postponedActivityResult = new PendingItem<>();
+    private final PendingItem<ActivityResult> postponedActivityResult = new PendingItem<>();
 
     public static Intent create(Activity activity, Conversation conversation) {
         final Intent intent = new Intent(activity, ChooseContactActivity.class);
@@ -71,7 +71,7 @@ public class ChooseContactActivity extends AbstractSearchableListItemActivity im
         } else {
             contacts.add(conversation.getJid().asBareJid().toString());
         }
-        intent.putExtra(EXTRA_FILTERED_CONTACTS, contacts.toArray(new String[contacts.size()]));
+        intent.putExtra(EXTRA_FILTERED_CONTACTS, contacts.toArray(new String[0]));
         intent.putExtra(EXTRA_CONVERSATION, conversation.getUuid());
         intent.putExtra(EXTRA_SELECT_MULTIPLE, true);
         intent.putExtra(EXTRA_SHOW_ENTER_JID, true);
@@ -219,8 +219,8 @@ public class ChooseContactActivity extends AbstractSearchableListItemActivity im
         }
     }
 
-    public @StringRes
-    int getTitleFromIntent() {
+    @StringRes
+    private int getTitleFromIntent() {
         final Intent intent = getIntent();
         boolean multiple = intent != null && intent.getBooleanExtra(EXTRA_SELECT_MULTIPLE, false);
         @StringRes int fallback = multiple ? R.string.title_activity_choose_contacts : R.string.title_activity_choose_contact;
@@ -291,15 +291,14 @@ public class ChooseContactActivity extends AbstractSearchableListItemActivity im
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_scan_qr_code:
-                ScanActivity.scan(this);
-                return true;
+        if (item.getItemId() == R.id.action_scan_qr_code) {
+            ScanActivity.scan(this);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    protected void showEnterJidDialog(XmppUri uri) {
+    private void showEnterJidDialog(XmppUri uri) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {

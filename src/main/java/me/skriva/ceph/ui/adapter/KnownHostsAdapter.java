@@ -11,14 +11,12 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import me.skriva.ceph.Config;
-
 public class KnownHostsAdapter extends ArrayAdapter<String> {
 
     private static Pattern E164_PATTERN = Pattern.compile("^\\+?[1-9]\\d{1,14}$");
 
     private ArrayList<String> domains;
-    private Filter domainFilter = new Filter() {
+    private final Filter domainFilter = new Filter() {
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {

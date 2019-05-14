@@ -17,18 +17,17 @@ import me.skriva.ceph.services.AbstractConnectionManager;
 import me.skriva.ceph.services.XmppConnectionService;
 import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.xml.Element;
-import me.skriva.ceph.xmpp.OnIqPacketReceived;
 import me.skriva.ceph.xmpp.jingle.stanzas.JinglePacket;
 import me.skriva.ceph.xmpp.stanzas.IqPacket;
 import rocks.xmpp.addr.Jid;
 
 public class JingleConnectionManager extends AbstractConnectionManager {
-	private List<JingleConnection> connections = new CopyOnWriteArrayList<>();
+	private final List<JingleConnection> connections = new CopyOnWriteArrayList<>();
 
-	private HashMap<Jid, JingleCandidate> primaryCandidates = new HashMap<>();
+	private final HashMap<Jid, JingleCandidate> primaryCandidates = new HashMap<>();
 
 	@SuppressLint("TrulyRandom")
-	private SecureRandom random = new SecureRandom();
+	private final SecureRandom random = new SecureRandom();
 
 	public JingleConnectionManager(XmppConnectionService service) {
 		super(service);
@@ -59,7 +58,7 @@ public class JingleConnectionManager extends AbstractConnectionManager {
 		}
 	}
 
-	public JingleConnection createNewConnection(Message message) {
+	public void createNewConnection(Message message) {
 		Transferable old = message.getTransferable();
 		if (old != null) {
 			old.cancel();
@@ -68,7 +67,6 @@ public class JingleConnectionManager extends AbstractConnectionManager {
 		mXmppConnectionService.markMessage(message,Message.STATUS_WAITING);
 		connection.init(message);
 		this.connections.add(connection);
-		return connection;
 	}
 
 	public JingleConnection createNewConnection(final JinglePacket packet) {
@@ -93,30 +91,26 @@ public class JingleConnectionManager extends AbstractConnectionManager {
 				IqPacket iq = new IqPacket(IqPacket.TYPE.GET);
 				iq.setTo(proxy);
 				iq.query(Namespace.BYTE_STREAMS);
-				account.getXmppConnection().sendIqPacket(iq,new OnIqPacketReceived() {
-
-					@Override
-					public void onIqPacketReceived(Account account, IqPacket packet) {
-						Element streamhost = packet.query().findChild("streamhost", Namespace.BYTE_STREAMS);
-						final String host = streamhost == null ? null : streamhost.getAttribute("host");
-						final String port = streamhost == null ? null : streamhost.getAttribute("port");
-						if (host != null && port != null) {
-							try {
-								JingleCandidate candidate = new JingleCandidate(nextRandomId(), true);
-								candidate.setHost(host);
-								candidate.setPort(Integer.parseInt(port));
-								candidate.setType(JingleCandidate.TYPE_PROXY);
-								candidate.setJid(proxy);
-								candidate.setPriority(655360 + 65535);
-								primaryCandidates.put(account.getJid().asBareJid(),candidate);
-								listener.onPrimaryCandidateFound(true,candidate);
-							} catch (final NumberFormatException e) {
-								listener.onPrimaryCandidateFound(false,null);
-								return;
-							}
-						} else {
+				account.getXmppConnection().sendIqPacket(iq, (account1, packet) -> {
+					Element streamhost = packet.query().findChild("streamhost", Namespace.BYTE_STREAMS);
+					final String host = streamhost == null ? null : streamhost.getAttribute("host");
+					final String port = streamhost == null ? null : streamhost.getAttribute("port");
+					if (host != null && port != null) {
+						try {
+							JingleCandidate candidate = new JingleCandidate(nextRandomId(), true);
+							candidate.setHost(host);
+							candidate.setPort(Integer.parseInt(port));
+							candidate.setType(JingleCandidate.TYPE_PROXY);
+							candidate.setJid(proxy);
+							candidate.setPriority(655360 + 65535);
+							primaryCandidates.put(account1.getJid().asBareJid(),candidate);
+							listener.onPrimaryCandidateFound(true,candidate);
+						} catch (final NumberFormatException e) {
 							listener.onPrimaryCandidateFound(false,null);
+							return;
 						}
+					} else {
+						listener.onPrimaryCandidateFound(false,null);
 					}
 				});
 			} else {

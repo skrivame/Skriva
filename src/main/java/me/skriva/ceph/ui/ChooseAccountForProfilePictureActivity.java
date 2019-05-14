@@ -14,9 +14,9 @@ import me.skriva.ceph.ui.adapter.AccountAdapter;
 
 public class ChooseAccountForProfilePictureActivity extends XmppActivity {
 
-    protected final List<Account> accountList = new ArrayList<>();
-    protected ListView accountListView;
-    protected AccountAdapter mAccountAdapter;
+    private final List<Account> accountList = new ArrayList<>();
+    private ListView accountListView;
+    private AccountAdapter mAccountAdapter;
 
     @Override
     protected void refreshUiReal() {

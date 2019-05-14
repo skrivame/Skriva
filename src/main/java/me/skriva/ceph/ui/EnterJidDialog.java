@@ -114,9 +114,7 @@ public class EnterJidDialog extends DialogFragment implements OnBackendConnected
 		builder.setPositiveButton(getArguments().getString(POSITIVE_BUTTON_KEY), null);
 		AlertDialog dialog = builder.create();
 
-		View.OnClickListener dialogOnClick = v -> {
-			handleEnter(binding, account, dialog);
-		};
+		View.OnClickListener dialogOnClick = v -> handleEnter(binding, account, dialog);
 
 		binding.jid.setOnEditorActionListener((v, actionId, event) -> {
 			handleEnter(binding, account, dialog);

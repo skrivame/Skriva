@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import de.measite.minidns.AbstractDNSClient;
 import de.measite.minidns.DNSClient;
@@ -32,12 +33,11 @@ import de.measite.minidns.record.Data;
 import de.measite.minidns.record.InternetAddressRR;
 import de.measite.minidns.record.SRV;
 import me.skriva.ceph.Config;
-import me.skriva.ceph.R;
 import me.skriva.ceph.services.XmppConnectionService;
 
 public class Resolver {
 
-    public static final int DEFAULT_PORT_XMPP = 5222;
+    private static final int DEFAULT_PORT_XMPP = 5222;
 
     private static final String DIRECT_TLS_SERVICE = "_xmpps-client";
     private static final String STARTTLS_SERICE = "_xmpp-client";
@@ -237,7 +237,7 @@ public class Resolver {
         return results;
     }
 
-    private static <D extends Data> ResolverResult<D> resolveWithFallback(DNSName dnsName, Class<D> type) throws IOException {
+    private static <D extends Data> ResolverResult<D> resolveWithFallback(DNSName dnsName, Class<D> type) {
         return resolveWithFallback(dnsName, type);
     }
 
@@ -321,8 +321,8 @@ public class Resolver {
             if (directTls != result.directTls) return false;
             if (authenticated != result.authenticated) return false;
             if (priority != result.priority) return false;
-            if (ip != null ? !ip.equals(result.ip) : result.ip != null) return false;
-            return hostname != null ? hostname.equals(result.hostname) : result.hostname == null;
+            if (!Objects.equals(ip, result.ip)) return false;
+            return Objects.equals(hostname, result.hostname);
         }
 
         @Override

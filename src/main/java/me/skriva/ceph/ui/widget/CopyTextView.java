@@ -29,7 +29,7 @@ public class CopyTextView extends TextView {
 	}
 
 	public interface CopyHandler {
-		public String transformTextForCopy(CharSequence text, int start, int end);
+		String transformTextForCopy(CharSequence text, int start, int end);
 	}
 
 	private CopyHandler copyHandler;

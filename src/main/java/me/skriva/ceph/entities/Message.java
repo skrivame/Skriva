@@ -86,25 +86,25 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 
 
 	public boolean markable = false;
-	protected String conversationUuid;
-	protected Jid counterpart;
-	protected Jid trueCounterpart;
-	protected String body;
-	protected String encryptedBody;
-	protected long timeSent;
-	protected int encryption;
-	protected int status;
-	protected int type;
-	protected boolean deleted = false;
-	protected boolean carbon = false;
-	protected boolean oob = false;
-	protected List<Edited> edits = new ArrayList<>();
-	protected String relativeFilePath;
-	protected boolean read = true;
-	protected String remoteMsgId = null;
-	protected String serverMsgId = null;
+	private String conversationUuid;
+	private Jid counterpart;
+	private Jid trueCounterpart;
+	String body;
+	private String encryptedBody;
+	private long timeSent;
+	private int encryption;
+	private int status;
+	private int type;
+	private boolean deleted = false;
+	private boolean carbon = false;
+	private boolean oob = false;
+	private List<Edited> edits = new ArrayList<>();
+	private String relativeFilePath;
+	private boolean read = true;
+	private String remoteMsgId = null;
+	private String serverMsgId = null;
 	private final Conversational conversation;
-	protected Transferable transferable = null;
+	private Transferable transferable = null;
 	private Message mNextMessage = null;
 	private String messageReference = null;
 	private Message mPreviousMessage = null;
@@ -119,7 +119,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	private List<MucOptions.User> counterparts;
 	private WeakReference<MucOptions.User> user;
 
-	protected Message(Conversational conversation) {
+	Message(Conversational conversation) {
 		this.conversation = conversation;
 	}
 
@@ -152,13 +152,13 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 				false);
 	}
 
-	protected Message(final Conversational conversation, final String uuid, final String conversationUUid, final Jid counterpart,
-	                final Jid trueCounterpart, final String body, final long timeSent,
-	                final int encryption, final int status, final int type, final boolean carbon,
-					  final String remoteMsgId, final String messageReference, final String relativeFilePath,
-	                final String serverMsgId, final String fingerprint, final boolean read,
-	                final String edited, final boolean oob, final String errorMessage, final Set<ReadByMarker> readByMarkers,
-	                final boolean markable, final boolean deleted) {
+	Message(final Conversational conversation, final String uuid, final String conversationUUid, final Jid counterpart,
+			final Jid trueCounterpart, final String body, final long timeSent,
+			final int encryption, final int status, final int type, final boolean carbon,
+			final String remoteMsgId, final String messageReference, final String relativeFilePath,
+			final String serverMsgId, final String fingerprint, final boolean read,
+			final String edited, final boolean oob, final String errorMessage, final Set<ReadByMarker> readByMarkers,
+			final boolean markable, final boolean deleted) {
 		this.conversation = conversation;
 		this.uuid = uuid;
 		this.conversationUuid = conversationUUid;
@@ -334,11 +334,10 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 		return errorMessage;
 	}
 
-	public boolean setErrorMessage(String message) {
+	public void setErrorMessage(String message) {
 		boolean changed = (message != null && !message.equals(errorMessage))
 				|| (message == null && errorMessage != null);
 		this.errorMessage = message;
-		return changed;
 	}
 
 	public long getTimeSent() {
@@ -936,8 +935,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 		int pastEncryption = getCleanedEncryption(this.getPreviousEncryption());
 		int futureEncryption = getCleanedEncryption(this.getNextEncryption());
 
-		boolean inUnencryptedSession = pastEncryption == ENCRYPTION_NONE
-				|| futureEncryption == ENCRYPTION_NONE
+		boolean inUnencryptedSession = futureEncryption == ENCRYPTION_NONE
 				|| pastEncryption != futureEncryption;
 
 		return inUnencryptedSession || getCleanedEncryption(this.getEncryption()) == pastEncryption;
@@ -953,8 +951,8 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 		return encryption;
 	}
 
-	public static boolean configurePrivateMessage(final Message message) {
-		return configurePrivateMessage(message, false);
+	public static void configurePrivateMessage(final Message message) {
+		configurePrivateMessage(message, false);
 	}
 
 	public static boolean configurePrivateFileMessage(final Message message) {

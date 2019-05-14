@@ -13,7 +13,7 @@ public class SerialSingleThreadExecutor implements Executor {
     final ArrayDeque<Runnable> tasks = new ArrayDeque<>();
     private final Executor executor = Executors.newSingleThreadExecutor();
     private final String name;
-    protected Runnable active;
+    Runnable active;
 
 
     public SerialSingleThreadExecutor(String name) {

@@ -30,15 +30,15 @@ import me.skriva.ceph.utils.ThemeHelper;
 
 public class RecordingActivity extends Activity implements View.OnClickListener {
 
-	public static String STORAGE_DIRECTORY_TYPE_NAME = "Recordings";
+	public static final String STORAGE_DIRECTORY_TYPE_NAME = "Recordings";
 
 	private ActivityRecordingBinding binding;
 
 	private MediaRecorder mRecorder;
 	private long mStartTime = 0;
 
-	private Handler mHandler = new Handler();
-	private Runnable mTickExecutor = new Runnable() {
+	private final Handler mHandler = new Handler();
+	private final Runnable mTickExecutor = new Runnable() {
 		@Override
 		public void run() {
 			tick();
@@ -107,7 +107,7 @@ public class RecordingActivity extends Activity implements View.OnClickListener 
 		}
 	}
 
-	protected void stopRecording(boolean saveFile) {
+	private void stopRecording(boolean saveFile) {
 		mShouldFinishAfterWrite = saveFile;
 		try {
 			mRecorder.stop();

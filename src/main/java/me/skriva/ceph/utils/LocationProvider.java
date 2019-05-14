@@ -18,7 +18,7 @@ public class LocationProvider {
 
     public static final GeoPoint FALLBACK = new GeoPoint(0.0,0.0);
 
-    public static String getUserCountry(Context context) {
+    private static String getUserCountry(Context context) {
         try {
             final TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             final String simCountry = tm.getSimCountryIso();
@@ -42,7 +42,7 @@ public class LocationProvider {
     }
 
 
-    public static synchronized GeoPoint getGeoPoint(Context context, String country) {
+    private static synchronized GeoPoint getGeoPoint(Context context, String country) {
         try {
             BufferedReader reader =  new BufferedReader(new InputStreamReader(context.getResources().openRawResource(R.raw.countries)));
             String line;

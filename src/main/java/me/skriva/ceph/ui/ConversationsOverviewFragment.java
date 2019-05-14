@@ -80,9 +80,9 @@ public class ConversationsOverviewFragment extends XmppFragment {
 	private ConversationAdapter conversationsAdapter;
 	private XmppActivity activity;
 	private float mSwipeEscapeVelocity = 0f;
-	private PendingActionHelper pendingActionHelper = new PendingActionHelper();
+	private final PendingActionHelper pendingActionHelper = new PendingActionHelper();
 
-	private ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0,LEFT|RIGHT) {
+	private final ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(0,LEFT|RIGHT) {
 		@Override
 		public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
 			//todo maybe we can manually changing the position of the conversation
@@ -191,7 +191,7 @@ public class ConversationsOverviewFragment extends XmppFragment {
 		}
 	};
 
-	private ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+	private final ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
 
 	public static Conversation getSuggestion(Activity activity) {
 		final Conversation exception;
@@ -334,10 +334,9 @@ public class ConversationsOverviewFragment extends XmppFragment {
 		if (MenuDoubleTabUtil.shouldIgnoreTap()) {
 			return false;
 		}
-		switch (item.getItemId()) {
-			case R.id.action_search:
-				startActivity(new Intent(getActivity(), SearchActivity.class));
-				return true;
+		if (item.getItemId() == R.id.action_search) {
+			startActivity(new Intent(getActivity(), SearchActivity.class));
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

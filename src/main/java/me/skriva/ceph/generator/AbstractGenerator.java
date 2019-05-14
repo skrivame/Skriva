@@ -56,7 +56,7 @@ public abstract class AbstractGenerator {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
 
-	protected XmppConnectionService mXmppConnectionService;
+	final XmppConnectionService mXmppConnectionService;
 
 	AbstractGenerator(XmppConnectionService service) {
 		this.mXmppConnectionService = service;
@@ -69,7 +69,7 @@ public abstract class AbstractGenerator {
 		return this.mVersion;
 	}
 
-	public String getIdentityName() {
+	String getIdentityName() {
 		return mXmppConnectionService.getString(R.string.app_name) + ' ' + getIdentityVersion();
 	}
 
@@ -107,7 +107,7 @@ public abstract class AbstractGenerator {
 		return DATE_FORMAT.format(time);
 	}
 
-	public List<String> getFeatures(Account account) {
+	List<String> getFeatures(Account account) {
 		ArrayList<String> features = new ArrayList<>(Arrays.asList(FEATURES));
 		if (mXmppConnectionService.confirmMessages()) {
 			features.addAll(Arrays.asList(MESSAGE_CONFIRMATION_FEATURES));

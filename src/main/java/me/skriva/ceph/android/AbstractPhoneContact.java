@@ -33,7 +33,7 @@ public abstract class AbstractPhoneContact {
     }
 
 
-    public int rating() {
+    int rating() {
         return (TextUtils.isEmpty(displayName) ? 0 : 2) + (TextUtils.isEmpty(photoUri) ? 0 : 1);
     }
 }

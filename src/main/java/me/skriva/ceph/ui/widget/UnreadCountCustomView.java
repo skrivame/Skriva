@@ -41,7 +41,7 @@ public class UnreadCountCustomView extends View {
         a.recycle();
     }
 
-    void init() {
+    private void init() {
         paint = new Paint();
         paint.setColor(backgroundColor);
         paint.setAntiAlias(true);

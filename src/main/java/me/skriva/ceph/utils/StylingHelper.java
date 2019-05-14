@@ -58,14 +58,14 @@ import me.skriva.ceph.ui.text.QuoteSpan;
 
 public class StylingHelper {
 
-	private static List<? extends Class<? extends ParcelableSpan>> SPAN_CLASSES = Arrays.asList(
+	private static final List<? extends Class<? extends ParcelableSpan>> SPAN_CLASSES = Arrays.asList(
 			StyleSpan.class,
 			StrikethroughSpan.class,
 			TypefaceSpan.class,
 			ForegroundColorSpan.class
 	);
 
-	public static void clear(final Editable editable) {
+	private static void clear(final Editable editable) {
 		final int end = editable.length() - 1;
 		for (Class<? extends ParcelableSpan> clazz : SPAN_CLASSES) {
 			for (ParcelableSpan span : editable.getSpans(0, end, clazz)) {

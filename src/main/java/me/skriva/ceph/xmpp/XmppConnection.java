@@ -101,39 +101,38 @@ import me.skriva.ceph.xmpp.stanzas.streammgmt.RequestPacket;
 import me.skriva.ceph.xmpp.stanzas.streammgmt.ResumePacket;
 import rocks.xmpp.addr.Jid;
 
+import static me.skriva.ceph.utils.SocksSocketFactory.*;
+
 public class XmppConnection implements Runnable {
 
     private static final int PACKET_IQ = 0;
     private static final int PACKET_MESSAGE = 1;
     private static final int PACKET_PRESENCE = 2;
-    public final OnIqPacketReceived registrationResponseListener = new OnIqPacketReceived() {
-        @Override
-        public void onIqPacketReceived(Account account, IqPacket packet) {
-            if (packet.getType() == IqPacket.TYPE.RESULT) {
-                account.setOption(Account.OPTION_REGISTER, false);
-                throw new StateChangingError(Account.State.REGISTRATION_SUCCESSFUL);
-            } else {
-                final List<String> PASSWORD_TOO_WEAK_MSGS = Arrays.asList(
-                        "The password is too weak",
-                        "Please use a longer password.");
-                Element error = packet.findChild("error");
-                Account.State state = Account.State.REGISTRATION_FAILED;
-                if (error != null) {
-                    if (error.hasChild("conflict")) {
-                        state = Account.State.REGISTRATION_CONFLICT;
-                    } else if (error.hasChild("resource-constraint")
-                            && "wait".equals(error.getAttribute("type"))) {
-                        state = Account.State.REGISTRATION_PLEASE_WAIT;
-                    } else if (error.hasChild("not-acceptable")
-                            && PASSWORD_TOO_WEAK_MSGS.contains(error.findChildContent("text"))) {
-                        state = Account.State.REGISTRATION_PASSWORD_TOO_WEAK;
-                    }
+    public final OnIqPacketReceived registrationResponseListener = (account, packet) -> {
+        if (packet.getType() == IqPacket.TYPE.RESULT) {
+            account.setOption(Account.OPTION_REGISTER, false);
+            throw new StateChangingError(Account.State.REGISTRATION_SUCCESSFUL);
+        } else {
+            final List<String> PASSWORD_TOO_WEAK_MSGS = Arrays.asList(
+                    "The password is too weak",
+                    "Please use a longer password.");
+            Element error = packet.findChild("error");
+            Account.State state = Account.State.REGISTRATION_FAILED;
+            if (error != null) {
+                if (error.hasChild("conflict")) {
+                    state = Account.State.REGISTRATION_CONFLICT;
+                } else if (error.hasChild("resource-constraint")
+                        && "wait".equals(error.getAttribute("type"))) {
+                    state = Account.State.REGISTRATION_PLEASE_WAIT;
+                } else if (error.hasChild("not-acceptable")
+                        && PASSWORD_TOO_WEAK_MSGS.contains(error.findChildContent("text"))) {
+                    state = Account.State.REGISTRATION_PASSWORD_TOO_WEAK;
                 }
-                throw new StateChangingError(state);
             }
+            throw new StateChangingError(state);
         }
     };
-    protected final Account account;
+    private final Account account;
     private final Features features = new Features(this);
     private final HashMap<Jid, ServiceDiscoveryResult> disco = new HashMap<>();
     private final SparseArray<AbstractAcknowledgeableStanza> mStanzaQueue = new SparseArray<>();
@@ -157,10 +156,10 @@ public class XmppConnection implements Runnable {
     private long lastSessionStarted = 0;
     private long lastDiscoStarted = 0;
     private boolean isMamPreferenceAlways = false;
-    private AtomicInteger mPendingServiceDiscoveries = new AtomicInteger(0);
-    private AtomicBoolean mWaitForDisco = new AtomicBoolean(true);
-    private AtomicBoolean mWaitingForSmCatchup = new AtomicBoolean(false);
-    private AtomicInteger mSmCatchupMessageCounter = new AtomicInteger(0);
+    private final AtomicInteger mPendingServiceDiscoveries = new AtomicInteger(0);
+    private final AtomicBoolean mWaitForDisco = new AtomicBoolean(true);
+    private final AtomicBoolean mWaitingForSmCatchup = new AtomicBoolean(false);
+    private final AtomicInteger mSmCatchupMessageCounter = new AtomicInteger(0);
     private boolean mInteractive = false;
     private int attempt = 0;
     private OnPresencePacketReceived presenceListener = null;
@@ -243,7 +242,7 @@ public class XmppConnection implements Runnable {
         this.mSmCatchupMessageCounter.incrementAndGet();
     }
 
-    protected void connect() {
+    private void connect() {
         if (mXmppConnectionService.areMessagesInitialized()) {
             mXmppConnectionService.resetSendingToWaiting(account);
         }
@@ -268,7 +267,7 @@ public class XmppConnection implements Runnable {
                     this.verifiedHostname = destination;
                 }
                 Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": connect to " + destination + " via Tor");
-                localSocket = SocksSocketFactory.createSocketOverTor(destination, account.getPort());
+                localSocket = createSocketOverTor(destination, account.getPort());
                 try {
                     startXmpp(localSocket);
                 } catch (InterruptedException e) {
@@ -384,7 +383,7 @@ public class XmppConnection implements Runnable {
             this.changeStatus(e.state);
         } catch (final UnknownHostException | ConnectException e) {
             this.changeStatus(Account.State.SERVER_NOT_FOUND);
-        } catch (final SocksSocketFactory.SocksProxyNotFoundException e) {
+        } catch (final SocksProxyNotFoundException e) {
             this.changeStatus(Account.State.TOR_NOT_AVAILABLE);
         } catch (final IOException | XmlPullParserException  e) {
             Log.d(Config.LOGTAG, account.getJid().asBareJid().toString() + ": " + e.getMessage());
@@ -894,7 +893,7 @@ public class XmppConnection implements Runnable {
             final int pinnedMechanism = account.getKeyAsInt(Account.PINNED_MECHANISM_KEY, -1);
             if (pinnedMechanism > saslMechanism.getPriority()) {
                 Log.e(Config.LOGTAG, "Auth failed. Authentication mechanism " + saslMechanism.getMechanism() +
-                        " has lower priority (" + String.valueOf(saslMechanism.getPriority()) +
+                        " has lower priority (" + saslMechanism.getPriority() +
                         ") than pinned priority (" + pinnedMechanism +
                         "). Possible downgrade attack?");
                 throw new StateChangingException(Account.State.DOWNGRADE_ATTACK);
@@ -1260,7 +1259,7 @@ public class XmppConnection implements Runnable {
         iq.query("http://jabber.org/protocol/disco#items");
         this.sendIqPacket(iq, (account, packet) -> {
             if (packet.getType() == IqPacket.TYPE.RESULT) {
-                HashSet<Jid> items = new HashSet<Jid>();
+                HashSet<Jid> items = new HashSet<>();
                 final List<Element> elements = packet.query().getChildren();
                 for (final Element element : elements) {
                     if (element.getName().equals("item")) {
@@ -1288,18 +1287,14 @@ public class XmppConnection implements Runnable {
     private void sendEnableCarbons() {
         final IqPacket iq = new IqPacket(IqPacket.TYPE.SET);
         iq.addChild("enable", "urn:xmpp:carbons:2");
-        this.sendIqPacket(iq, new OnIqPacketReceived() {
-
-            @Override
-            public void onIqPacketReceived(final Account account, final IqPacket packet) {
-                if (!packet.hasChild("error")) {
-                    Log.d(Config.LOGTAG, account.getJid().asBareJid()
-                            + ": successfully enabled carbons");
-                    features.carbonsEnabled = true;
-                } else {
-                    Log.d(Config.LOGTAG, account.getJid().asBareJid()
-                            + ": error enableing carbons " + packet.toString());
-                }
+        this.sendIqPacket(iq, (account, packet) -> {
+            if (!packet.hasChild("error")) {
+                Log.d(Config.LOGTAG, account.getJid().asBareJid()
+                        + ": successfully enabled carbons");
+                features.carbonsEnabled = true;
+            } else {
+                Log.d(Config.LOGTAG, account.getJid().asBareJid()
+                        + ": error enableing carbons " + packet.toString());
             }
         });
     }
@@ -1315,7 +1310,7 @@ public class XmppConnection implements Runnable {
             throw new IOException();
         } else if (streamError.hasChild("host-unknown")) {
             throw new StateChangingException(Account.State.HOST_UNKNOWN);
-        } else if (streamError.hasChild("policy-violation")) { ;
+        } else if (streamError.hasChild("policy-violation")) {
             final String text = streamError.findChildContent("text");
             if (text != null) {
                 Log.d(Config.LOGTAG,account.getJid().asBareJid()+": policy violation. "+text);
@@ -1349,9 +1344,9 @@ public class XmppConnection implements Runnable {
         return CryptoHelper.random(s ? 3 : 9, mXmppConnectionService.getRNG());
     }
 
-    public String sendIqPacket(final IqPacket packet, final OnIqPacketReceived callback) {
+    public void sendIqPacket(final IqPacket packet, final OnIqPacketReceived callback) {
         packet.setFrom(account.getJid());
-        return this.sendUnmodifiedIqPacket(packet, callback, false);
+        this.sendUnmodifiedIqPacket(packet, callback, false);
     }
 
     public synchronized String sendUnmodifiedIqPacket(final IqPacket packet, final OnIqPacketReceived callback, boolean force) {
@@ -1479,7 +1474,7 @@ public class XmppConnection implements Runnable {
 
     public void disconnect(final boolean force) {
         interrupt();
-        Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": disconnecting force=" + Boolean.toString(force));
+        Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": disconnecting force=" + force);
         if (force) {
             forceCloseSocket();
         } else {
@@ -1720,7 +1715,7 @@ public class XmppConnection implements Runnable {
     private class StateChangingError extends Error {
         private final Account.State state;
 
-        public StateChangingError(Account.State state) {
+        StateChangingError(Account.State state) {
             this.state = state;
         }
     }
@@ -1728,18 +1723,18 @@ public class XmppConnection implements Runnable {
     private class StateChangingException extends IOException {
         private final Account.State state;
 
-        public StateChangingException(Account.State state) {
+        StateChangingException(Account.State state) {
             this.state = state;
         }
     }
 
     public class Features {
-        XmppConnection connection;
+        final XmppConnection connection;
         private boolean carbonsEnabled = false;
         private boolean encryptionEnabled = false;
         private boolean blockListRequested = false;
 
-        public Features(final XmppConnection connection) {
+        Features(final XmppConnection connection) {
             this.connection = connection;
         }
 

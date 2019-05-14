@@ -16,7 +16,7 @@ import me.skriva.ceph.ui.widget.DisabledActionModeCallback;
 public class ChangePasswordActivity extends XmppActivity implements XmppConnectionService.OnAccountPasswordChanged {
 
 	private Button mChangePasswordButton;
-	private View.OnClickListener mOnChangePasswordButtonClicked = new View.OnClickListener() {
+	private final View.OnClickListener mOnChangePasswordButtonClicked = new View.OnClickListener() {
 		@Override
 		public void onClick(View view) {
 			if (mAccount != null) {

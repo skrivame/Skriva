@@ -37,7 +37,7 @@ public class ViewUtil {
         view(context, file, mime);
     }
 
-    public static void view(Context context, File file, String mime) {
+    private static void view(Context context, File file, String mime) {
         Intent openIntent = new Intent(Intent.ACTION_VIEW);
         Uri uri;
         try {

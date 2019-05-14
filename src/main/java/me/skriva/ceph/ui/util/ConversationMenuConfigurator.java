@@ -104,13 +104,10 @@ public class ConversationMenuConfigurator {
 		}
 
 		axolotl.setVisible(Config.supportOmemo());
-		switch (conversation.getNextEncryption()) {
-			case Message.ENCRYPTION_AXOLOTL:
-				axolotl.setChecked(true);
-				break;
-			default:
-				axolotl.setChecked(true);
-				break;
-		}
+        if (conversation.getNextEncryption() == Message.ENCRYPTION_AXOLOTL) {
+            axolotl.setChecked(true);
+        } else {
+            axolotl.setChecked(true);
+        }
 	}
 }

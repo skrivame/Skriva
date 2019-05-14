@@ -27,7 +27,7 @@ public class Plain extends SaslMechanism {
 		return getMessage(account.getUsername(), account.getPassword());
 	}
 
-	public static String getMessage(String username, String password) {
+	private static String getMessage(String username, String password) {
 		final String message = '\u0000' + username + '\u0000' + password;
 		return Base64.encodeToString(message.getBytes(Charset.defaultCharset()), Base64.NO_WRAP);
 	}

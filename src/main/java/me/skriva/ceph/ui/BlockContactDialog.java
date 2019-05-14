@@ -13,7 +13,7 @@ import me.skriva.ceph.entities.Conversation;
 import me.skriva.ceph.ui.util.JidDialog;
 import rocks.xmpp.addr.Jid;
 
-public final class BlockContactDialog {
+final class BlockContactDialog {
 	public static void show(final XmppActivity xmppActivity, final Blockable blockable) {
 		final AlertDialog.Builder builder = new AlertDialog.Builder(xmppActivity);
 		final boolean isBlocked = blockable.isBlocked();

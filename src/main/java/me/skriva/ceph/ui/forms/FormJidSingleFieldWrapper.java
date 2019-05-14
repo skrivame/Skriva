@@ -11,7 +11,7 @@ import rocks.xmpp.addr.Jid;
 
 public class FormJidSingleFieldWrapper extends FormTextFieldWrapper {
 
-	protected FormJidSingleFieldWrapper(Context context, Field field) {
+	FormJidSingleFieldWrapper(Context context, Field field) {
 		super(context, field);
 		editText.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		editText.setHint(R.string.account_settings_example_jabber_id);
@@ -34,7 +34,7 @@ public class FormJidSingleFieldWrapper extends FormTextFieldWrapper {
 
 	@Override
 	protected void setValues(List<String> values) {
-		StringBuilder builder = new StringBuilder("");
+		StringBuilder builder = new StringBuilder();
 		for(String value : values) {
 			builder.append(value);
 		}

@@ -43,7 +43,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
 
     private final XmppActivity activity;
 
-    private int mediaSize = 0;
+    private int mediaSize;
 
     public MediaAdapter(XmppActivity activity, @DimenRes int mediaSize) {
         this.activity = activity;
@@ -161,7 +161,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                 imageView.setBackgroundColor(0xff333333);
                 imageView.setImageDrawable(null);
                 final BitmapWorkerTask task = new BitmapWorkerTask(mediaSize, imageView);
-                final AsyncDrawable asyncDrawable = new AsyncDrawable(activity.getResources(), null, task);
+                final AsyncDrawable asyncDrawable = new AsyncDrawable(activity.getResources(), task);
                 imageView.setImageDrawable(asyncDrawable);
                 try {
                     task.execute(attachment);
@@ -179,8 +179,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     static class AsyncDrawable extends BitmapDrawable {
         private final WeakReference<BitmapWorkerTask> bitmapWorkerTaskReference;
 
-        AsyncDrawable(Resources res, Bitmap bitmap, BitmapWorkerTask bitmapWorkerTask) {
-            super(res, bitmap);
+        AsyncDrawable(Resources res, BitmapWorkerTask bitmapWorkerTask) {
+            super(res, (Bitmap) null);
             bitmapWorkerTaskReference = new WeakReference<>(bitmapWorkerTask);
         }
 

@@ -101,10 +101,8 @@ public class WelcomeActivity extends XmppActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (grantResults.length > 0) {
             if (allGranted(grantResults)) {
-                switch (requestCode) {
-                    case REQUEST_IMPORT_BACKUP:
-                        startActivity(new Intent(this, ImportBackupActivity.class));
-                        break;
+                if (requestCode == REQUEST_IMPORT_BACKUP) {
+                    startActivity(new Intent(this, ImportBackupActivity.class));
                 }
             } else {
                 Toast.makeText(this, R.string.no_storage_permission, Toast.LENGTH_SHORT).show();
@@ -117,7 +115,7 @@ public class WelcomeActivity extends XmppActivity {
         }
     }
 
-    public void addInviteUri(Intent intent) {
+    private void addInviteUri(Intent intent) {
         StartConversationActivity.addInviteUri(intent, getIntent());
     }
 

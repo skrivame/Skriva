@@ -27,10 +27,10 @@ import java.util.logging.Level;
 /**
  * Try to retrieve the list of DNS server by executing getprop.
  */
-public class AndroidUsingExecLowPriority extends AbstractDNSServerLookupMechanism {
+class AndroidUsingExecLowPriority extends AbstractDNSServerLookupMechanism {
 
 	public static final DNSServerLookupMechanism INSTANCE = new AndroidUsingExecLowPriority();
-	public static final int PRIORITY = AndroidUsingReflection.PRIORITY + 1;
+	private static final int PRIORITY = AndroidUsingReflection.PRIORITY + 1;
 
 	private AndroidUsingExecLowPriority() {
 		super(AndroidUsingExecLowPriority.class.getSimpleName(), PRIORITY);
@@ -76,7 +76,7 @@ public class AndroidUsingExecLowPriority extends AbstractDNSServerLookupMechanis
 				}
 			}
 			if (server.size() > 0) {
-				return server.toArray(new String[server.size()]);
+				return server.toArray(new String[0]);
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "Exception in findDNSByExec", e);

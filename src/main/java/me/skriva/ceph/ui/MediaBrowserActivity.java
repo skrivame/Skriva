@@ -70,8 +70,6 @@ public class MediaBrowserActivity extends XmppActivity implements OnMediaLoaded 
 
     @Override
     public void onMediaLoaded(List<Attachment> attachments) {
-        runOnUiThread(()->{
-            mMediaAdapter.setAttachments(attachments);
-        });
+        runOnUiThread(()-> mMediaAdapter.setAttachments(attachments));
     }
 }

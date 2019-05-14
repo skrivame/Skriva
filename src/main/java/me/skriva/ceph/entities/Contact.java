@@ -47,24 +47,24 @@ public class Contact implements ListItem, Blockable {
 	private String serverName;
 	private String presenceName;
 	private String commonName;
-	protected Jid jid;
+	private final Jid jid;
 	private int subscription = 0;
 	private Uri systemAccount;
 	private String photoUri;
 	private final JSONObject keys;
 	private JSONArray groups = new JSONArray();
 	private final Presences presences = new Presences();
-	protected Account account;
-	protected Avatar avatar;
+	private Account account;
+	private Avatar avatar;
 
 	private boolean mActive = false;
 	private long mLastseen = 0;
 	private String mLastPresence = null;
 
-	public Contact(final String account, final String systemName, final String serverName,
-	               final Jid jid, final int subscription, final String photoUri,
-	               final Uri systemAccount, final String keys, final String avatar, final long lastseen,
-	               final String presence, final String groups) {
+	private Contact(final String account, final String systemName, final String serverName,
+                    final Jid jid, final int subscription, final String photoUri,
+                    final Uri systemAccount, final String keys, final String avatar, final long lastseen,
+                    final String presence, final String groups) {
 		this.accountUuid = account;
 		this.systemName = systemName;
 		this.serverName = serverName;
@@ -243,7 +243,7 @@ public class Contact implements ListItem, Blockable {
 		return this.presences.getShownStatus();
 	}
 
-	public boolean setPhotoUri(String uri) {
+	private boolean setPhotoUri(String uri) {
 		if (uri != null && !uri.equals(this.photoUri)) {
 			this.photoUri = uri;
 			return true;
@@ -259,7 +259,7 @@ public class Contact implements ListItem, Blockable {
 		this.serverName = serverName;
 	}
 
-	public boolean setSystemName(String systemName) {
+	private boolean setSystemName(String systemName) {
 		final String old = getDisplayName();
 		this.systemName = systemName;
 		return !old.equals(getDisplayName());
@@ -275,7 +275,7 @@ public class Contact implements ListItem, Blockable {
 		return systemAccount;
 	}
 
-	public void setSystemAccount(Uri lookupUri) {
+	private void setSystemAccount(Uri lookupUri) {
 		this.systemAccount = lookupUri;
 	}
 

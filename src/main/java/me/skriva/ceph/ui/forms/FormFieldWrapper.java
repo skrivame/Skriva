@@ -15,10 +15,10 @@ import me.skriva.ceph.xmpp.forms.Field;
 
 public abstract class FormFieldWrapper {
 
-	protected final Context context;
-	protected final Field field;
-	protected final View view;
-	OnFormFieldValuesEdited onFormFieldValuesEditedListener;
+	final Context context;
+	final Field field;
+	final View view;
+	private OnFormFieldValuesEdited onFormFieldValuesEditedListener;
 
 	FormFieldWrapper(Context context, Field field) {
 		this.context = context;
@@ -52,7 +52,7 @@ public abstract class FormFieldWrapper {
 
 	abstract void setReadOnly(boolean readOnly);
 
-	protected SpannableString createSpannableLabelString(String label, boolean required) {
+	SpannableString createSpannableLabelString(String label, boolean required) {
 		SpannableString spannableString = new SpannableString(label + (required ? " *" : ""));
 		if (required) {
 			int start = label.length();
@@ -63,7 +63,7 @@ public abstract class FormFieldWrapper {
 		return spannableString;
 	}
 
-	protected void invokeOnFormFieldValuesEdited() {
+	void invokeOnFormFieldValuesEdited() {
 		if (this.onFormFieldValuesEditedListener != null) {
 			this.onFormFieldValuesEditedListener.onFormFieldValuesEdited();
 		}
@@ -77,7 +77,7 @@ public abstract class FormFieldWrapper {
 		this.onFormFieldValuesEditedListener = listener;
 	}
 
-	protected static <F extends FormFieldWrapper> FormFieldWrapper createFromField(Class<F> c, Context context, Field field) {
+	static <F extends FormFieldWrapper> FormFieldWrapper createFromField(Class<F> c, Context context, Field field) {
 		try {
 			F fieldWrapper = c.getDeclaredConstructor(Context.class, Field.class).newInstance(context,field);
 			fieldWrapper.setValues(field.getValues());

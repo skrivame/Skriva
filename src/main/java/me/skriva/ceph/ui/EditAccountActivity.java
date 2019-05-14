@@ -1,10 +1,8 @@
 package me.skriva.ceph.ui;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -59,7 +57,6 @@ import me.skriva.ceph.ui.util.MenuDoubleTabUtil;
 import me.skriva.ceph.ui.util.PendingItem;
 import me.skriva.ceph.ui.util.SoftKeyboardUtils;
 import me.skriva.ceph.utils.CryptoHelper;
-import me.skriva.ceph.utils.Resolver;
 import me.skriva.ceph.utils.SignupUtils;
 import me.skriva.ceph.utils.TorServiceUtils;
 import me.skriva.ceph.utils.UIHelper;
@@ -274,17 +271,14 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
 
         }
     };
-    private View.OnFocusChangeListener mEditTextFocusListener = new View.OnFocusChangeListener() {
-        @Override
-        public void onFocusChange(View view, boolean b) {
-            EditText et = (EditText) view;
-            if (b) {
-                int resId = mUsernameMode ? R.string.username : R.string.account_settings_example_jabber_id;
-                final int res = resId;
-                new Handler().postDelayed(() -> et.setHint(res), 200);
-            } else {
-                et.setHint(null);
-            }
+    private final View.OnFocusChangeListener mEditTextFocusListener = (view, b) -> {
+        EditText et = (EditText) view;
+        if (b) {
+            int resId = mUsernameMode ? R.string.username : R.string.account_settings_example_jabber_id;
+            final int res = resId;
+            new Handler().postDelayed(() -> et.setHint(res), 200);
+        } else {
+            et.setHint(null);
         }
     };
 
@@ -369,7 +363,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         refreshUi();
     }
 
-    protected void finishInitialSetup(final Avatar avatar) {
+    private void finishInitialSetup(final Avatar avatar) {
         runOnUiThread(() -> {
             SoftKeyboardUtils.hideSoftKeyboard(EditAccountActivity.this);
             final Intent intent;
@@ -417,7 +411,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         processFingerprintVerification(uri, true);
     }
 
-    protected void processFingerprintVerification(XmppUri uri, boolean showWarningToast) {
+    private void processFingerprintVerification(XmppUri uri, boolean showWarningToast) {
         if (mAccount != null && mAccount.getJid().asBareJid().equals(uri.getJid()) && uri.hasFingerprints()) {
             if (xmppConnectionService.verifyFingerprints(mAccount, uri.getFingerprints())) {
                 Toast.makeText(this, R.string.verified_fingerprints, Toast.LENGTH_SHORT).show();
@@ -428,7 +422,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         }
     }
 
-    protected void updateSaveButton() {
+    private void updateSaveButton() {
         boolean accountInfoEdited = accountInfoEdited();
 
         if (accountInfoEdited && !mInitMode) {
@@ -486,7 +480,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         return account != null && account.getStatus() == Account.State.TOR_NOT_AVAILABLE;
     }
 
-    protected boolean accountInfoEdited() {
+    private boolean accountInfoEdited() {
         if (this.mAccount == null) {
             return false;
         }
@@ -494,7 +488,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
                 !this.mAccount.getPassword().equals(this.binding.accountPassword.getText().toString());
     }
 
-    protected boolean jidEdited() {
+    private boolean jidEdited() {
         final String unmodified;
         if (mUsernameMode) {
             unmodified = this.mAccount.getJid().getLocal();
@@ -549,7 +543,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
             xmppConnectionService.publishDisplayName(mAccount);
             refreshAvatar();
             return null;
-        }, true);
+        });
     }
 
     private void refreshAvatar() {
@@ -766,7 +760,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
                 shareLink(false);
                 break;
             case R.id.action_change_password_on_server:
-                gotoChangePassword(null);
+                gotoChangePassword();
                 break;
             case R.id.action_mam_prefs:
                 editMamPrefs();
@@ -794,11 +788,11 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         binding.serverInfoMore.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
-    private void gotoChangePassword(String newPassword) {
+    private void gotoChangePassword() {
         final Intent changePasswordIntent = new Intent(this, ChangePasswordActivity.class);
         changePasswordIntent.putExtra(EXTRA_ACCOUNT, mAccount.getJid().toString());
-        if (newPassword != null) {
-            changePasswordIntent.putExtra("password", newPassword);
+        if (null != null) {
+            changePasswordIntent.putExtra("password", (String) null);
         }
         startActivity(changePasswordIntent);
     }
@@ -1068,7 +1062,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         }
     }
 
-    public void showWipePepDialog() {
+    private void showWipePepDialog() {
         Builder builder = new Builder(this);
         builder.setTitle(getString(R.string.clear_other_devices));
         builder.setIconAttribute(android.R.attr.alertDialogIcon);

@@ -9,7 +9,7 @@ import java.util.NoSuchElementException;
 /**
  * A tokenizer for GS2 header strings
  */
-public final class Tokenizer implements Iterator<String>, Iterable<String> {
+final class Tokenizer implements Iterator<String>, Iterable<String> {
 	private final List<String> parts;
 	private int index;
 

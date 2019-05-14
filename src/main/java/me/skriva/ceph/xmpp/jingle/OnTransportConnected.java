@@ -1,7 +1,7 @@
 package me.skriva.ceph.xmpp.jingle;
 
-public interface OnTransportConnected {
-	public void failed();
+interface OnTransportConnected {
+	void failed();
 
-	public void established();
+	void established();
 }

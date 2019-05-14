@@ -92,7 +92,7 @@ public class ConversationsActivity extends XmppActivity implements OnConversatio
     public static final String EXTRA_IS_PRIVATE_MESSAGE = "pm";
     public static final String EXTRA_DO_NOT_APPEND = "do_not_append";
 
-    private static List<String> VIEW_AND_SHARE_ACTIONS = Arrays.asList(
+    private static final List<String> VIEW_AND_SHARE_ACTIONS = Arrays.asList(
             ACTION_VIEW_CONVERSATION,
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE
@@ -109,7 +109,7 @@ public class ConversationsActivity extends XmppActivity implements OnConversatio
     private final PendingItem<ActivityResult> postponedActivityResult = new PendingItem<>();
     private ActivityConversationsBinding binding;
     private boolean mActivityPaused = true;
-    private AtomicBoolean mRedirectInProcess = new AtomicBoolean(false);
+    private final AtomicBoolean mRedirectInProcess = new AtomicBoolean(false);
 
     private static boolean isViewOrShareIntent(Intent i) {
         Log.d(Config.LOGTAG, "action: " + (i == null ? null : i.getAction()));
@@ -309,10 +309,8 @@ public class ConversationsActivity extends XmppActivity implements OnConversatio
 
     private void handleNegativeActivityResult(int requestCode) {
         Conversation conversation = ConversationFragment.getConversationReliable(this);
-        switch (requestCode) {
-            case REQUEST_BATTERY_OP:
-                setNeverAskForBatteryOptimizationsAgain();
-                break;
+        if (requestCode == REQUEST_BATTERY_OP) {
+            setNeverAskForBatteryOptimizationsAgain();
         }
     }
 
@@ -320,7 +318,6 @@ public class ConversationsActivity extends XmppActivity implements OnConversatio
         Conversation conversation = ConversationFragment.getConversationReliable(this);
         if (conversation == null) {
             Log.d(Config.LOGTAG, "conversation not found");
-            return;
         }
     }
 
@@ -357,7 +354,6 @@ public class ConversationsActivity extends XmppActivity implements OnConversatio
             if (isCameraFeatureAvailable()) {
                 Fragment fragment = getFragmentManager().findFragmentById(R.id.main_fragment);
                 boolean visible = getResources().getBoolean(R.bool.show_qr_code_scan)
-                        && fragment != null
                         && fragment instanceof ConversationsOverviewFragment;
                 qrCodeScanMenuItem.setVisible(visible);
             } else {
@@ -610,7 +606,7 @@ public class ConversationsActivity extends XmppActivity implements OnConversatio
         if (!mActivityPaused && pendingViewIntent.peek() == null) {
             xmppConnectionService.sendReadMarker(conversation, upToUuid);
         } else {
-            Log.d(Config.LOGTAG, "ignoring read callback. mActivityPaused=" + Boolean.toString(mActivityPaused));
+            Log.d(Config.LOGTAG, "ignoring read callback. mActivityPaused=" + mActivityPaused);
         }
     }
 

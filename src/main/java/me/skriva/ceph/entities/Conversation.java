@@ -60,16 +60,16 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	static final String ATTRIBUTE_MODERATED = "moderated";
 	static final String ATTRIBUTE_NON_ANONYMOUS = "non_anonymous";
 	public static final String ATTRIBUTE_FORMERLY_PRIVATE_NON_ANONYMOUS = "formerly_private_non_anonymous";
-	protected final ArrayList<Message> messages = new ArrayList<>();
-	public AtomicBoolean messagesLoaded = new AtomicBoolean(true);
-	protected Account account = null;
+	final ArrayList<Message> messages = new ArrayList<>();
+	public final AtomicBoolean messagesLoaded = new AtomicBoolean(true);
+	Account account = null;
 	private String draftMessage;
-	private String name;
-	private String contactUuid;
-	private String accountUuid;
+	private final String name;
+	private final String contactUuid;
+	private final String accountUuid;
 	private Jid contactJid;
 	private int status;
-	private long created;
+	private final long created;
 	private int mode;
 	private JSONObject attributes;
 	private Jid nextCounterpart;
@@ -81,8 +81,6 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	private String messageReference = null;
 	private String messageReferenceQuote;
 	private ConversationFragment conversationFragment;
-	private long lastPossibleNotificationTime = 0;
-	private boolean resumed = true;
 
 	public Conversation(final String name, final Account account, final Jid contactJid,
 	                    final int mode) {
@@ -92,9 +90,9 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		this.account = account;
 	}
 
-	public Conversation(final String uuid, final String name, final String contactUuid,
-	                    final String accountUuid, final Jid contactJid, final long created, final int status,
-	                    final int mode, final String attributes) {
+	private Conversation(final String uuid, final String name, final String contactUuid,
+						 final String accountUuid, final Jid contactJid, final long created, final int status,
+						 final int mode, final String attributes) {
 		this.uuid = uuid;
 		this.name = name;
 		this.contactUuid = contactUuid;
@@ -401,7 +399,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 
 	public void setLastClearHistory(long time, String reference) {
 		if (reference != null) {
-			setAttribute(ATTRIBUTE_LAST_CLEAR_HISTORY, String.valueOf(time) + ":" + reference);
+			setAttribute(ATTRIBUTE_LAST_CLEAR_HISTORY, time + ":" + reference);
 		} else {
 			setAttribute(ATTRIBUTE_LAST_CLEAR_HISTORY, time);
 		}
@@ -415,7 +413,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		if (mode == MODE_SINGLE) {
 			return Collections.singletonList(getJid().asBareJid());
 		} else {
-			return getJidListAttribute(ATTRIBUTE_CRYPTO_TARGETS);
+			return getJidListAttribute();
 		}
 	}
 
@@ -589,7 +587,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		this.status = status;
 	}
 
-	public long getCreated() {
+	private long getCreated() {
 		return this.created;
 	}
 
@@ -659,7 +657,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		} else {
 			defaultEncryption = Message.ENCRYPTION_NONE;
 		}
-		int encryption = this.getIntAttribute(ATTRIBUTE_NEXT_ENCRYPTION, defaultEncryption);
+		int encryption = this.getIntAttribute(defaultEncryption);
 		if (encryption == Message.ENCRYPTION_OTR || encryption < 0) {
 			return defaultEncryption;
 		} else {
@@ -680,7 +678,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	}
 
 	public boolean setNextEncryption(int encryption) {
-		return this.setAttribute(ATTRIBUTE_NEXT_ENCRYPTION, encryption);
+		return this.setAttribute(encryption);
 	}
 
 	public String getNextMessage() {
@@ -797,12 +795,12 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		return setAttribute(key, String.valueOf(value));
 	}
 
-	private boolean setAttribute(String key, long value) {
-		return setAttribute(key, Long.toString(value));
+	private void setAttribute(String key, long value) {
+		setAttribute(key, Long.toString(value));
 	}
 
-	private boolean setAttribute(String key, int value) {
-		return setAttribute(key, String.valueOf(value));
+	private boolean setAttribute(int value) {
+		return setAttribute(Conversation.ATTRIBUTE_NEXT_ENCRYPTION, String.valueOf(value));
 	}
 
 	public boolean setAttribute(String key, String value) {
@@ -826,7 +824,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		}
 	}
 
-	public boolean setAttribute(String key, List<Jid> jids) {
+	private void setAttribute(String key, List<Jid> jids) {
 		JSONArray array = new JSONArray();
 		for (Jid jid : jids) {
 			array.put(jid.asBareJid().toString());
@@ -834,9 +832,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		synchronized (this.attributes) {
 			try {
 				this.attributes.put(key, array);
-				return true;
 			} catch (JSONException e) {
-				return false;
 			}
 		}
 	}
@@ -847,11 +843,11 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		}
 	}
 
-	private List<Jid> getJidListAttribute(String key) {
+	private List<Jid> getJidListAttribute() {
 		ArrayList<Jid> list = new ArrayList<>();
 		synchronized (this.attributes) {
 			try {
-				JSONArray array = this.attributes.getJSONArray(key);
+				JSONArray array = this.attributes.getJSONArray(Conversation.ATTRIBUTE_CRYPTO_TARGETS);
 				for (int i = 0; i < array.length(); ++i) {
 					try {
 						list.add(Jid.of(array.getString(i)));
@@ -866,8 +862,8 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		return list;
 	}
 
-	private int getIntAttribute(String key, int defaultValue) {
-		String value = this.getAttribute(key);
+	private int getIntAttribute(int defaultValue) {
+		String value = this.getAttribute(Conversation.ATTRIBUTE_NEXT_ENCRYPTION);
 		if (value == null) {
 			return defaultValue;
 		} else {
@@ -933,13 +929,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	public void sort() {
 		synchronized (this.messages) {
 			Collections.sort(this.messages, (left, right) -> {
-				if (left.getTimeSent() < right.getTimeSent()) {
-					return -1;
-				} else if (left.getTimeSent() > right.getTimeSent()) {
-					return 1;
-				} else {
-					return 0;
-				}
+                return Long.compare(left.getTimeSent(), right.getTimeSent());
 			});
 			untieMessages();
 		}
@@ -1019,55 +1009,6 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	@Override
 	public int getAvatarBackgroundColor() {
 		return UIHelper.getColorForName(getName().toString());
-	}
-
-	/**
-	 * Resets the information about the resumed state of the corresponding
-	 * {@link me.skriva.ceph.ui.ConversationFragment} object.
-	 */
-	public void resetResumed() {
-		resumed = false;
-	}
-
-	/**
-	 * Informs this conversation about the fact that the corresponding
-	 * {@link me.skriva.ceph.ui.ConversationFragment} object is resumed.
-	 */
-	public void resumed() {
-		this.resumed = true;
-	}
-
-	/**
-	 * Provides the resumed state of the corresponding
-	 * {@link me.skriva.ceph.ui.ConversationFragment} object.
-	 * @return true if the {@link me.skriva.ceph.ui.ConversationFragment} object
-	 * was resumed after the last reset by {@link #resetResumed()} or false otherwise
-	 */
-	public boolean wasResumed() {
-		return resumed;
-	}
-
-	/**
-	 * Provides the time at which the user may have been notified for an incoming message
-	 * but may have not been notified because of another one arriving shortly before.
-	 * This mechanism is done with the help of
-	 * {@link me.skriva.ceph.services.NotificationService#notifyAgain(Conversation)}
-	 * The time is set by {@link #updateLastPossibleNotificationTime()}.
-	 * @return time at which the user may have been notified for an incoming message
-	 */
-	public long getLastPossibleNotificationTime() {
-		return lastPossibleNotificationTime;
-	}
-
-	/**
-	 * This should only be executed by
-	 * {@link me.skriva.ceph.services.NotificationService#notifyAgain(Conversation)}
-	 * each time a notification may be triggered.
-	 * Sets the time at which the user may have been notified for an incoming message
-	 * but may have not been notified because of another one arriving shortly before.
-	 */
-	public void updateLastPossibleNotificationTime() {
-		lastPossibleNotificationTime = System.currentTimeMillis();
 	}
 
 	public String getMessageReference() {
