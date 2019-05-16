@@ -5,7 +5,6 @@
 # https://github.com/github/gitignore/blob/master/Gradle.gitignore
 .gradle/
 build/
-gradle.properties
 captures/
 signing.properties
 # Ignore Gradle GUI config
