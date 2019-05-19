@@ -13,7 +13,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import de.measite.minidns.AbstractDNSClient;
 import de.measite.minidns.DNSClient;
@@ -33,11 +32,12 @@ import de.measite.minidns.record.Data;
 import de.measite.minidns.record.InternetAddressRR;
 import de.measite.minidns.record.SRV;
 import me.skriva.ceph.Config;
+import me.skriva.ceph.R;
 import me.skriva.ceph.services.XmppConnectionService;
 
 public class Resolver {
 
-    private static final int DEFAULT_PORT_XMPP = 5222;
+    public static final int DEFAULT_PORT_XMPP = 5222;
 
     private static final String DIRECT_TLS_SERVICE = "_xmpps-client";
     private static final String STARTTLS_SERICE = "_xmpp-client";
@@ -237,8 +237,8 @@ public class Resolver {
         return results;
     }
 
-    private static <D extends Data> ResolverResult<D> resolveWithFallback(DNSName dnsName, Class<D> type) {
-        return resolveWithFallback(dnsName, type);
+    private static <D extends Data> ResolverResult<D> resolveWithFallback(DNSName dnsName, Class<D> type) throws IOException {
+        return resolveWithFallback(dnsName, type, validateHostname());
     }
 
     private static <D extends Data> ResolverResult<D> resolveWithFallback(DNSName dnsName, Class<D> type, boolean validateHostname) throws IOException {
@@ -256,6 +256,10 @@ public class Resolver {
             Log.d(Config.LOGTAG, Resolver.class.getSimpleName() + ": error resolving " + type.getSimpleName() + " with DNSSEC. Trying DNS instead.", throwable);
         }
         return ResolverApi.INSTANCE.resolve(question);
+    }
+
+    private static boolean validateHostname() {
+        return SERVICE != null && SERVICE.getBooleanPreference("validate_hostname", R.bool.validate_hostname);
     }
 
     public static class Result implements Comparable<Result> {
@@ -321,8 +325,8 @@ public class Resolver {
             if (directTls != result.directTls) return false;
             if (authenticated != result.authenticated) return false;
             if (priority != result.priority) return false;
-            if (!Objects.equals(ip, result.ip)) return false;
-            return Objects.equals(hostname, result.hostname);
+            if (ip != null ? !ip.equals(result.ip) : result.ip != null) return false;
+            return hostname != null ? hostname.equals(result.hostname) : result.hostname == null;
         }
 
         @Override

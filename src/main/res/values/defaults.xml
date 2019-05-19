@@ -21,7 +21,7 @@
     <bool name="use_green_background">true</bool>
     <bool name="send_button_status">true</bool>
     <string name="quick_action">RECORD_VOICE</string>
-    <bool name="show_dynamic_tags">false</bool>
+    <bool name="show_dynamic_tags">true</bool>
     <bool name="btbv">true</bool>
     <integer name="automatic_message_deletion">0</integer>
     <bool name="allow_message_correction">true</bool>
@@ -34,6 +34,7 @@
     <bool name="indicate_received">false</bool>
     <bool name="enable_foreground_service">false</bool>
     <bool name="never_send">false</bool>
+    <bool name="validate_hostname">false</bool>
     <bool name="show_qr_code_scan">true</bool>
     <bool name="scroll_to_bottom">true</bool>
     <string name="omemo_setting_default">default_on</string>

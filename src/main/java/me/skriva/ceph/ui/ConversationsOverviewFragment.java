@@ -32,7 +32,7 @@ package me.skriva.ceph.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Bundle;

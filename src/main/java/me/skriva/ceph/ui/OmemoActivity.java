@@ -1,6 +1,6 @@
 package me.skriva.ceph.ui;
 
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
 import android.view.ContextMenu;

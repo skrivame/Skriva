@@ -1,7 +1,7 @@
 package me.skriva.ceph.ui.adapter;
 
 import android.content.SharedPreferences;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;

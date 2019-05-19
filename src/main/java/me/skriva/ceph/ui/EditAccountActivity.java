@@ -4,7 +4,7 @@ import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;

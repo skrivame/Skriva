@@ -1,6 +1,6 @@
 package me.skriva.ceph.ui.adapter;
 
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.DiffUtil;

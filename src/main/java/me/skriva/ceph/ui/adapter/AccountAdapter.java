@@ -1,6 +1,6 @@
 package me.skriva.ceph.ui.adapter;
 
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;

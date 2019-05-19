@@ -6,7 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;

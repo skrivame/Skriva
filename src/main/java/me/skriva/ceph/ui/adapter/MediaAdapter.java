@@ -2,7 +2,7 @@ package me.skriva.ceph.ui.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;

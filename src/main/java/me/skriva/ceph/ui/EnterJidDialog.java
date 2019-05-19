@@ -1,7 +1,7 @@
 package me.skriva.ceph.ui;
 
 import android.app.Activity;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import android.os.Bundle;

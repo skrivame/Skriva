@@ -3,7 +3,7 @@ package me.skriva.ceph.ui;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Build;

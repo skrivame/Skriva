@@ -35,8 +35,8 @@ public final class Config {
 
     //Notification settings
     public static final boolean HIDE_MESSAGE_TEXT_IN_NOTIFICATION = false;
-    public static final boolean ALWAYS_NOTIFY_BY_DEFAULT = false;
-    public static final boolean SUPPRESS_ERROR_NOTIFICATION = false;
+    public static final boolean ALWAYS_NOTIFY_BY_DEFAULT = true;
+    public static final boolean SUPPRESS_ERROR_NOTIFICATION = true;
 
 
     public static final boolean DISABLE_BAN = false; // disables the ability to ban users from rooms

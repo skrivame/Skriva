@@ -30,7 +30,7 @@
 package me.skriva.ceph.ui;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil ;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
