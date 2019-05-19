@@ -1108,14 +1108,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         // Show the message reference preview.
         MessageReferenceUtils.displayMessageReference(activity, binding.messageReferencePreview, null, message, activity.isDarkTheme());
 
-        if (quoteMessage) {
-            // Show the lines of the referenced message as quotations instead of letting a legacy quotation be used for the body of the message to be sent.
-            binding.textinput.insertAsQuote(MessageUtils.prepareQuote(message));
-            conversation.setMessageReferenceQuote("");
-        } else {
-            // Set the legacy quotation so that it can be used as the first part of the body for the message to be sent.
-            conversation.setMessageReferenceQuote(MessageUtils.createQuote(MessageUtils.prepareQuote(message)) + "\n");
-        }
+        // Show the lines of the referenced message as quotations instead of letting a legacy quotation be used for the body of the message to be sent.
+        MessageUtils.prepareQuote(message);
+        conversation.setMessageReferenceQuote("");
+
     }
 
     /**

@@ -69,10 +69,6 @@ public class MessageUtils {
 		return builder.toString();
 	}
 
-	public static String createQuote(String text) {
-		return text.replaceAll("(\n *){2,}", "\n").replaceAll("(^|\n)", "$1> ").replaceAll("\n$", "");
-	}
-
 	public static boolean treatAsDownloadable(final String body, final boolean oob) {
 		try {
 			final String[] lines = body.split("\n");

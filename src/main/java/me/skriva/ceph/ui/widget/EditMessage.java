@@ -145,23 +145,6 @@ public class EditMessage extends EmojiWrapperEditText implements EmojiEditTextIn
 		this.mCommitContentListener = listener;
 	}
 
-	public void insertAsQuote(String text) {
-		text = MessageUtils.createQuote(text);
-		Editable editable = getEditableText();
-		int position = getSelectionEnd();
-		if (position == -1) position = editable.length();
-		if (position > 0 && editable.charAt(position - 1) != '\n') {
-			editable.insert(position++, "\n");
-		}
-		editable.insert(position, text);
-		position += text.length();
-		editable.insert(position++, "\n");
-		if (position < editable.length() && editable.charAt(position) != '\n') {
-			editable.insert(position, "\n");
-		}
-		setSelection(position);
-	}
-
 	@Override
 	public InputConnection onCreateInputConnection(EditorInfo editorInfo) {
 		final InputConnection ic = super.onCreateInputConnection(editorInfo);
