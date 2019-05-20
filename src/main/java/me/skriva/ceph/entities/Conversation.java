@@ -82,6 +82,8 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 	private String messageReference = null;
 	private String messageReferenceQuote;
 	private ConversationFragment conversationFragment;
+	private long lastPossibleNotificationTime = 0;
+	private boolean resumed = true;
 
 	public Conversation(final String name, final Account account, final Jid contactJid,
 	                    final int mode) {
@@ -925,9 +927,7 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 
 	public void sort() {
 		synchronized (this.messages) {
-			Collections.sort(this.messages, (left, right) -> {
-                return Long.compare(left.getTimeSent(), right.getTimeSent());
-			});
+			Collections.sort(this.messages, (left, right) -> Long.compare(left.getTimeSent(), right.getTimeSent()));
 			untieMessages();
 		}
 	}
@@ -1008,6 +1008,55 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		return UIHelper.getColorForName(getName().toString());
 	}
 
+	/**
+	 * Resets the information about the resumed state of the corresponding
+	 * {@link me.skriva.ceph.ui.ConversationFragment} object.
+	 */
+	public void resetResumed() {
+		resumed = false;
+	}
+
+	/**
+	 * Informs this conversation about the fact that the corresponding
+	 * {@link me.skriva.ceph.ui.ConversationFragment} object is resumed.
+	 */
+	public void resumed() {
+		this.resumed = true;
+	}
+
+	/**
+	 * Provides the resumed state of the corresponding
+	 * {@link me.skriva.ceph.ui.ConversationFragment} object.
+	 * @return true if the {@link me.skriva.ceph.ui.ConversationFragment} object
+	 * was resumed after the last reset by {@link #resetResumed()} or false otherwise
+	 */
+	public boolean wasResumed() {
+		return resumed;
+	}
+
+	/**
+	 * Provides the time at which the user may have been notified for an incoming message
+	 * but may have not been notified because of another one arriving shortly before.
+	 * This mechanism is done with the help of
+	 * {@link me.skriva.ceph.services.NotificationService#notifyAgain(Conversation)}
+	 * The time is set by {@link #updateLastPossibleNotificationTime()}.
+	 * @return time at which the user may have been notified for an incoming message
+	 */
+	public long getLastPossibleNotificationTime() {
+		return lastPossibleNotificationTime;
+	}
+
+	/**
+	 * This should only be executed by
+	 * {@link me.skriva.ceph.services.NotificationService#notifyAgain(Conversation)}
+	 * each time a notification may be triggered.
+	 * Sets the time at which the user may have been notified for an incoming message
+	 * but may have not been notified because of another one arriving shortly before.
+	 */
+	public void updateLastPossibleNotificationTime() {
+		lastPossibleNotificationTime = System.currentTimeMillis();
+	}
+	
 	public String getMessageReference() {
 		return messageReference;
 	}

@@ -1976,6 +1976,9 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             this.conversation.trim();
         }
 
+        // Set the conversation to "resumed" for receiving notifications again after they were suppressed due to multiple incoming messages.
+        this.conversation.resumed();
+
         setupIme();
 
         final boolean scrolledToBottomAndNoPending = this.scrolledToBottom() && pendingScrollState.peek() == null;
