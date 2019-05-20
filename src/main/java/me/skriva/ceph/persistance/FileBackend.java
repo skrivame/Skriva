@@ -949,24 +949,15 @@ public class FileBackend {
     public Avatar getPepAvatar(Uri image, int size, Bitmap.CompressFormat format) {
 
         final Avatar uncompressAvatar = getUncompressedAvatar(image);
-        if (uncompressAvatar != null && uncompressAvatar.image.length() <= Config.AVATAR_CHAR_LIMIT) {
+        if (uncompressAvatar != null) {
             return uncompressAvatar;
         }
-        if (uncompressAvatar != null) {
-            Log.d(Config.LOGTAG, "uncompressed avatar exceeded char limit by " + (uncompressAvatar.image.length() - Config.AVATAR_CHAR_LIMIT));
-        }
 
-        Bitmap bm = cropCenterSquare(image, size);
+        Bitmap bm = cropCenterSquare(image, 384);
         if (bm == null) {
             return null;
         }
-        if (hasAlpha(bm)) {
-            Log.d(Config.LOGTAG, "alpha in avatar detected; uploading as PNG");
-            bm.recycle();
-            bm = cropCenterSquare(image, 256);
-            return getPepAvatar(bm, Bitmap.CompressFormat.PNG, 100);
-        }
-        return getPepAvatar(bm, format, 100);
+        return getPepAvatar(bm, Bitmap.CompressFormat.PNG, 100);
     }
 
     private Avatar getUncompressedAvatar(Uri uri) {
@@ -1291,7 +1282,7 @@ public class FileBackend {
         if (avatar == null) {
             return null;
         }
-        Bitmap bm = cropCenter(getAvatarUri(avatar), size, size);
+        Bitmap bm = cropCenterSquare(getAvatarUri(avatar), size);
         if (bm == null) {
             return null;
         }

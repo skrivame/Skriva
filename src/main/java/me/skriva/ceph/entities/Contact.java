@@ -46,7 +46,7 @@ public class Contact implements ListItem, Blockable {
 	private String accountUuid;
 	private String systemName;
 	private String serverName;
-	private String presenceName;
+	public String presenceName;
 	private String commonName;
 	private final Jid jid;
 	private int subscription = 0;

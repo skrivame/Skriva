@@ -88,7 +88,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
     private boolean mInitMode = false;
     private Boolean mForceRegister = null;
     private boolean mUsernameMode = Config.DOMAIN_LOCK != null;
-    private boolean mShowOptions = false;
+    protected boolean mShowOptions = false;
     private Account mAccount;
     private final OnClickListener mCancelButtonClickListener = v -> {
         deleteAccountAndReturnIfNecessary();
@@ -549,7 +549,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
     }
 
     private void refreshAvatar() {
-        AvatarWorkerTask.loadAvatar(mAccount,binding.avater,R.dimen.avatar_on_details_screen_size);
+        AvatarWorkerTask.loadAvatar(mAccount,binding.avater,R.dimen.avatar_big);
     }
 
     @Override
@@ -869,7 +869,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
 
         if (!mInitMode) {
             this.binding.avater.setVisibility(View.VISIBLE);
-            AvatarWorkerTask.loadAvatar(mAccount,binding.avater,R.dimen.avatar_on_details_screen_size);
+            AvatarWorkerTask.loadAvatar(mAccount,binding.avater,R.dimen.avatar_big);
         } else {
             this.binding.avater.setVisibility(View.GONE);
         }

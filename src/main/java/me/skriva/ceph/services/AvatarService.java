@@ -48,7 +48,7 @@ public class AvatarService implements OnAdvancedStreamFeaturesLoaded {
 	private static final int TRANSPARENT = 0x00000000;
 	private static final int PLACEHOLDER_COLOR = 0xFF202020;
 
-	private static final int SYSTEM_UI_AVATAR_SIZE = 48;
+	private static final int SYSTEM_UI_AVATAR_SIZE = 384;
 
 	private static final String PREFIX_CONTACT = "contact";
 	private static final String PREFIX_CONVERSATION = "conversation";
@@ -94,13 +94,13 @@ public class AvatarService implements OnAdvancedStreamFeaturesLoaded {
 			return avatar;
 		}
 		if (avatar == null && contact.getProfilePhoto() != null) {
-			avatar = mXmppConnectionService.getFileBackend().cropCenterSquare(Uri.parse(contact.getProfilePhoto()), size);
+			avatar = mXmppConnectionService.getFileBackend().cropCenterSquare(Uri.parse(contact.getProfilePhoto()), 512);
 		}
 		if (avatar == null && contact.getAvatarFilename() != null) {
-			avatar = mXmppConnectionService.getFileBackend().getAvatar(contact.getAvatarFilename(), size);
+			avatar = mXmppConnectionService.getFileBackend().getAvatar(contact.getAvatarFilename(), 512);
 		}
 		if (avatar == null) {
-			avatar = get(contact.getDisplayName(), contact.getJid().asBareJid().toString(), size, false);
+			avatar = get(contact.getDisplayName(), contact.getJid().asBareJid().toString(), 512, false);
 		}
 		this.mXmppConnectionService.getBitmapCache().put(KEY, avatar);
 		return avatar;
