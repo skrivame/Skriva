@@ -7,8 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 
-import me.skriva.ceph.R;
 import me.drakeet.support.toast.ToastCompat;
+import me.skriva.ceph.R;
 
 public class TorServiceUtils {
 

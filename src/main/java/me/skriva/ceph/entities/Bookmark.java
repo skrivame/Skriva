@@ -1,6 +1,7 @@
 package me.skriva.ceph.entities;
 
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

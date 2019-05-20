@@ -1,6 +1,7 @@
 package me.skriva.ceph.ui;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import me.skriva.ceph.R;

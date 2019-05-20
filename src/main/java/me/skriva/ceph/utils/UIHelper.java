@@ -1,11 +1,12 @@
 package me.skriva.ceph.utils;
 
 import android.content.Context;
-import androidx.annotation.ColorInt;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Pair;
+
+import androidx.annotation.ColorInt;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;

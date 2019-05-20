@@ -2,9 +2,10 @@ package me.skriva.ceph.entities;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;

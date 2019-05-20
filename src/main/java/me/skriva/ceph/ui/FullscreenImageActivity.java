@@ -2,12 +2,12 @@ package me.skriva.ceph.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 import com.github.piasy.biv.BigImageViewer;
 import com.github.piasy.biv.indicator.progresspie.ProgressPieIndicator;

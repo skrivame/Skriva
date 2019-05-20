@@ -5,11 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.SystemClock;
 import android.security.KeyChain;
-import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
+
+import androidx.annotation.NonNull;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -100,7 +101,8 @@ import me.skriva.ceph.xmpp.stanzas.streammgmt.RequestPacket;
 import me.skriva.ceph.xmpp.stanzas.streammgmt.ResumePacket;
 import rocks.xmpp.addr.Jid;
 
-import static me.skriva.ceph.utils.SocksSocketFactory.*;
+import static me.skriva.ceph.utils.SocksSocketFactory.SocksProxyNotFoundException;
+import static me.skriva.ceph.utils.SocksSocketFactory.createSocketOverTor;
 
 public class XmppConnection implements Runnable {
 

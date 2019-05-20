@@ -8,8 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -34,6 +32,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.common.base.Strings;
 
@@ -79,10 +80,8 @@ import me.skriva.ceph.utils.GeoHelper;
 import me.skriva.ceph.utils.StylingHelper;
 import me.skriva.ceph.utils.UIHelper;
 import me.skriva.ceph.xmpp.mam.MamReference;
-
 import pl.droidsonroids.gif.GifDrawable;
 import pl.droidsonroids.gif.GifImageView;
-
 import rocks.xmpp.addr.Jid;
 
 public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextView.CopyHandler {
@@ -586,15 +585,13 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			Toast.makeText(activity, R.string.file_deleted, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		double target;
+		double target = metrics.density * 288;
 		String mime = file.getMimeType();
 		if (mime != null && mime.equals("image/gif")) {
-			target = metrics.density * 288;
 			Log.d(Config.LOGTAG, "GIF Image");
 			viewHolder.image.setVisibility(View.GONE);
 			viewHolder.gifImage.setVisibility(View.VISIBLE);
 		} else {
-			target = metrics.density * 288;
 			Log.d(Config.LOGTAG, "Image");
 			viewHolder.image.setVisibility(View.VISIBLE);
 			viewHolder.gifImage.setVisibility(View.GONE);

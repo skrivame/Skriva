@@ -31,9 +31,10 @@ package me.skriva.ceph.ui.util;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import androidx.annotation.NonNull;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;

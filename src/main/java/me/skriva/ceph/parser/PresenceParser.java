@@ -5,7 +5,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import me.skriva.ceph.Config;
 import me.skriva.ceph.crypto.axolotl.AxolotlService;
 import me.skriva.ceph.entities.Account;

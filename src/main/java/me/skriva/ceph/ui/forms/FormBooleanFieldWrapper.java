@@ -2,7 +2,6 @@ package me.skriva.ceph.ui.forms;
 
 import android.content.Context;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import java.util.ArrayList;
 import java.util.List;

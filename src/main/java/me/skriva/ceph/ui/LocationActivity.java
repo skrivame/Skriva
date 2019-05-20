@@ -14,9 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;

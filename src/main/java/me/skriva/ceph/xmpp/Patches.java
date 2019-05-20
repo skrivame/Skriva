@@ -1,7 +1,6 @@
 package me.skriva.ceph.xmpp;
 
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

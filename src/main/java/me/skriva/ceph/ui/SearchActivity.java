@@ -29,9 +29,7 @@
 
 package me.skriva.ceph.ui;
 
-import androidx.databinding.DataBindingUtil ;
 import android.os.Bundle;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,6 +39,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -57,10 +58,10 @@ import me.skriva.ceph.ui.adapter.MessageAdapter;
 import me.skriva.ceph.ui.interfaces.OnSearchResultsAvailable;
 import me.skriva.ceph.ui.util.ChangeWatcher;
 import me.skriva.ceph.ui.util.DateSeparator;
-import me.skriva.ceph.ui.util.StyledAttributes;
 import me.skriva.ceph.ui.util.ListViewUtils;
 import me.skriva.ceph.ui.util.PendingItem;
 import me.skriva.ceph.ui.util.ShareUtil;
+import me.skriva.ceph.ui.util.StyledAttributes;
 import me.skriva.ceph.utils.FtsUtils;
 
 import static me.skriva.ceph.ui.util.SoftKeyboardUtils.hideSoftKeyboard;

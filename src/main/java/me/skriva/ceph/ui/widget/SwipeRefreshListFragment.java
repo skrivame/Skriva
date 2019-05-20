@@ -18,12 +18,13 @@ package me.skriva.ceph.ui.widget;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.ListFragment;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
+import androidx.fragment.app.ListFragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import me.skriva.ceph.R;
 import me.skriva.ceph.ui.util.StyledAttributes;

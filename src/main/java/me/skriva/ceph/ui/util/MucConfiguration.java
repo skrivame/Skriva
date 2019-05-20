@@ -2,6 +2,7 @@ package me.skriva.ceph.ui.util;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.StringRes;
 
 import me.skriva.ceph.R;

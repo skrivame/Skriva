@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil ;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
+
+import androidx.databinding.DataBindingUtil;
 
 import java.io.File;
 import java.io.IOException;

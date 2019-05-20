@@ -2,7 +2,6 @@ package me.skriva.ceph.ui.util;
 
 import android.app.Activity;
 import android.preference.PreferenceManager;
-import androidx.appcompat.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.TypefaceSpan;
@@ -10,6 +9,8 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.appcompat.app.AlertDialog;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;

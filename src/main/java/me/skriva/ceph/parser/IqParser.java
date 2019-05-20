@@ -1,9 +1,10 @@
 package me.skriva.ceph.parser;
 
-import androidx.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
+
+import androidx.annotation.NonNull;
 
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.ecc.Curve;
@@ -27,8 +28,8 @@ import me.skriva.ceph.crypto.axolotl.AxolotlService;
 import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.Contact;
 import me.skriva.ceph.services.XmppConnectionService;
-import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.xml.Element;
+import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.xmpp.InvalidJid;
 import me.skriva.ceph.xmpp.OnIqPacketReceived;
 import me.skriva.ceph.xmpp.OnUpdateBlocklist;

@@ -2,18 +2,18 @@ package me.skriva.ceph.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil ;
 import android.os.Bundle;
+
 import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 
 import java.util.List;
 
 import me.skriva.ceph.R;
+import me.skriva.ceph.databinding.ActivityMediaBrowserBinding;
 import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.Contact;
 import me.skriva.ceph.entities.Conversation;
-
-import me.skriva.ceph.databinding.ActivityMediaBrowserBinding;
 import me.skriva.ceph.ui.adapter.MediaAdapter;
 import me.skriva.ceph.ui.interfaces.OnMediaLoaded;
 import me.skriva.ceph.ui.util.Attachment;

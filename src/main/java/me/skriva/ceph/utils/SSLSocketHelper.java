@@ -1,8 +1,9 @@
 package me.skriva.ceph.utils;
 
 import android.os.Build;
-import androidx.annotation.RequiresApi;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import org.conscrypt.Conscrypt;
 

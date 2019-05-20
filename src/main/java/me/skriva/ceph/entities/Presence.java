@@ -2,7 +2,6 @@ package me.skriva.ceph.entities;
 
 import androidx.annotation.NonNull;
 
-import java.lang.Comparable;
 import java.util.Locale;
 
 import me.skriva.ceph.xml.Element;

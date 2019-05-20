@@ -30,15 +30,16 @@
 package me.skriva.ceph.ui;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil ;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.StringRes;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
 
 import com.theartofdev.edmodo.cropper.CropImage;
 

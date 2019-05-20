@@ -1,9 +1,10 @@
 package me.skriva.ceph.ui.adapter;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collection;

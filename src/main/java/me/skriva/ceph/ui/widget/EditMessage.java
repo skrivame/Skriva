@@ -1,15 +1,11 @@
 package me.skriva.ceph.ui.widget;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import androidx.core.view.inputmethod.EditorInfoCompat;
-import androidx.core.view.inputmethod.InputConnectionCompat;
-import androidx.core.view.inputmethod.InputContentInfoCompat;
-
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -19,15 +15,18 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import androidx.core.view.inputmethod.EditorInfoCompat;
+import androidx.core.view.inputmethod.InputConnectionCompat;
+import androidx.core.view.inputmethod.InputContentInfoCompat;
 
 import com.vanniktech.emoji.EmojiEditTextInterface;
 import com.vanniktech.emoji.emoji.Emoji;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
-import me.skriva.ceph.utils.MessageUtils;
 
 public class EditMessage extends EmojiWrapperEditText implements EmojiEditTextInterface {
 

@@ -2,16 +2,17 @@ package me.skriva.ceph.ui;
 
 import android.app.Activity;
 import android.app.Dialog;
-import androidx.databinding.DataBindingUtil;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Spinner;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
 
 import java.util.ArrayList;
 import java.util.Collection;

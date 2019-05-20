@@ -32,16 +32,17 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.security.KeyChain;
-import androidx.annotation.BoolRes;
-import androidx.annotation.IntegerRes;
-import androidx.core.app.RemoteInput;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
 import android.util.Pair;
 import android.widget.Toast;
+
+import androidx.annotation.BoolRes;
+import androidx.annotation.IntegerRes;
+import androidx.core.app.RemoteInput;
+import androidx.core.content.ContextCompat;
 
 import org.conscrypt.Conscrypt;
 
@@ -70,7 +71,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-
+import me.leolin.shortcutbadger.ShortcutBadger;
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
 import me.skriva.ceph.android.JabberIdContact;
@@ -95,8 +96,8 @@ import me.skriva.ceph.generator.AbstractGenerator;
 import me.skriva.ceph.generator.IqGenerator;
 import me.skriva.ceph.generator.MessageGenerator;
 import me.skriva.ceph.generator.PresenceGenerator;
-import me.skriva.ceph.http.HttpConnectionManager;
 import me.skriva.ceph.http.CustomURLStreamHandlerFactory;
+import me.skriva.ceph.http.HttpConnectionManager;
 import me.skriva.ceph.parser.AbstractParser;
 import me.skriva.ceph.parser.IqParser;
 import me.skriva.ceph.parser.MessageParser;
@@ -123,9 +124,9 @@ import me.skriva.ceph.utils.Resolver;
 import me.skriva.ceph.utils.SerialSingleThreadExecutor;
 import me.skriva.ceph.utils.StringUtils;
 import me.skriva.ceph.utils.WakeLockHelper;
-import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.utils.XmppUri;
 import me.skriva.ceph.xml.Element;
+import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.xmpp.OnBindListener;
 import me.skriva.ceph.xmpp.OnContactStatusChanged;
 import me.skriva.ceph.xmpp.OnIqPacketReceived;
@@ -147,7 +148,6 @@ import me.skriva.ceph.xmpp.pep.PublishOptions;
 import me.skriva.ceph.xmpp.stanzas.IqPacket;
 import me.skriva.ceph.xmpp.stanzas.MessagePacket;
 import me.skriva.ceph.xmpp.stanzas.PresencePacket;
-import me.leolin.shortcutbadger.ShortcutBadger;
 import rocks.xmpp.addr.Jid;
 
 public class XmppConnectionService extends Service {

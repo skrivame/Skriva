@@ -30,8 +30,9 @@
 package me.skriva.ceph.ui.util;
 
 import android.os.Handler;
-import androidx.annotation.StringRes;
 import android.widget.EditText;
+
+import androidx.annotation.StringRes;
 
 public class DelayedHintHelper {
 

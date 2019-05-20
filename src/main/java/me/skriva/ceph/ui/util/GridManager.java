@@ -1,11 +1,12 @@
 package me.skriva.ceph.ui.util;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.ViewTreeObserver;
+
 import androidx.annotation.DimenRes;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
-import android.view.ViewTreeObserver;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.ui.adapter.MediaAdapter;

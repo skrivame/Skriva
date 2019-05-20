@@ -19,14 +19,15 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.FileProvider;
 import android.system.Os;
 import android.system.StructStat;
 import android.util.Base64;
 import android.util.Base64OutputStream;
 import android.util.Log;
 import android.util.LruCache;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.content.FileProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -44,8 +45,8 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;

@@ -1,8 +1,5 @@
 package me.skriva.ceph.ui.widget;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -12,6 +9,9 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ListSelectionManager {
 

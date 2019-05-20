@@ -1,7 +1,6 @@
 package me.skriva.ceph.ui.adapter;
 
 import android.content.SharedPreferences;
-import androidx.databinding.DataBindingUtil ;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.databinding.DataBindingUtil;
 
 import com.wefika.flowlayout.FlowLayout;
 

@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.crypto.axolotl.AxolotlService;
-import me.skriva.ceph.crypto.axolotl.OnMessageCreatedCallback;
 import me.skriva.ceph.crypto.axolotl.XmppAxolotlMessage;
 import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.Conversation;

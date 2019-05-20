@@ -1,8 +1,9 @@
 package me.skriva.ceph.http;
 
 import android.os.PowerManager;
-import androidx.annotation.Nullable;
 import android.util.Log;
+
+import androidx.annotation.Nullable;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

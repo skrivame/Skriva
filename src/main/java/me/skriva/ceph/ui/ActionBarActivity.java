@@ -1,8 +1,9 @@
 package me.skriva.ceph.ui;
 
+import android.view.MenuItem;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import android.view.MenuItem;
 
 
 public abstract class ActionBarActivity extends AppCompatActivity {

@@ -1,15 +1,15 @@
 package me.skriva.ceph.ui;
 
-import androidx.databinding.DataBindingUtil ;
-import androidx.appcompat.app.AlertDialog;
 import android.content.Intent;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
-
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.databinding.DataBindingUtil;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;

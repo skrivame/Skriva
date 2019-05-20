@@ -7,7 +7,7 @@ import rocks.xmpp.addr.Jid;
 
 public final class Config {
     private static final int UNENCRYPTED = 1;
-    private static final int OMEMO = 8;
+    private static final int OMEMO = 2;
 
     private static final int ENCRYPTION_MASK = UNENCRYPTED  | OMEMO;
 

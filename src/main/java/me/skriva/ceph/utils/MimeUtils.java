@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package me.skriva.ceph.utils;
+
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -28,7 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import me.skriva.ceph.Config;
-import me.skriva.ceph.entities.Transferable;
 
 /**
  * Utilities for dealing with MIME types.

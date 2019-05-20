@@ -3,10 +3,7 @@ package me.skriva.ceph.ui;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil ;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
@@ -16,10 +13,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import me.drakeet.support.toast.ToastCompat;
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
 import me.skriva.ceph.databinding.ActivityMucDetailsBinding;
@@ -48,7 +50,6 @@ import me.skriva.ceph.utils.EmojiWrapper;
 import me.skriva.ceph.utils.StringUtils;
 import me.skriva.ceph.utils.StylingHelper;
 import me.skriva.ceph.utils.XmppUri;
-import me.drakeet.support.toast.ToastCompat;
 import rocks.xmpp.addr.Jid;
 
 import static me.skriva.ceph.entities.Bookmark.printableValue;
