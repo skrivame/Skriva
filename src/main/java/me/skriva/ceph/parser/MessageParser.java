@@ -312,7 +312,6 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
         }
         final String body = packet.getBody();
         final Element mucUserElement = packet.findChild("x", "http://jabber.org/protocol/muc#user");
-        final String pgpEncrypted = packet.findChildContent("x", "jabber:x:encrypted");
         final Element replaceElement = packet.findChild("replace", "urn:xmpp:message-correct:0");
         final Element oob = packet.findChild("x", Namespace.OOB);
         final Element xP1S3 = packet.findChild("x", Namespace.P1_S3_FILE_TRANSFER);
@@ -372,7 +371,7 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
             return;
         }
 
-        if ((body != null || pgpEncrypted != null || (axolotlEncrypted != null && axolotlEncrypted.hasChild("payload")) || oobUrl != null || xP1S3 != null) && !isMucStatusMessage || messageReference != null) {
+        if ((body != null || (axolotlEncrypted != null && axolotlEncrypted.hasChild("payload")) || oobUrl != null || xP1S3 != null) && !isMucStatusMessage || messageReference != null) {
             final boolean conversationIsProbablyMuc = isTypeGroupChat || mucUserElement != null || account.getXmppConnection().getMucServersWithholdAccount().contains(counterpart.getDomain());
             final Conversation conversation = mXmppConnectionService.findOrCreateConversation(account, counterpart.asBareJid(), conversationIsProbablyMuc, false, query, false);
             final boolean conversationMultiMode = conversation.getMode() == Conversation.MODE_MULTI;
@@ -413,9 +412,6 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
             if (xP1S3url != null) {
                 message = new Message(conversation, xP1S3url.toString(), Message.ENCRYPTION_NONE, status);
                 message.setOob(true);
-                if (CryptoHelper.isPgpEncryptedUrl(xP1S3url.toString())) {
-                    message.setEncryption(Message.ENCRYPTION_DECRYPTED);
-                }
             }   else if (axolotlEncrypted != null && Config.supportOmemo()) {
                 Jid origin;
                 Set<Jid> fallbacksBySourceId = Collections.emptySet();
@@ -474,9 +470,6 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
             } else if (body == null && oobUrl != null) {
                 message = new Message(conversation, oobUrl, Message.ENCRYPTION_NONE, status);
                 message.setOob(true);
-                if (CryptoHelper.isPgpEncryptedUrl(oobUrl)) {
-                    message.setEncryption(Message.ENCRYPTION_DECRYPTED);
-                }
             } else {
                 message = new Message(conversation, body, Message.ENCRYPTION_NONE, status);
             }
@@ -489,9 +482,6 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
             message.setTime(timestamp);
             if (body != null && body.equals(oobUrl)) {
                 message.setOob(true);
-                if (CryptoHelper.isPgpEncryptedUrl(oobUrl)) {
-                    message.setEncryption(Message.ENCRYPTION_DECRYPTED);
-                }
             }
             message.markable = packet.hasChild("markable", "urn:xmpp:chat-markers:0");
             if (conversationMultiMode) {

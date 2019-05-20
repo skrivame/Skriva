@@ -43,10 +43,6 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	public static final int STATUS_SEND_DISPLAYED = 8;
 
 	public static final int ENCRYPTION_NONE = 0;
-	public static final int ENCRYPTION_PGP = 1;
-	public static final int ENCRYPTION_OTR = 2;
-	public static final int ENCRYPTION_DECRYPTED = 3;
-	public static final int ENCRYPTION_DECRYPTION_FAILED = 4;
 	public static final int ENCRYPTION_AXOLOTL = 5;
 	public static final int ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE = 6;
 	public static final int ENCRYPTION_AXOLOTL_FAILED = 7;
@@ -523,7 +519,7 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 				}
 				return (message.getRemoteMsgId().equals(this.remoteMsgId) || message.getRemoteMsgId().equals(this.uuid))
 						&& matchingCounterpart
-						&& (body.equals(otherBody) || (message.getEncryption() == Message.ENCRYPTION_PGP && hasUuid));
+						&& (body.equals(otherBody));
 			} else {
 				return this.remoteMsgId == null
 						&& matchingCounterpart
@@ -593,8 +589,6 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 						!this.hasMessageReference() &&
 						this.getTransferable() == null &&
 						message.getTransferable() == null &&
-						message.getEncryption() != Message.ENCRYPTION_PGP &&
-						message.getEncryption() != Message.ENCRYPTION_DECRYPTION_FAILED &&
 						this.getType() == message.getType() &&
 						//this.getStatus() == message.getStatus() &&
 						isStatusMergeable(this.getStatus(), message.getStatus()) &&
@@ -942,9 +936,6 @@ public class Message extends AbstractEntity implements AvatarService.Avatarable 
 	}
 
 	private static int getCleanedEncryption(int encryption) {
-		if (encryption == ENCRYPTION_DECRYPTED || encryption == ENCRYPTION_DECRYPTION_FAILED) {
-			return ENCRYPTION_PGP;
-		}
 		if (encryption == ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE || encryption == ENCRYPTION_AXOLOTL_FAILED) {
 			return ENCRYPTION_AXOLOTL;
 		}

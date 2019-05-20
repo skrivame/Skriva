@@ -733,7 +733,6 @@ public class NotificationService {
         return message.getType() != Message.TYPE_TEXT
                 && message.getTransferable() == null
                 && !message.isDeleted()
-                && message.getEncryption() != Message.ENCRYPTION_PGP
                 && message.getFileParams().height > 0;
     }
 

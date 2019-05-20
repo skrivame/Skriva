@@ -547,19 +547,12 @@ public class FileBackend {
     }
 
     public DownloadableFile getFile(Message message, boolean decrypted) {
-        final boolean encrypted = !decrypted
-                && (message.getEncryption() == Message.ENCRYPTION_PGP
-                || message.getEncryption() == Message.ENCRYPTION_DECRYPTED);
         String path = message.getRelativeFilePath();
         if (path == null) {
             path = message.getUuid();
         }
         final DownloadableFile file = getFileForPath(path, message.getMimeType());
-        if (encrypted) {
-            return new DownloadableFile(getConversationsDirectory("Files") + file.getName() + ".pgp");
-        } else {
-            return file;
-        }
+        return file;
     }
 
     public List<Attachment> convertToAttachments(List<DatabaseBackend.FilePath> relativeFilePaths) {

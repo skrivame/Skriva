@@ -828,7 +828,7 @@ public class DatabaseBackend extends SQLiteOpenHelper {
 
     public Cursor getMessageSearchCursor(List<String> term) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String SQL = "SELECT " + Message.TABLENAME + ".*," + Conversation.TABLENAME + '.' + Conversation.CONTACTJID + ',' + Conversation.TABLENAME + '.' + Conversation.ACCOUNT + ',' + Conversation.TABLENAME + '.' + Conversation.MODE + " FROM " + Message.TABLENAME + " join " + Conversation.TABLENAME + " on " + Message.TABLENAME + '.' + Message.CONVERSATION + '=' + Conversation.TABLENAME + '.' + Conversation.UUID + " join messages_index ON messages_index.uuid=messages.uuid where " + Message.ENCRYPTION + " NOT IN(" + Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE + ',' + Message.ENCRYPTION_DECRYPTION_FAILED + ',' + Message.ENCRYPTION_AXOLOTL_FAILED + ") AND " + Message.TYPE + " IN(" + Message.TYPE_TEXT + ',' + Message.TYPE_PRIVATE + ") AND messages_index.body MATCH ? ORDER BY " + Message.TIME_SENT + " DESC limit " + Config.MAX_SEARCH_RESULTS;
+        String SQL = "SELECT " + Message.TABLENAME + ".*," + Conversation.TABLENAME + '.' + Conversation.CONTACTJID + ',' + Conversation.TABLENAME + '.' + Conversation.ACCOUNT + ',' + Conversation.TABLENAME + '.' + Conversation.MODE + " FROM " + Message.TABLENAME + " join " + Conversation.TABLENAME + " on " + Message.TABLENAME + '.' + Message.CONVERSATION + '=' + Conversation.TABLENAME + '.' + Conversation.UUID + " join messages_index ON messages_index.uuid=messages.uuid where " + Message.ENCRYPTION + " NOT IN(" + Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE + ','  + Message.ENCRYPTION_AXOLOTL_FAILED + ") AND " + Message.TYPE + " IN(" + Message.TYPE_TEXT + ',' + Message.TYPE_PRIVATE + ") AND messages_index.body MATCH ? ORDER BY " + Message.TIME_SENT + " DESC limit " + Config.MAX_SEARCH_RESULTS;
         Log.d(Config.LOGTAG, "search term: " + FtsUtils.toMatchString(term));
         return db.rawQuery(SQL, new String[]{FtsUtils.toMatchString(term)});
     }
@@ -839,13 +839,8 @@ public class DatabaseBackend extends SQLiteOpenHelper {
         String[] selectionArgs;
         if (internal) {
             final String name = file.getName();
-            if (name.endsWith(".pgp")) {
-                selection = "(" + Message.RELATIVE_FILE_PATH + " IN(?,?) OR (" + Message.RELATIVE_FILE_PATH + "=? and encryption in(1,4))) and type in (1,2,5)";
-                selectionArgs = new String[]{file.getAbsolutePath(), name, name.substring(0, name.length() - 4)};
-            } else {
-                selection = Message.RELATIVE_FILE_PATH + " IN(?,?) and type in (1,2,5)";
-                selectionArgs = new String[]{file.getAbsolutePath(), name};
-            }
+            selection = Message.RELATIVE_FILE_PATH + " IN(?,?) and type in (1,2,5)";
+            selectionArgs = new String[]{file.getAbsolutePath(), name};
         } else {
             selection = Message.RELATIVE_FILE_PATH + "=? and type in (1,2,5)";
             selectionArgs = new String[]{file.getAbsolutePath()};

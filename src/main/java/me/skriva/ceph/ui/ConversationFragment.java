@@ -410,7 +410,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             updateSnackBar(conversation);
         }
     };
-    private final AtomicBoolean mSendingPgpMessage = new AtomicBoolean(false);
     private final OnEditorActionListener mEditorActionListener = (v, actionId, event) -> {
         if (actionId == EditorInfo.IME_ACTION_SEND) {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -1170,8 +1169,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             }
 
             final boolean deleted = m.isDeleted();
-            final boolean encrypted = m.getEncryption() == Message.ENCRYPTION_DECRYPTION_FAILED
-                    || m.getEncryption() == Message.ENCRYPTION_PGP;
             final boolean receiving = m.getStatus() == Message.STATUS_RECEIVED && (t instanceof JingleConnection || t instanceof HttpDownloadConnection);
             activity.getMenuInflater().inflate(R.menu.message_context, menu);
             menu.setHeaderTitle(R.string.message_options);
@@ -1189,10 +1186,10 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             MenuItem deleteFile = menu.findItem(R.id.delete_file);
             MenuItem showErrorMessage = menu.findItem(R.id.show_error_message);
             final boolean showError = m.getStatus() == Message.STATUS_SEND_FAILED && m.getErrorMessage() != null && !Message.ERROR_MESSAGE_CANCELLED.equals(m.getErrorMessage());
-            if (!encrypted && !m.wasMergedWithNext()) {
+            if (!m.wasMergedWithNext()) {
                 commentMessage.setVisible(MessageUtils.prepareQuote(m).length() > 0);
             }
-            if (!m.isFileOrImage() && !encrypted && !m.isGeoUri() && !m.treatAsDownloadable()) {
+            if (!m.isFileOrImage() && !m.isGeoUri() && !m.treatAsDownloadable()) {
                 copyMessage.setVisible(true);
                 commentMessage.setVisible(!showError && MessageUtils.prepareQuote(m).length() > 0);
                 String body = m.getMergedBody().toString();
@@ -1202,9 +1199,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                 } else if (Patterns.AUTOLINK_WEB_URL.matcher(body).find()) {
                     copyLink.setVisible(true);
                 }
-            }
-            if (m.getEncryption() == Message.ENCRYPTION_DECRYPTION_FAILED && !deleted) {
-                retryDecryption.setVisible(true);
             }
             if (!showError
                     && relevantForCorrection.getType() == Message.TYPE_TEXT
@@ -2268,7 +2262,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     }
 
     private void messageSent() {
-        mSendingPgpMessage.set(false);
         this.binding.textinput.setText("");
         if (conversation.setCorrectingMessage(null)) {
             this.binding.textinput.append(conversation.getDraftMessage());
@@ -2297,10 +2290,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             return true;
         }
         return false;
-    }
-
-    public void doneSendingPgpMessage() {
-        mSendingPgpMessage.set(false);
     }
 
     private long getMaxHttpUploadSize(Conversation conversation) {
@@ -2683,11 +2672,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     @Override
     public void onContactPictureLongClicked(View v, final Message message) {
         final String fingerprint;
-        if (message.getEncryption() == Message.ENCRYPTION_PGP || message.getEncryption() == Message.ENCRYPTION_DECRYPTED) {
-            fingerprint = "pgp";
-        } else {
-            fingerprint = message.getFingerprint();
-        }
+        fingerprint = message.getFingerprint();
         final PopupMenu popupMenu = new PopupMenu(getActivity(), v);
         final Contact contact = message.getContact();
         if (message.getStatus() <= Message.STATUS_RECEIVED && (contact == null  || !contact.isSelf())) {
@@ -2742,11 +2727,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
     @Override
     public void onContactPictureClicked(Message message) {
         String fingerprint;
-        if (message.getEncryption() == Message.ENCRYPTION_PGP || message.getEncryption() == Message.ENCRYPTION_DECRYPTED) {
-            fingerprint = "pgp";
-        } else {
-            fingerprint = message.getFingerprint();
-        }
+        fingerprint = message.getFingerprint();
         final boolean received = message.getStatus() <= Message.STATUS_RECEIVED;
         if (received) {
             if (message.getConversation() instanceof Conversation && message.getConversation().getMode() == Conversation.MODE_MULTI) {

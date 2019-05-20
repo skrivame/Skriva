@@ -292,12 +292,4 @@ public final class CryptoHelper {
             return url;
         }
     }
-
-    public static boolean isPgpEncryptedUrl(String url) {
-        if (url == null) {
-            return false;
-        }
-        final String u = url.toLowerCase();
-        return !u.contains(" ") && (u.startsWith("https://") || u.startsWith("http://") || u.startsWith("p1s3://")) && u.endsWith(".pgp");
-    }
 }

@@ -531,43 +531,6 @@ public class MucOptions {
         }
     }
 
-    public long[] getPgpKeyIds() {
-        List<Long> ids = new ArrayList<>();
-        for (User user : this.users) {
-            if (user.getPgpKeyId() != 0) {
-                ids.add(user.getPgpKeyId());
-            }
-        }
-        ids.add(account.getPgpId());
-        long[] primitiveLongArray = new long[ids.size()];
-        for (int i = 0; i < ids.size(); ++i) {
-            primitiveLongArray[i] = ids.get(i);
-        }
-        return primitiveLongArray;
-    }
-
-    public boolean pgpKeysInUse() {
-        synchronized (users) {
-            for (User user : users) {
-                if (user.getPgpKeyId() != 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public boolean everybodyHasKeys() {
-        synchronized (users) {
-            for (User user : users) {
-                if (user.getPgpKeyId() == 0) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public Jid createJoinJid(String nick) {
         try {
             return conversation.getJid().withResource(nick);
@@ -735,7 +698,6 @@ public class MucOptions {
         private Affiliation affiliation = Affiliation.NONE;
         private Jid realJid;
         private Jid fullJid;
-        private long pgpKeyId = 0;
         private Avatar avatar;
         private final MucOptions options;
         private ChatState chatState = Config.DEFAULT_CHATSTATE;
@@ -763,20 +725,6 @@ public class MucOptions {
 
         public void setAffiliation(String affiliation) {
             this.affiliation = Affiliation.of(affiliation);
-        }
-
-        long getPgpKeyId() {
-            if (this.pgpKeyId != 0) {
-                return this.pgpKeyId;
-            } else if (realJid != null) {
-                return getAccount().getRoster().getContact(realJid).getPgpKeyId();
-            } else {
-                return 0;
-            }
-        }
-
-        public void setPgpKeyId(long id) {
-            this.pgpKeyId = id;
         }
 
         public Contact getContact() {

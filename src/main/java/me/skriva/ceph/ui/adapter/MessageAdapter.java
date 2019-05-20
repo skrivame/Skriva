@@ -842,7 +842,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			}
 			// Display a referenced message and a comment for it if the referencing message has a message reference that matches a locally available message-
 			// Otherwise display the referencing message normally.
-		} else if (message.hasMessageReference() && message.getEncryption() != Message.ENCRYPTION_DECRYPTION_FAILED && message.getEncryption() != Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
+		} else if (message.hasMessageReference() && message.getEncryption() != Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
 			Message referencedMessage = ((Conversation) conversation).findMessageWithUuidOrRemoteMsgId(message.getMessageReference());
 
 			// Try to load the referenced message from the DB if it is null and could not be found in the currently loaded conversation.
@@ -854,7 +854,7 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			MessageReferenceUtils.deleteLegacyQuotation(activity, message, referencedMessage);
 
 			displayReferencingMessage(viewHolder, message, referencedMessage, darkBackground, type);
-		} else if (message.isFileOrImage() && message.getEncryption() != Message.ENCRYPTION_PGP && message.getEncryption() != Message.ENCRYPTION_DECRYPTION_FAILED) {
+		} else if (message.isFileOrImage()) {
 			if (message.isImageOrVideo()) {
 				displayImageMessage(viewHolder, message, darkBackground);
 			} else if (message.isAudio()) {
@@ -862,8 +862,6 @@ public class MessageAdapter extends ArrayAdapter<Message> implements CopyTextVie
 			} else {
 				displayOpenableMessage(viewHolder, message, darkBackground);
 			}
-		} else if (message.getEncryption() == Message.ENCRYPTION_DECRYPTION_FAILED) {
-			displayInfoMessage(viewHolder, activity.getString(R.string.decryption_failed), darkBackground);
 		} else if (message.getEncryption() == Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
 			displayInfoMessage(viewHolder, activity.getString(R.string.not_encrypted_for_this_device), darkBackground);
 		} else if (message.getEncryption() == Message.ENCRYPTION_AXOLOTL_FAILED) {

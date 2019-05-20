@@ -280,8 +280,6 @@ public class UIHelper {
 			}
 		} else if (message.isFileOrImage() && message.isDeleted()) {
 			return new Pair<>(context.getString(R.string.file_deleted), true);
-		} else if (message.getEncryption() == Message.ENCRYPTION_DECRYPTION_FAILED) {
-			return new Pair<>(context.getString(R.string.decryption_failed), true);
 		} else if (message.getEncryption() == Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
 			return new Pair<>(context.getString(R.string.not_encrypted_for_this_device), true);
 		} else if (message.getEncryption() == Message.ENCRYPTION_AXOLOTL_FAILED) {

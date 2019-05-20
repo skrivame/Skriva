@@ -247,7 +247,7 @@ public class MessageReferenceUtils {
      * Deletes legacy quotation added for backward compatibility if present but preserve independent quotations.
      */
     public static void deleteLegacyQuotation(final XmppActivity activity, final Message message, final Message referencedMessage) {
-        if (referencedMessage != null && referencedMessage.getEncryption() != Message.ENCRYPTION_DECRYPTION_FAILED && referencedMessage.getEncryption() != Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
+        if (referencedMessage != null && referencedMessage.getEncryption() != Message.ENCRYPTION_AXOLOTL_NOT_FOR_THIS_DEVICE) {
             String messageBody = message.getBody();
             String[] messageBodyLines = messageBody.split("\n");
             int numberOfMessageBodyLines = messageBodyLines.length;

@@ -59,8 +59,6 @@ public final class MimeUtils {
         add("application/oda", "oda");
         add("application/ogg", "ogg");
         add("application/pdf", "pdf");
-        add("application/pgp-keys", "key");
-        add("application/pgp-signature", "pgp");
         add("application/pics-rules", "prf");
         add("application/pkix-cert", "cer");
         add("application/rar", "rar");
@@ -559,11 +557,8 @@ public final class MimeUtils {
         if (dotPosition != -1) {
             String extension = filename.substring(dotPosition + 1);
             // we want the real file extension, not the crypto one
-            if (ignoreCryptoExtension && Transferable.VALID_CRYPTO_EXTENSIONS.contains(extension)) {
-                return extractRelevantExtension(filename.substring(0,dotPosition));
-            } else {
-                return extension;
-            }
+            return extension;
+
         }
         return null;
     }

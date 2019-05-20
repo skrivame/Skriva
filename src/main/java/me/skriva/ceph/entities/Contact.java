@@ -290,32 +290,6 @@ public class Contact implements ListItem, Blockable {
 		return groups;
 	}
 
-	public long getPgpKeyId() {
-		synchronized (this.keys) {
-			if (this.keys.has("pgp_keyid")) {
-				try {
-					return this.keys.getLong("pgp_keyid");
-				} catch (JSONException e) {
-					return 0;
-				}
-			} else {
-				return 0;
-			}
-		}
-	}
-
-	public boolean setPgpKeyId(long keyId) {
-		final long previousKeyId = getPgpKeyId();
-		synchronized (this.keys) {
-			try {
-				this.keys.put("pgp_keyid", keyId);
-				return previousKeyId != keyId;
-			} catch (final JSONException ignored) {
-			}
-		}
-		return false;
-	}
-
 	public void setOption(int option) {
 		this.subscription |= 1 << option;
 	}

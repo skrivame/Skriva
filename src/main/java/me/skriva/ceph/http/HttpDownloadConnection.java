@@ -78,18 +78,11 @@ public class HttpDownloadConnection implements Transferable {
 			String[] parts = mUrl.getPath().toLowerCase().split("\\.");
 			String lastPart = parts.length >= 1 ? parts[parts.length - 1] : null;
 			String secondToLast = parts.length >= 2 ? parts[parts.length - 2] : null;
-			if ("pgp".equals(lastPart) || "gpg".equals(lastPart)) {
-				this.message.setEncryption(Message.ENCRYPTION_PGP);
-			} else if (message.getEncryption() != Message.ENCRYPTION_OTR
-					&& message.getEncryption() != Message.ENCRYPTION_AXOLOTL) {
+			if (message.getEncryption() != Message.ENCRYPTION_AXOLOTL) {
 				this.message.setEncryption(Message.ENCRYPTION_NONE);
 			}
 			String extension;
-			if (VALID_CRYPTO_EXTENSIONS.contains(lastPart)) {
-				extension = secondToLast;
-			} else {
-				extension = lastPart;
-			}
+			extension = lastPart;
 			message.setRelativeFilePath(message.getUuid() + (extension != null ? ("." + extension) : ""));
 			this.file = mXmppConnectionService.getFileBackend().getFile(message, false);
 			final String reference = mUrl.getRef();

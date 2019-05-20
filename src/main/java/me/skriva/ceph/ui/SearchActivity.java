@@ -271,11 +271,7 @@ public class SearchActivity extends XmppActivity implements TextWatcher, OnSearc
 	@Override
 	public void onContactPictureClicked(Message message) {
 		String fingerprint;
-		if (message.getEncryption() == Message.ENCRYPTION_PGP || message.getEncryption() == Message.ENCRYPTION_DECRYPTED) {
-			fingerprint = "pgp";
-		} else {
-			fingerprint = message.getFingerprint();
-		}
+		fingerprint = message.getFingerprint();
 		if (message.getStatus() == Message.STATUS_RECEIVED) {
 			final Contact contact = message.getContact();
 			if (contact != null) {

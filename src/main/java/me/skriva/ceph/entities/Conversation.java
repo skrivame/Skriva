@@ -186,7 +186,6 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 		synchronized (this.messages) {
 			for (final Message message : this.messages) {
 				if (message.getUuid().equals(uuid)
-						&& message.getEncryption() != Message.ENCRYPTION_PGP
 						&& (message.isFileOrImage() || message.treatAsDownloadable())) {
 					return message;
 				}
@@ -658,11 +657,8 @@ public class Conversation extends AbstractEntity implements Blockable, Comparabl
 			defaultEncryption = Message.ENCRYPTION_NONE;
 		}
 		int encryption = this.getIntAttribute(defaultEncryption);
-		if (encryption == Message.ENCRYPTION_OTR || encryption < 0) {
-			return defaultEncryption;
-		} else {
-			return encryption;
-		}
+		return encryption;
+
 	}
 
 	private static boolean suitableForOmemoByDefault(final Conversation conversation) {

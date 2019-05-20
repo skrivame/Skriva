@@ -127,14 +127,8 @@ public class JingleConnection implements Transferable {
 				if (ftVersion == Content.Version.FT_5) { //older Conversations will break when receiving a session-info
 					sendHash();
 				}
-				if (message.getEncryption() == Message.ENCRYPTION_DECRYPTED) {
-					file.delete();
-				}
 			}
 			Log.d(Config.LOGTAG,"successfully transmitted file:" + file.getAbsolutePath()+" ("+ CryptoHelper.bytesToHex(file.getSha1Sum())+")");
-			if (message.getEncryption() != Message.ENCRYPTION_PGP) {
-				mXmppConnectionService.getFileBackend().updateMediaScanner(file);
-			}
 		}
 
 		@Override
@@ -379,18 +373,6 @@ public class JingleConnection implements Transferable {
 				if (VALID_IMAGE_EXTENSIONS.contains(extension)) {
 					message.setType(Message.TYPE_IMAGE);
 					message.setRelativeFilePath(message.getUuid()+"."+extension);
-				} else if (VALID_CRYPTO_EXTENSIONS.contains(
-						filename[filename.length - 1])) {
-					if (filename.length == 3) {
-						extension = filename[filename.length - 2];
-						if (VALID_IMAGE_EXTENSIONS.contains(extension)) {
-							message.setType(Message.TYPE_IMAGE);
-							message.setRelativeFilePath(message.getUuid()+"."+extension);
-						} else {
-							message.setType(Message.TYPE_FILE);
-						}
-						message.setEncryption(Message.ENCRYPTION_PGP);
-					}
 				} else {
 					message.setType(Message.TYPE_FILE);
 				}
@@ -399,9 +381,6 @@ public class JingleConnection implements Transferable {
 					if (!fileNameElement.getContent().isEmpty()) {
 						String parts[] = fileNameElement.getContent().split("/");
 						suffix = parts[parts.length - 1];
-						if (message.getEncryption() == Message.ENCRYPTION_PGP && (suffix.endsWith(".pgp") || suffix.endsWith(".gpg"))) {
-							suffix = suffix.substring(0,suffix.length() - 4);
-						}
 					}
 					message.setRelativeFilePath(message.getUuid()+"_"+suffix);
 				}

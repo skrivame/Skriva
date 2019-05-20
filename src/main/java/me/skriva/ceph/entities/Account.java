@@ -58,7 +58,6 @@ public class Account extends AbstractEntity implements AvatarService.Avatarable 
     public static final int OPTION_HTTP_UPLOAD_AVAILABLE = 7;
     public static final int OPTION_UNVERIFIED = 8;
     private static final String KEY_PGP_SIGNATURE = "pgp_signature";
-    private static final String KEY_PGP_ID = "pgp_id";
     public final HashSet<Pair<String, String>> inProgressDiscoFetches = new HashSet<>();
     private final JSONObject keys;
     private final Roster roster = new Roster(this);
@@ -416,35 +415,6 @@ public class Account extends AbstractEntity implements AvatarService.Avatarable 
     public void unsetPgpSignature() {
         synchronized (this.keys) {
             keys.remove(KEY_PGP_SIGNATURE);
-        }
-    }
-
-    public long getPgpId() {
-        synchronized (this.keys) {
-            if (keys.has(KEY_PGP_ID)) {
-                try {
-                    return keys.getLong(KEY_PGP_ID);
-                } catch (JSONException e) {
-                    return 0;
-                }
-            } else {
-                return 0;
-            }
-        }
-    }
-
-    public boolean setPgpSignId(long pgpID) {
-        synchronized (this.keys) {
-            try {
-                if (pgpID == 0) {
-                    keys.remove(KEY_PGP_ID);
-                } else {
-                    keys.put(KEY_PGP_ID, pgpID);
-                }
-            } catch (JSONException e) {
-                return false;
-            }
-            return true;
         }
     }
 
