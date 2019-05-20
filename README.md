@@ -25,3 +25,7 @@ For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/
 - [Homepage](https://skriva.me)
 - [Status](https://status.skriva.me)
 - [Blog](https://blog.skriva.me)
+
+### Credits
+- [iNPUTmice](https://github.com/siacs/Conversations) (Conversations)
+- [melvo](https://github.com/melvo) & [Olomono](https://github.com/olomono) (Media commenting & prevent notification spam)
