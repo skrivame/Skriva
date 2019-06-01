@@ -9,7 +9,12 @@
 
 ### About
 Skriva is a simple Conversations fork designed to be usable by people, who never used a XMPP client before.
-Therefore, its coming with a slightly reduced feature set compared to Conversations and is also locked to a non S2S XMPP server.
+Therefore, certain features like PGP encryption or channel discovery have been removed or not inherited.
+Additionally the default server (skriva.me) is not S2S compliant.
+
+OMEMO encryption is only available for the Skriva client as well!
+If you want to make this client able to communicate with other clients over OMEMO, check down below.
+
 For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/).
 
 ### Features
@@ -20,6 +25,33 @@ For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/
 - Beginner friendly
 - Inline GIFs
 - Internal image viewer
+- Free default server
+
+### Motivation
+As stated before the target of this fork is to have an easy to use client for absolute newbies.
+The idea to this project came to me, when I was listening to a lecture about data security and data privacy.
+We had a discussion about secure communication and of course also spoke about instant messengers.
+
+Our professor said that secure communication should be worth a few bucks to us, however, I thought about this differently.
+Secure and especially private communcation should be a basic right for everybody. It should not only be limited to those who are willing to spend or to those who have the knowledge.
+
+However, when confronted with Conversations many of my friends were simply too lazy or even confused on how to set it up.
+- Where do I find a server?
+- How can I do this and that?
+- The color is hurting my eyes.
+- *insert more cries here*
+
+While Conversations is a great client, it often challenges "normal" people.
+As the majority does not even know what XMPP is, how it works and what its capable of.
+
+Therefore, there are three simple goals of this project:
+1. Easy and free access to secure communication
+2. Raise awarness of XMPP
+3. Drive users to other clients and servers in a long run
+
+### OMEMO compatibility
+If you want to run OMEMO encrypted messaging with other clients, simply check out this PR:
+https://github.com/skrivame/Skriva/pull/3
 
 ### Useful links
 - [Homepage](https://skriva.me)
