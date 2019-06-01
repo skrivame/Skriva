@@ -2058,8 +2058,12 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
         final boolean doNotAppend = extras.getBoolean(ConversationsActivity.EXTRA_DO_NOT_APPEND, false);
         final List<Uri> uris = extractUris(extras);
         if (uris != null && uris.size() > 0) {
-            final List<Uri> cleanedUris = cleanUris(new ArrayList<>(uris));
-            mediaPreviewAdapter.addMediaPreviews(Attachment.of(getActivity(), cleanedUris));
+            if (uris.size() == 1 && "geo".equals(uris.get(0).getScheme())) {
+                mediaPreviewAdapter.addMediaPreviews(Attachment.of(getActivity(), uris.get(0), Attachment.Type.LOCATION));
+            } else {
+                final List<Uri> cleanedUris = cleanUris(new ArrayList<>(uris));
+                mediaPreviewAdapter.addMediaPreviews(Attachment.of(getActivity(), cleanedUris));
+            }
             toggleInputMethod();
             return;
         }
@@ -2079,7 +2083,11 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                 }
             }
         } else {
-            if (messageReference != null) {
+            if (text != null && GeoHelper.GEO_URI.matcher(text).matches()) {
+                mediaPreviewAdapter.addMediaPreviews(Attachment.of(getActivity(), Uri.parse(text), Attachment.Type.LOCATION));
+                toggleInputMethod();
+                return;
+            } else if (messageReference != null) {
                 commentMessage(messageReference, quoteMessage);
             } else {
                 appendText(text, doNotAppend);
