@@ -4,7 +4,7 @@ import me.skriva.ceph.entities.Account;
 
 public class PushManagementService {
 
-	private final XmppConnectionService mXmppConnectionService;
+	protected final XmppConnectionService mXmppConnectionService;
 
 	public PushManagementService(XmppConnectionService service) {
 		this.mXmppConnectionService = service;

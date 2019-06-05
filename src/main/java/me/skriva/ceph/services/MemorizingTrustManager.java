@@ -121,7 +121,7 @@ public class MemorizingTrustManager {
 
 	private Context master;
 	private AppCompatActivity foregroundAct;
-	private NotificationManager notificationManager;
+	protected NotificationManager notificationManager;
 	private static int decisionId = 0;
 	private static final SparseArray<MTMDecision> openDecisions = new SparseArray<>();
 
@@ -339,8 +339,8 @@ public class MemorizingTrustManager {
 		}
 		try {
 			ks.load(null, null);
-			ks.load(new java.io.FileInputStream(keyStoreFile), "MTM".toCharArray());
-		} catch (java.io.FileNotFoundException e) {
+			ks.load(new FileInputStream(keyStoreFile), "MTM".toCharArray());
+		} catch (FileNotFoundException e) {
 			LOGGER.log(Level.INFO, "getAppKeyStore(" + keyStoreFile + ") - file does not exist");
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "getAppKeyStore(" + keyStoreFile + ")", e);
@@ -367,9 +367,9 @@ public class MemorizingTrustManager {
 		appTrustManager = getTrustManager(appKeyStore);
 
 		// store KeyStore to file
-		java.io.FileOutputStream fos = null;
+		FileOutputStream fos = null;
 		try {
-			fos = new java.io.FileOutputStream(keyStoreFile);
+			fos = new FileOutputStream(keyStoreFile);
 			appKeyStore.store(fos, "MTM".toCharArray());
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, "storeCert(" + keyStoreFile + ")", e);
@@ -621,9 +621,9 @@ public class MemorizingTrustManager {
 			MessageDigest md = MessageDigest.getInstance(digest);
 			md.update(cert.getEncoded());
 			return hexString(md.digest());
-		} catch (java.security.cert.CertificateEncodingException e) {
+		} catch (CertificateEncodingException e) {
 			return e.getMessage();
-		} catch (java.security.NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e) {
 			return e.getMessage();
 		}
 	}

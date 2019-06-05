@@ -7,7 +7,7 @@ import me.skriva.ceph.xml.TagWriter;
 
 public abstract class SaslMechanism {
 
-	private final TagWriter tagWriter;
+	protected final TagWriter tagWriter;
 	final Account account;
 	final SecureRandom rng;
 

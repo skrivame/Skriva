@@ -478,7 +478,6 @@
   <string name="pref_theme_dark">Тамна тема</string>
   <string name="pref_use_green_background">Зелена позадина</string>
   <string name="pref_use_green_background_summary">Зелена позадина за примљене поруке</string>
-  <string name="unable_to_connect_to_keychain">Не могу да се повежем са Отвореним кључарником</string>
   <string name="this_device_is_no_longer_in_use">Овај уређај више није у употреби</string>
   <string name="type_pc">Рачунар</string>
   <string name="type_phone">Мобилни телефон</string>

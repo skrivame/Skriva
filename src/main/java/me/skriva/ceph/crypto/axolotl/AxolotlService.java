@@ -57,7 +57,7 @@ import rocks.xmpp.addr.Jid;
 
 public class AxolotlService implements OnAdvancedStreamFeaturesLoaded {
 
-	public static final String PEP_PREFIX = "me.skriva.ceph.axolotl";
+	public static final String PEP_PREFIX = "eu.siacs.conversations.axolotl";
 	public static final String PEP_DEVICE_LIST = PEP_PREFIX + ".devicelist";
 	public static final String PEP_DEVICE_LIST_NOTIFY = PEP_DEVICE_LIST + "+notify";
 	public static final String PEP_BUNDLES = PEP_PREFIX + ".bundles";

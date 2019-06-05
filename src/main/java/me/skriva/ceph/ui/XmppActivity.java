@@ -100,7 +100,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 	private boolean isCameraFeatureAvailable = false;
 
 	int mTheme;
-	private boolean mUsingEnterKey = false;
+	protected boolean mUsingEnterKey = false;
 	Toast mToast;
 	ConferenceInvite mPendingConferenceInvite = null;
 	private final ServiceConnection mConnection = new ServiceConnection() {

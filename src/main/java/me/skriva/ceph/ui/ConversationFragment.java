@@ -1176,7 +1176,6 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             MenuItem copyMessage = menu.findItem(R.id.copy_message);
             MenuItem copyLink = menu.findItem(R.id.copy_link);
             MenuItem commentMessage = menu.findItem(R.id.comment_message);
-            MenuItem retryDecryption = menu.findItem(R.id.retry_decryption);
             MenuItem correctMessage = menu.findItem(R.id.correct_message);
             MenuItem shareWith = menu.findItem(R.id.share_with);
             MenuItem sendAgain = menu.findItem(R.id.send_again);

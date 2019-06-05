@@ -9,7 +9,7 @@ public final class Config {
     private static final int UNENCRYPTED = 1;
     private static final int OMEMO = 2;
 
-    private static final int ENCRYPTION_MASK = UNENCRYPTED  | OMEMO;
+    public static final int ENCRYPTION_MASK = UNENCRYPTED  | OMEMO;
 
     public static boolean supportOmemo() {
         return true;
@@ -56,7 +56,7 @@ public final class Config {
 
     public static final int AVATAR_SIZE = 384;
     public static final Bitmap.CompressFormat AVATAR_FORMAT = Bitmap.CompressFormat.JPEG;
-    public static final int AVATAR_CHAR_LIMIT = 9400 * 2;
+    public static final int AVATAR_CHAR_LIMIT = 9400;
 
     public static final int IMAGE_SIZE = 1920;
     public static final Bitmap.CompressFormat IMAGE_FORMAT = Bitmap.CompressFormat.JPEG;
