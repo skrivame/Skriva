@@ -4,7 +4,7 @@ import me.skriva.ceph.BuildConfig;
 
 public abstract class AbstractQuickConversationsService {
 
-    private final XmppConnectionService service;
+    public final XmppConnectionService service;
 
     AbstractQuickConversationsService(XmppConnectionService service) {
         this.service = service;

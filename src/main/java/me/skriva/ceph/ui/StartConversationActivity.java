@@ -1038,8 +1038,7 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 		Log.d(Config.LOGTAG,"user requested to refresh");
 	}
 
-
-	private void setRefreshing(boolean refreshing) {
+	public void setRefreshing(boolean refreshing) {
 		MyListFragment fragment = (MyListFragment) mListPagerAdapter.getItem(0);
 		if (fragment != null) {
 			fragment.setRefreshing(refreshing);

@@ -260,7 +260,7 @@ public class ConferenceDetailsActivity extends XmppActivity implements OnConvers
         return true;
     }
 
-    private void onMucEditButtonClicked(View v) {
+    public void onMucEditButtonClicked(View v) {
         if (this.binding.mucEditor.getVisibility() == View.GONE) {
             final MucOptions mucOptions = mConversation.getMucOptions();
             this.binding.mucEditor.setVisibility(View.VISIBLE);

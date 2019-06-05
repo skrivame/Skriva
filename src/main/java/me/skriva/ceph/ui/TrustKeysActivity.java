@@ -254,7 +254,7 @@ public class TrustKeysActivity extends OmemoActivity implements OnKeyStatusUpdat
 		}
 	}
 
-	private void disableEncryptionDialog(View view) {
+	public void disableEncryptionDialog(View view) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(R.string.disable_encryption);
 		builder.setMessage(R.string.disable_encryption_message);

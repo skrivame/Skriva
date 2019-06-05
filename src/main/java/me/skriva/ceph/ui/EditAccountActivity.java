@@ -537,7 +537,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
         this.binding.actionEditYourName.setOnClickListener(this::onEditYourNameClicked);
     }
 
-    private void onEditYourNameClicked(View view) {
+    public void onEditYourNameClicked(View view) {
         quickEdit(mAccount.getDisplayName(), R.string.your_name, value -> {
             final String displayName = value.trim();
             updateDisplayName(displayName);

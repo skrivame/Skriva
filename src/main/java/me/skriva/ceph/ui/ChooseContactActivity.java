@@ -136,7 +136,7 @@ public class ChooseContactActivity extends AbstractSearchableListItemActivity im
 
     }
 
-    private void onFabClicked(View v) {
+    public void onFabClicked(View v) {
         if (selected.size() == 0) {
             showEnterJidDialog(null);
         } else {

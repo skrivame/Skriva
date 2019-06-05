@@ -105,7 +105,7 @@ public class PublishGroupChatProfilePictureActivity extends XmppActivity impleme
     }
 
 
-    private void publish(View view) {
+    public void publish(View view) {
         binding.publishButton.setText(R.string.publishing);
         binding.publishButton.setEnabled(false);
         xmppConnectionService.publishMucAvatar(conversation, uri, this);
