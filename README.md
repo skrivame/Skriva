@@ -12,9 +12,6 @@ Skriva is a simple Conversations fork designed to be usable by people, who never
 Therefore, certain features like PGP encryption or channel discovery have been removed or not inherited.
 Additionally the default server (skriva.me) is not S2S compliant.
 
-OMEMO encryption is only available for the Skriva client as well!
-If you want to make this client able to communicate with other clients over OMEMO, check down below.
-
 For more informations be sure to check our [F.A.Q](https://blog.skriva.me/f-a-q/).
 
 ### Features
@@ -48,10 +45,6 @@ Therefore, there are three simple goals of this project:
 1. Easy and free access to secure communication
 2. Raise awarness of XMPP
 3. Drive users to other clients and servers in a long run
-
-### OMEMO compatibility
-If you want to run OMEMO encrypted messaging with other clients, simply check out this PR:
-https://github.com/skrivame/Skriva/pull/3
 
 ### Useful links
 - [Homepage](https://skriva.me)
