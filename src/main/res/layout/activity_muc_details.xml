@@ -40,6 +40,7 @@
                             android:id="@+id/your_photo"
                             android:layout_width="@dimen/avatar_big"
                             android:layout_height="@dimen/avatar_big"
+                            android:layout_gravity="center_horizontal"
                             android:paddingBottom="8dp"/>
 
                         <RelativeLayout

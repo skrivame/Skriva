@@ -48,6 +48,7 @@
                                 android:layout_width="@dimen/avatar_big"
                                 android:layout_height="@dimen/avatar_big"
                                 android:paddingBottom="8dp"
+                                android:layout_gravity="center_horizontal"
                                 android:contentDescription="@string/account_image_description" />
 
                             <com.google.android.material.textfield.TextInputLayout

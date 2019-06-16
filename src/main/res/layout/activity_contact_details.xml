@@ -47,6 +47,7 @@
                                 android:id="@+id/details_contact_badge"
                                 android:layout_width="@dimen/avatar_big"
                                 android:layout_height="@dimen/avatar_big"
+                                android:layout_gravity="center_horizontal"
                                 android:paddingBottom="8dp"/>
 
                             <TextView
