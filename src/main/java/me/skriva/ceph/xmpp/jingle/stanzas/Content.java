@@ -2,6 +2,7 @@ package me.skriva.ceph.xmpp.jingle.stanzas;
 
 import me.skriva.ceph.entities.DownloadableFile;
 import me.skriva.ceph.xml.Element;
+import me.skriva.ceph.xml.Namespace;
 
 public class Content extends Element {
 
@@ -37,9 +38,9 @@ public class Content extends Element {
 	public Version getVersion() {
 		if (hasChild("description", Version.FT_3.namespace)) {
 			return Version.FT_3;
-		} else if (hasChild("description" , Version.FT_4.namespace)) {
+		} else if (hasChild("description", Version.FT_4.namespace)) {
 			return Version.FT_4;
-		} else if (hasChild("description" , Version.FT_5.namespace)) {
+		} else if (hasChild("description", Version.FT_5.namespace)) {
 			return Version.FT_5;
 		}
 		return null;
@@ -102,32 +103,28 @@ public class Content extends Element {
 	}
 
 	public Element socks5transport() {
-		Element transport = this.findChild("transport",
-				"urn:xmpp:jingle:transports:s5b:1");
+		Element transport = this.findChild("transport", Namespace.JINGLE_TRANSPORTS_S5B);
 		if (transport == null) {
-			transport = this.addChild("transport",
-					"urn:xmpp:jingle:transports:s5b:1");
+			transport = this.addChild("transport", Namespace.JINGLE_TRANSPORTS_S5B);
 			transport.setAttribute("sid", this.transportId);
 		}
 		return transport;
 	}
 
 	public Element ibbTransport() {
-		Element transport = this.findChild("transport",
-				"urn:xmpp:jingle:transports:ibb:1");
+		Element transport = this.findChild("transport", Namespace.JINGLE_TRANSPORTS_IBB);
 		if (transport == null) {
-			transport = this.addChild("transport",
-					"urn:xmpp:jingle:transports:ibb:1");
+			transport = this.addChild("transport", Namespace.JINGLE_TRANSPORTS_IBB);
 			transport.setAttribute("sid", this.transportId);
 		}
 		return transport;
 	}
 
 	public boolean hasSocks5Transport() {
-		return this.hasChild("transport", "urn:xmpp:jingle:transports:s5b:1");
+		return this.hasChild("transport", Namespace.JINGLE_TRANSPORTS_S5B);
 	}
 
 	public boolean hasIbbTransport() {
-		return this.hasChild("transport", "urn:xmpp:jingle:transports:ibb:1");
+		return this.hasChild("transport", Namespace.JINGLE_TRANSPORTS_IBB);
 	}
 }

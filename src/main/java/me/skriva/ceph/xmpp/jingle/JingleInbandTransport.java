@@ -15,6 +15,7 @@ import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.DownloadableFile;
 import me.skriva.ceph.persistance.FileBackend;
 import me.skriva.ceph.services.AbstractConnectionManager;
+import me.skriva.ceph.utils.CryptoHelper;
 import me.skriva.ceph.xml.Element;
 import me.skriva.ceph.xmpp.OnIqPacketReceived;
 import me.skriva.ceph.xmpp.stanzas.IqPacket;
@@ -22,18 +23,18 @@ import rocks.xmpp.addr.Jid;
 
 public class JingleInbandTransport extends JingleTransport {
 
-	private final Account account;
-	private final Jid counterpart;
-	private final int blockSize;
+	private Account account;
+	private Jid counterpart;
+	private int blockSize;
 	private int seq = 0;
-	private final String sessionId;
+	private String sessionId;
 
 	private boolean established = false;
 
 	private boolean connected = true;
 
 	private DownloadableFile file;
-	private final JingleConnection connection;
+	private JingleConnection connection;
 
 	private InputStream fileInputStream = null;
 	private InputStream innerInputStream = null;
@@ -44,10 +45,13 @@ public class JingleInbandTransport extends JingleTransport {
 
 	private OnFileTransmissionStatusChanged onFileTransmissionStatusChanged;
 
-	private final OnIqPacketReceived onAckReceived = (account, packet) -> {
-		if (connected && packet.getType() == IqPacket.TYPE.RESULT) {
-			if (remainingSize > 0) {
-				sendNextBlock();
+	private OnIqPacketReceived onAckReceived = new OnIqPacketReceived() {
+		@Override
+		public void onIqPacketReceived(Account account, IqPacket packet) {
+			if (connected && packet.getType() == IqPacket.TYPE.RESULT) {
+				if (remainingSize > 0) {
+					sendNextBlock();
+				}
 			}
 		}
 	};
@@ -77,11 +81,16 @@ public class JingleInbandTransport extends JingleTransport {
 		open.setAttribute("block-size", Integer.toString(this.blockSize));
 		this.connected = true;
 		this.account.getXmppConnection().sendIqPacket(iq,
-				(account, packet) -> {
-					if (packet.getType() != IqPacket.TYPE.RESULT) {
-						callback.failed();
-					} else {
-						callback.established();
+				new OnIqPacketReceived() {
+
+					@Override
+					public void onIqPacketReceived(Account account,
+												   IqPacket packet) {
+						if (packet.getType() != IqPacket.TYPE.RESULT) {
+							callback.failed();
+						} else {
+							callback.established();
+						}
 					}
 				});
 	}
@@ -104,7 +113,7 @@ public class JingleInbandTransport extends JingleTransport {
 			Log.d(Config.LOGTAG,account.getJid().asBareJid()+" "+e.getMessage());
 			callback.onFileTransferAborted();
 		}
-    }
+	}
 
 	@Override
 	public void send(DownloadableFile file, OnFileTransmissionStatusChanged callback) {
@@ -145,6 +154,7 @@ public class JingleInbandTransport extends JingleTransport {
 			if (count == -1) {
 				sendClose();
 				file.setSha1Sum(digest.digest());
+				Log.d(Config.LOGTAG,account.getJid().asBareJid()+": sendNextBlock() count was -1");
 				this.onFileTransmissionStatusChanged.onFileTransmitted(file);
 				fileInputStream.close();
 				return;
@@ -172,6 +182,7 @@ public class JingleInbandTransport extends JingleTransport {
 			} else {
 				sendClose();
 				file.setSha1Sum(digest.digest());
+				Log.d(Config.LOGTAG,account.getJid().asBareJid()+": sendNextBlock() remaining size");
 				this.onFileTransmissionStatusChanged.onFileTransmitted(file);
 				fileInputStream.close();
 			}
@@ -195,6 +206,7 @@ public class JingleInbandTransport extends JingleTransport {
 				file.setSha1Sum(digest.digest());
 				fileOutputStream.flush();
 				fileOutputStream.close();
+				Log.d(Config.LOGTAG,account.getJid().asBareJid()+": receive next block nothing remaining");
 				this.onFileTransmissionStatusChanged.onFileTransmitted(file);
 			} else {
 				connection.updateProgress((int) ((((double) (this.fileSize - this.remainingSize)) / this.fileSize) * 100));
