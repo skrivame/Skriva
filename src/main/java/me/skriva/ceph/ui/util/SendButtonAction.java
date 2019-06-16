@@ -38,7 +38,10 @@ import static me.skriva.ceph.ui.ConversationFragment.ATTACHMENT_CHOICE_TAKE_PHOT
 public enum SendButtonAction {
 	TEXT, TAKE_PHOTO, SEND_LOCATION, RECORD_VOICE, CANCEL, CHOOSE_PICTURE, RECORD_VIDEO;
 
-	public static SendButtonAction valueOfOrDefault(String setting, SendButtonAction text) {
+	public static SendButtonAction valueOfOrDefault(final String setting) {
+		if (setting == null) {
+			return TEXT;
+		}
 		try {
 			return valueOf(setting);
 		} catch (IllegalArgumentException e) {
