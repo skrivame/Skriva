@@ -22,6 +22,7 @@ import me.skriva.ceph.crypto.axolotl.XmppAxolotlMessage;
 import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.Contact;
 import me.skriva.ceph.entities.Conversation;
+import me.skriva.ceph.entities.Conversational;
 import me.skriva.ceph.entities.Message;
 import me.skriva.ceph.entities.MucOptions;
 import me.skriva.ceph.entities.ReadByMarker;
@@ -258,6 +259,17 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
                         packet.getId(),
                         Message.STATUS_SEND_FAILED,
                         extractErrorMessage(packet));
+                final Element error = packet.findChild("error");
+                final boolean notAcceptable = error != null && error.hasChild("not-acceptable");
+                if (notAcceptable) {
+                    Conversation conversation = mXmppConnectionService.find(account,from);
+                    if (conversation != null && conversation.getMode() == Conversational.MODE_MULTI) {
+                        if (conversation.getMucOptions().online()) {
+                            Log.d(Config.LOGTAG,account.getJid().asBareJid()+": received not-acceptable error for seemingly online muc at "+from);
+                            mXmppConnectionService.mucSelfPingAndRejoin(conversation);
+                        }
+                    }
+                }
             }
             return true;
         }
@@ -856,7 +868,10 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
         boolean execute(Account account) {
             if (jid != null) {
                 Conversation conversation = mXmppConnectionService.findOrCreateConversation(account, jid, true, false);
-                if (!conversation.getMucOptions().online()) {
+                if (conversation.getMucOptions().online()) {
+                    Log.d(Config.LOGTAG,account.getJid().asBareJid()+": received invite to "+jid+" but muc is considered to be online");
+                    mXmppConnectionService.mucSelfPingAndRejoin(conversation);
+                } else {
                     conversation.getMucOptions().setPassword(password);
                     mXmppConnectionService.databaseBackend.updateConversation(conversation);
                     mXmppConnectionService.joinMuc(conversation, inviter != null && inviter.mutualPresenceSubscription());

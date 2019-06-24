@@ -1825,7 +1825,7 @@ public class XmppConnectionService extends Service {
 	    archiveConversation(conversation, true);
     }
 
-	private void archiveConversation(Conversation conversation, final boolean maySyncronizeWithBookmarks) {
+	private void archiveConversation(Conversation conversation, final boolean maySynchronizeWithBookmarks) {
 		getNotificationService().clear(conversation);
 		conversation.setStatus(Conversation.STATUS_ARCHIVED);
 		conversation.setNextMessage(null);
@@ -1834,7 +1834,7 @@ public class XmppConnectionService extends Service {
 			if (conversation.getMode() == Conversation.MODE_MULTI) {
 				if (conversation.getAccount().getStatus() == Account.State.ONLINE) {
 					Bookmark bookmark = conversation.getBookmark();
-					if (maySyncronizeWithBookmarks && bookmark != null && synchronizeWithBookmarks()) {
+					if (maySynchronizeWithBookmarks && bookmark != null && synchronizeWithBookmarks()) {
 						if (conversation.getMucOptions().getError() == MucOptions.Error.DESTROYED) {
 							Account account = bookmark.getAccount();
 							bookmark.setConversation(null);
@@ -2233,7 +2233,6 @@ public class XmppConnectionService extends Service {
 		}
 		for (Account account : getAccounts()) {
 			if (account.getStatus() == Account.State.ONLINE) {
-				account.deactivateGracePeriod();
 				final XmppConnection connection = account.getXmppConnection();
 				if (connection != null) {
 					if (connection.getFeatures().csi()) {
@@ -2281,6 +2280,26 @@ public class XmppConnectionService extends Service {
 			}
 		}
 	}
+
+    public void mucSelfPingAndRejoin(final Conversation conversation) {
+        final Jid self = conversation.getMucOptions().getSelf().getFullJid();
+        final IqPacket ping = new IqPacket(IqPacket.TYPE.GET);
+        ping.setTo(self);
+        ping.addChild("ping", Namespace.PING);
+        sendIqPacket(conversation.getAccount(), ping, (account, response) -> {
+            if (response.getType() == IqPacket.TYPE.ERROR) {
+                Element error = response.findChild("error");
+                if (error == null || error.hasChild("service-unavailable") || error.hasChild("feature-not-implemented") || error.hasChild("item-not-found")) {
+                    Log.d(Config.LOGTAG,account.getJid().asBareJid()+": ping to "+self+" came back as ignorable error");
+                } else {
+                    Log.d(Config.LOGTAG,account.getJid().asBareJid()+": ping to "+self+" failed. attempting rejoin");
+                    joinMuc(conversation);
+                }
+            } else if (response.getType() == IqPacket.TYPE.RESULT) {
+                Log.d(Config.LOGTAG,account.getJid().asBareJid()+": ping to "+self+" came back fine");
+            }
+        });
+    }
 
 	public void joinMuc(Conversation conversation) {
 		joinMuc(conversation, null, false);
@@ -2354,7 +2373,10 @@ public class XmppConnectionService extends Service {
 							saveConversationAsBookmark(conversation, null);
 						}
 					}
-					sendUnsentMessages(conversation);
+                    if (mucOptions.push()) {
+                        enableMucPush(conversation);
+                    }
+                    sendUnsentMessages(conversation);
 				}
 
 				@Override
@@ -2380,6 +2402,8 @@ public class XmppConnectionService extends Service {
 						fetchConferenceConfiguration(conversation);
 					}
 				}
+
+
 			});
 			updateConversationUi();
 		} else {
@@ -2389,6 +2413,35 @@ public class XmppConnectionService extends Service {
 			updateConversationUi();
 		}
 	}
+
+    private void enableMucPush(final Conversation conversation) {
+        final Account account = conversation.getAccount();
+        final Jid room = conversation.getJid().asBareJid();
+        final IqPacket enable = mIqGenerator.enablePush(conversation.getAccount().getJid(), conversation.getUuid(), null);
+        enable.setTo(room);
+        sendIqPacket(account, enable, (a, response) -> {
+            if (response.getType() == IqPacket.TYPE.RESULT) {
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": enabled push for muc "+room);
+            } else if (response.getType() == IqPacket.TYPE.ERROR) {
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": unable to enable push for muc "+room+" "+response.getError());
+            }
+        });
+
+    }
+
+    private void disableMucPush(final Conversation conversation) {
+        final Account account = conversation.getAccount();
+        final Jid room = conversation.getJid().asBareJid();
+        final IqPacket disable = mIqGenerator.disablePush(conversation.getAccount().getJid(), conversation.getUuid());
+        disable.setTo(room);
+        sendIqPacket(account, disable, (a, response) -> {
+            if (response.getType() == IqPacket.TYPE.RESULT) {
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": disabled push for muc "+room);
+            } else if (response.getType() == IqPacket.TYPE.ERROR) {
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": unable to disable push for muc "+room+" "+response.getError());
+            }
+        });
+    }
 
 	private void fetchConferenceMembers(final Conversation conversation) {
 		final Account account = conversation.getAccount();
@@ -2569,6 +2622,9 @@ public class XmppConnectionService extends Service {
 		account.pendingConferenceJoins.remove(conversation);
 		account.pendingConferenceLeaves.remove(conversation);
 		if (account.getStatus() == Account.State.ONLINE || now) {
+            if (conversation.getMucOptions().push()) {
+                disableMucPush(conversation);
+            }
 			sendPresencePacket(conversation.getAccount(), mPresenceGenerator.leave(conversation.getMucOptions()));
 			conversation.getMucOptions().setOffline();
 			Bookmark bookmark = conversation.getBookmark();

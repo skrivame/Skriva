@@ -365,6 +365,7 @@ public class JingleConnection implements Transferable {
 		this.initialTransport = content.hasSocks5Transport() ? Transport.SOCKS : Transport.IBB;
 		this.contentName = content.getAttribute("name");
 		this.transportId = content.getTransportId();
+		mXmppConnectionService.sendIqPacket(account, packet.generateResponse(IqPacket.TYPE.RESULT), null);
 		if (this.initialTransport == Transport.SOCKS) {
 			this.mergeCandidates(JingleCandidate.parse(content.socks5transport().getChildren()));
 		} else if (this.initialTransport == Transport.IBB) {
@@ -379,7 +380,7 @@ public class JingleConnection implements Transferable {
 					return;
 				}
 			} else {
-				Log.d(Config.LOGTAG, "received block size =" + receivedBlockSize);
+				Log.d(Config.LOGTAG, "received block size was null");
 				this.sendCancel();
 				this.fail();
 				return;
@@ -392,8 +393,6 @@ public class JingleConnection implements Transferable {
 			return;
 		}
 		this.fileOffer = content.getFileOffer(this.ftVersion);
-
-		mXmppConnectionService.sendIqPacket(account, packet.generateResponse(IqPacket.TYPE.RESULT), null);
 
 		if (fileOffer != null) {
 			Element encrypted = fileOffer.findChild("encrypted", AxolotlService.PEP_PREFIX);
@@ -609,12 +608,18 @@ public class JingleConnection implements Transferable {
 	}
 
 	private boolean receiveAccept(JinglePacket packet) {
+		if (this.mJingleStatus != JINGLE_STATUS_INITIATED) {
+			Log.d(Config.LOGTAG,account.getJid().asBareJid()+": received out of order session-accept");
+			return false;
+		}
+
 		this.mJingleStatus = JINGLE_STATUS_ACCEPTED;
 		mXmppConnectionService.markMessage(message, Message.STATUS_UNSEND);
 		Content content = packet.getJingleContent();
 		if (content.hasSocks5Transport()) {
 			mergeCandidates(JingleCandidate.parse(content.socks5transport().getChildren()));
 			this.connectNextCandidate();
+			return true;
 		} else if (content.hasIbbTransport()) {
 			String receivedBlockSize = packet.getJingleContent().ibbTransport().getAttribute("block-size");
 			if (receivedBlockSize != null) {
@@ -622,11 +627,14 @@ public class JingleConnection implements Transferable {
 				if (bs > this.ibbBlockSize) {
 					this.ibbBlockSize = bs;
 				}
+
 			}
 			this.transport = new JingleInbandTransport(this, this.transportId, this.ibbBlockSize);
 			this.transport.connect(onIbbTransportConnected);
+			return true;
+		} else {
+			return false;
 		}
-		return true;
 	}
 
 	private boolean receiveTransportInfo(JinglePacket packet) {
@@ -1082,13 +1090,7 @@ public class JingleConnection implements Transferable {
 	public boolean start() {
 		if (account.getStatus() == Account.State.ONLINE) {
 			if (mJingleStatus == JINGLE_STATUS_INITIATED) {
-				new Thread(new Runnable() {
-
-					@Override
-					public void run() {
-						sendAccept();
-					}
-				}).start();
+				new Thread(this::sendAccept).start();
 			}
 			return true;
 		} else {

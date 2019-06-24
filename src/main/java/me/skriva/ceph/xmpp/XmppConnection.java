@@ -1413,7 +1413,7 @@ public class XmppConnection implements Runnable {
         if (!r()) {
             final IqPacket iq = new IqPacket(IqPacket.TYPE.GET);
             iq.setFrom(account.getJid());
-            iq.addChild("ping", "urn:xmpp:ping");
+            iq.addChild("ping", Namespace.PING);
             this.sendIqPacket(iq, null);
         }
         this.lastPingSent = SystemClock.elapsedRealtime();
@@ -1815,8 +1815,8 @@ public class XmppConnection implements Runnable {
         }
 
         public boolean push() {
-            return hasDiscoFeature(account.getJid().asBareJid(), "urn:xmpp:push:0")
-                    || hasDiscoFeature(Jid.of(account.getServer()), "urn:xmpp:push:0");
+            return hasDiscoFeature(account.getJid().asBareJid(), Namespace.PUSH)
+                    || hasDiscoFeature(Jid.of(account.getServer()), Namespace.PUSH);
         }
 
         public boolean rosterVersioning() {

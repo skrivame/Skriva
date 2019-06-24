@@ -19,6 +19,7 @@ import me.skriva.ceph.services.AvatarService;
 import me.skriva.ceph.services.MessageArchiveService;
 import me.skriva.ceph.utils.JidHelper;
 import me.skriva.ceph.utils.UIHelper;
+import me.skriva.ceph.xml.Namespace;
 import me.skriva.ceph.xmpp.chatstate.ChatState;
 import me.skriva.ceph.xmpp.forms.Data;
 import me.skriva.ceph.xmpp.forms.Field;
@@ -113,6 +114,10 @@ public class MucOptions {
 
     public boolean mamSupport() {
         return MessageArchiveService.Version.has(getFeatures());
+    }
+
+    public boolean push() {
+        return getFeatures().contains(Namespace.PUSH);
     }
 
     public boolean updateConfiguration(ServiceDiscoveryResult serviceDiscoveryResult) {
