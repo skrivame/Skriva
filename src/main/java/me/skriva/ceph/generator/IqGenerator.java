@@ -422,13 +422,34 @@ public class IqGenerator extends AbstractGenerator {
 	}
 
 	public IqPacket pushTokenToAppServer(Jid appServer, String token, String deviceId) {
-		IqPacket packet = new IqPacket(IqPacket.TYPE.SET);
+		return pushTokenToAppServer(appServer, token, deviceId, null);
+	}
+
+	public IqPacket pushTokenToAppServer(Jid appServer, String token, String deviceId, Jid muc) {
+		final IqPacket packet = new IqPacket(IqPacket.TYPE.SET);
 		packet.setTo(appServer);
-		Element command = packet.addChild("command", "http://jabber.org/protocol/commands");
+		final Element command = packet.addChild("command", Namespace.COMMANDS);
 		command.setAttribute("node", "register-push-fcm");
 		command.setAttribute("action", "execute");
-		Data data = new Data();
+		final Data data = new Data();
 		data.put("token", token);
+		data.put("android-id", deviceId);
+		if (muc != null) {
+			data.put("muc", muc.toEscapedString());
+		}
+		data.submit();
+		command.addChild(data);
+		return packet;
+	}
+
+	public IqPacket unregisterChannelOnAppServer(Jid appServer, String deviceId, String channel) {
+		final IqPacket packet = new IqPacket(IqPacket.TYPE.SET);
+		packet.setTo(appServer);
+		final Element command = packet.addChild("command", Namespace.COMMANDS);
+		command.setAttribute("node", "unregister-push-fcm");
+		command.setAttribute("action", "execute");
+		final Data data = new Data();
+		data.put("channel", channel);
 		data.put("android-id", deviceId);
 		data.submit();
 		command.addChild(data);
@@ -453,7 +474,7 @@ public class IqGenerator extends AbstractGenerator {
 	public IqPacket disablePush(final Jid jid, final String node) {
 		IqPacket packet = new IqPacket(IqPacket.TYPE.SET);
 		Element disable = packet.addChild("disable", Namespace.PUSH);
-		disable.setAttribute("jid", jid.toString());
+		disable.setAttribute("jid", jid.toEscapedString());
 		disable.setAttribute("node", node);
 		return packet;
 	}

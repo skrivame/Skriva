@@ -97,7 +97,7 @@ public class EditAccountActivity extends OmemoActivity implements OnAccountUpdat
     private final UiCallback<Avatar> mAvatarFetchCallback = new UiCallback<Avatar>() {
 
         @Override
-        public void userInputRequried(final PendingIntent pi, final Avatar avatar) {
+        public void userInputRequired(final PendingIntent pi, final Avatar avatar) {
             finishInitialSetup(avatar);
         }
 

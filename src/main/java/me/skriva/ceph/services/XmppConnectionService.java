@@ -516,6 +516,7 @@ public class XmppConnectionService extends Service {
             toggleForegroundService(true);
         }
         String pushedAccountHash = null;
+        String pushedChannelHash = null;
         boolean interactive = false;
         if (action != null) {
             final String uuid = intent.getStringExtra("uuid");
@@ -628,6 +629,7 @@ public class XmppConnectionService extends Service {
                     break;
                 case ACTION_FCM_MESSAGE_RECEIVED:
                     pushedAccountHash = intent.getStringExtra("account");
+                    pushedChannelHash = intent.getStringExtra("channel");
                     Log.d(Config.LOGTAG, "push message arrived in service. account=" + pushedAccountHash);
                     break;
                 case Intent.ACTION_SEND:
@@ -641,13 +643,18 @@ public class XmppConnectionService extends Service {
         synchronized (this) {
             WakeLockHelper.acquire(wakeLock);
             boolean pingNow = ConnectivityManager.CONNECTIVITY_ACTION.equals(action) || (Config.POST_CONNECTIVITY_CHANGE_PING_INTERVAL > 0 && ACTION_POST_CONNECTIVITY_CHANGE.equals(action));
-            HashSet<Account> pingCandidates = new HashSet<>();
+            final HashSet<Account> pingCandidates = new HashSet<>();
+            final String androidId = PhoneHelper.getAndroidId(this);
             for (Account account : accounts) {
+                final boolean pushWasMeantForThisAccount = CryptoHelper.getAccountFingerprint(account, androidId).equals(pushedAccountHash);
                 pingNow |= processAccountState(account,
                         interactive,
                         "ui".equals(action),
-                        CryptoHelper.getAccountFingerprint(account, PhoneHelper.getAndroidId(this)).equals(pushedAccountHash),
+                        pushWasMeantForThisAccount,
                         pingCandidates);
+                if (pushWasMeantForThisAccount && pushedChannelHash != null) {
+                    checkMucStillJoined(account, pushedAccountHash, androidId);
+                }
             }
             if (pingNow) {
                 for (Account account : pingCandidates) {
@@ -738,6 +745,20 @@ public class XmppConnectionService extends Service {
             }
         }
         return pingNow;
+    }
+
+    private void checkMucStillJoined(final Account account, final String hash, final String androidId) {
+        for(final Conversation conversation : this.conversations) {
+            if (conversation.getAccount() == account && conversation.getMode() == Conversational.MODE_MULTI) {
+                Jid jid = conversation.getJid().asBareJid();
+                final String currentHash = CryptoHelper.getFingerprint(jid, androidId);
+                if (currentHash.equals(hash)) {
+                    Log.d(Config.LOGTAG,account.getJid().asBareJid()+": received cloud push notification for MUC "+jid);
+                    return;
+                }
+            }
+        }
+        mPushManagementService.unregisterChannel(account, hash);
     }
 
     public boolean isDataSaverDisabled() {
@@ -2414,31 +2435,36 @@ public class XmppConnectionService extends Service {
 		}
 	}
 
-    private void enableMucPush(final Conversation conversation) {
+    private void enableDirectMucPush(final Conversation conversation) {
         final Account account = conversation.getAccount();
         final Jid room = conversation.getJid().asBareJid();
         final IqPacket enable = mIqGenerator.enablePush(conversation.getAccount().getJid(), conversation.getUuid(), null);
         enable.setTo(room);
         sendIqPacket(account, enable, (a, response) -> {
             if (response.getType() == IqPacket.TYPE.RESULT) {
-                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": enabled push for muc "+room);
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": enabled direct push for muc "+room);
             } else if (response.getType() == IqPacket.TYPE.ERROR) {
-                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": unable to enable push for muc "+room+" "+response.getError());
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": unable to enable direct push for muc "+room+" "+response.getError());
             }
         });
 
     }
 
-    private void disableMucPush(final Conversation conversation) {
+    private void enableMucPush(final Conversation conversation) {
+        enableDirectMucPush(conversation);
+        mPushManagementService.registerPushTokenOnServer(conversation);
+    }
+
+    private void disableDirectMucPush(final Conversation conversation) {
         final Account account = conversation.getAccount();
         final Jid room = conversation.getJid().asBareJid();
         final IqPacket disable = mIqGenerator.disablePush(conversation.getAccount().getJid(), conversation.getUuid());
         disable.setTo(room);
         sendIqPacket(account, disable, (a, response) -> {
             if (response.getType() == IqPacket.TYPE.RESULT) {
-                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": disabled push for muc "+room);
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": disabled direct push for muc "+room);
             } else if (response.getType() == IqPacket.TYPE.ERROR) {
-                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": unable to disable push for muc "+room+" "+response.getError());
+                Log.d(Config.LOGTAG,a.getJid().asBareJid()+": unable to disable direct push for muc "+room+" "+response.getError());
             }
         });
     }
@@ -2623,7 +2649,8 @@ public class XmppConnectionService extends Service {
 		account.pendingConferenceLeaves.remove(conversation);
 		if (account.getStatus() == Account.State.ONLINE || now) {
             if (conversation.getMucOptions().push()) {
-                disableMucPush(conversation);
+                disableDirectMucPush(conversation);
+                mPushManagementService.disablePushOnServer(conversation);
             }
 			sendPresencePacket(conversation.getAccount(), mPresenceGenerator.leave(conversation.getMucOptions()));
 			conversation.getMucOptions().setOffline();
@@ -3884,6 +3911,7 @@ updateRosterUi();
 		for (Account account : getAccounts()) {
 			if (account.isOnlineAndConnected() && mPushManagementService.available(account)) {
 				mPushManagementService.registerPushTokenOnServer(account);
+                //TODO renew mucs
 			}
 		}
 	}

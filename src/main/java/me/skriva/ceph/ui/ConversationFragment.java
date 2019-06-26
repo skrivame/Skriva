@@ -661,7 +661,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             }
 
             @Override
-            public void userInputRequried(PendingIntent pi, Message object) {
+            public void userInputRequired(PendingIntent pi, Message object) {
 
             }
         });
@@ -695,7 +695,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
             }
 
             @Override
-            public void userInputRequried(PendingIntent pi, Message message) {
+            public void userInputRequired(PendingIntent pi, Message message) {
                 hidePrepareFileToast(prepareFileToast);
             }
         });
@@ -717,7 +717,7 @@ public class ConversationFragment extends XmppFragment implements EditMessage.Ke
                 new UiCallback<Message>() {
 
                     @Override
-                    public void userInputRequried(PendingIntent pi, Message object) {
+                    public void userInputRequired(PendingIntent pi, Message object) {
                         hidePrepareFileToast(prepareFileToast);
                     }
 

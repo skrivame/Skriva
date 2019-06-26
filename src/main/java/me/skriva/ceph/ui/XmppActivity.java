@@ -141,7 +141,7 @@ public abstract class XmppActivity extends ActionBarActivity {
 		}
 
 		@Override
-		public void userInputRequried(PendingIntent pi, Conversation object) {
+		public void userInputRequired(PendingIntent pi, Conversation object) {
 
 		}
 	};
