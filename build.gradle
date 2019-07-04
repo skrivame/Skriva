@@ -59,9 +59,9 @@ dependencies {
     implementation 'me.drakeet.support:toastcompat:1.1.0'
     implementation 'com.leinardi.android:speed-dial:2.0.1'
     implementation 'com.vanniktech:emoji-google:0.6.0'
-    implementation 'com.google.guava:guava:27.1-android'
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
-    implementation 'com.facebook.fresco:fresco:1.13.0'
+    implementation 'com.google.guava:guava:28.0-android'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
+    implementation 'com.facebook.fresco:fresco:2.0.0'
     implementation 'com.github.piasy:BigImageViewer:1.5.7'
 }
 
@@ -76,7 +76,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 117
+        versionCode 120
         versionName "1.0.5.1"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
