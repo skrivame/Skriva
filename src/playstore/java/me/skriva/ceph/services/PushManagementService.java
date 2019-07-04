@@ -5,13 +5,16 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
 import me.skriva.ceph.entities.Account;
+import me.skriva.ceph.entities.Conversation;
 import me.skriva.ceph.utils.PhoneHelper;
 import me.skriva.ceph.xml.Element;
 import me.skriva.ceph.xml.Namespace;
+import me.skriva.ceph.xmpp.OnIqPacketReceived;
 import me.skriva.ceph.xmpp.XmppConnection;
 import me.skriva.ceph.xmpp.forms.Data;
 import me.skriva.ceph.xmpp.stanzas.IqPacket;
@@ -25,28 +28,33 @@ public class PushManagementService {
 		this.mXmppConnectionService = service;
 	}
 
+	private static Data findResponseData(IqPacket response) {
+		final Element command = response.findChild("command", Namespace.COMMANDS);
+		final Element x = command == null ? null : command.findChild("x", Namespace.DATA);
+		return x == null ? null : Data.parse(x);
+	}
+
+	private Jid getAppServer() {
+		return Jid.of(mXmppConnectionService.getString(R.string.app_server));
+	}
+
 	void registerPushTokenOnServer(final Account account) {
 		Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": has push support");
 		retrieveFcmInstanceToken(token -> {
 			final String androidId = PhoneHelper.getAndroidId(mXmppConnectionService);
-			final Jid appServer = Jid.of(mXmppConnectionService.getString(R.string.app_server));
-			IqPacket packet = mXmppConnectionService.getIqGenerator().pushTokenToAppServer(appServer, token, androidId);
-			mXmppConnectionService.sendIqPacket(account, packet, (a, p) -> {
-				Element command = p.findChild("command", "http://jabber.org/protocol/commands");
-				if (p.getType() == IqPacket.TYPE.RESULT && command != null) {
-					Element x = command.findChild("x", Namespace.DATA);
-					if (x != null) {
-						Data data = Data.parse(x);
-						try {
-							String node = data.getValue("node");
-							String secret = data.getValue("secret");
-							Jid jid = Jid.of(data.getValue("jid"));
-							if (node != null && secret != null) {
-								enablePushOnServer(a, jid, node, secret);
-							}
-						} catch (IllegalArgumentException e) {
-							e.printStackTrace();
+			final IqPacket packet = mXmppConnectionService.getIqGenerator().pushTokenToAppServer(getAppServer(), token, androidId);
+			mXmppConnectionService.sendIqPacket(account, packet, (a, response) -> {
+				final Data data = findResponseData(response);
+				if (response.getType() == IqPacket.TYPE.RESULT && data != null) {
+					try {
+						String node = data.getValue("node");
+						String secret = data.getValue("secret");
+						Jid jid = Jid.of(data.getValue("jid"));
+						if (node != null && secret != null) {
+							enablePushOnServer(a, jid, node, secret);
 						}
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
 					}
 				} else {
 					Log.d(Config.LOGTAG, a.getJid().asBareJid() + ": invalid response from app server");
@@ -55,8 +63,48 @@ public class PushManagementService {
 		});
 	}
 
-	private void enablePushOnServer(final Account account, final Jid jid, final String node, final String secret) {
-		IqPacket enable = mXmppConnectionService.getIqGenerator().enablePush(jid, node, secret);
+	public void unregisterChannel(final Account account, final String channel) {
+		final String androidId = PhoneHelper.getAndroidId(mXmppConnectionService);
+		final Jid appServer = getAppServer();
+		final IqPacket packet = mXmppConnectionService.getIqGenerator().unregisterChannelOnAppServer(appServer, androidId, channel);
+		mXmppConnectionService.sendIqPacket(account, packet, (a, response) -> {
+			if (response.getType() == IqPacket.TYPE.RESULT) {
+				Log.d(Config.LOGTAG,a.getJid().asBareJid()+": successfully unregistered channel");
+			} else if (response.getType() == IqPacket.TYPE.ERROR) {
+				Log.d(Config.LOGTAG, a.getJid().asBareJid()+": unable to unregister channel with hash "+channel);
+			}
+		});
+	}
+
+	void registerPushTokenOnServer(final Conversation conversation) {
+		Log.d(Config.LOGTAG, conversation.getAccount().getJid().asBareJid() + ": room "+conversation.getJid().asBareJid()+" has push support");
+		retrieveFcmInstanceToken(token -> {
+			final Jid muc = conversation.getJid().asBareJid();
+			final String androidId = PhoneHelper.getAndroidId(mXmppConnectionService);
+			final IqPacket packet = mXmppConnectionService.getIqGenerator().pushTokenToAppServer(getAppServer(), token, androidId, muc);
+			packet.setTo(muc);
+			mXmppConnectionService.sendIqPacket(conversation.getAccount(), packet, (a, response) -> {
+				final Data data = findResponseData(response);
+				if (response.getType() == IqPacket.TYPE.RESULT && data != null) {
+					try {
+						final String node = data.getValue("node");
+						final String secret = data.getValue("secret");
+						final Jid jid = Jid.of(data.getValue("jid"));
+						if (node != null && secret != null) {
+							enablePushOnServer(conversation, jid, node, secret);
+						}
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					}
+				} else {
+					Log.d(Config.LOGTAG, a.getJid().asBareJid() + ": invalid response from app server");
+				}
+			});
+		});
+	}
+
+	private void enablePushOnServer(final Account account, final Jid appServer, final String node, final String secret) {
+		final IqPacket enable = mXmppConnectionService.getIqGenerator().enablePush(appServer, node, secret);
 		mXmppConnectionService.sendIqPacket(account, enable, (a, p) -> {
 			if (p.getType() == IqPacket.TYPE.RESULT) {
 				Log.d(Config.LOGTAG, a.getJid().asBareJid() + ": successfully enabled push on server");
@@ -66,14 +114,48 @@ public class PushManagementService {
 		});
 	}
 
-	private void retrieveFcmInstanceToken(final OnGcmInstanceTokenRetrieved instanceTokenRetrieved) {
-		new Thread(() -> {
-			try {
-				instanceTokenRetrieved.onGcmInstanceTokenRetrieved(FirebaseInstanceId.getInstance().getToken());
-			} catch (Exception e) {
-				Log.d(Config.LOGTAG, "unable to get push token",e);
+	private void enablePushOnServer(final Conversation conversation, final Jid appServer, final String node, final String secret) {
+		final Jid muc = conversation.getJid().asBareJid();
+		final IqPacket enable = mXmppConnectionService.getIqGenerator().enablePush(appServer, node, secret);
+		enable.setTo(muc);
+		mXmppConnectionService.sendIqPacket(conversation.getAccount(), enable, (a, p) -> {
+			if (p.getType() == IqPacket.TYPE.RESULT) {
+				Log.d(Config.LOGTAG, a.getJid().asBareJid() + ": successfully enabled push on " + muc);
+				if (conversation.setAttribute(Conversation.ATTRIBUTE_ALWAYS_NOTIFY, node)) {
+					mXmppConnectionService.updateConversation(conversation);
+				}
+			} else if (p.getType() == IqPacket.TYPE.ERROR) {
+				Log.d(Config.LOGTAG, a.getJid().asBareJid() + ": enabling push on " + muc + " failed");
 			}
-		}).start();
+		});
+	}
+
+	public void disablePushOnServer(final Conversation conversation) {
+		final Jid muc = conversation.getJid().asBareJid();
+		final String node = conversation.getAttribute(Conversation.ATTRIBUTE_PUSH_NODE);
+		if (node != null) {
+			final IqPacket disable = mXmppConnectionService.getIqGenerator().disablePush(getAppServer(), node);
+			disable.setTo(muc);
+			mXmppConnectionService.sendIqPacket(conversation.getAccount(), disable, (account, response) -> {
+				if (response.getType() == IqPacket.TYPE.ERROR) {
+					Log.d(Config.LOGTAG,account.getJid().asBareJid()+": unable to disable push for room "+muc);
+				}
+			});
+		} else {
+			Log.d(Config.LOGTAG,conversation.getAccount().getJid().asBareJid()+": room "+muc+" has no stored node. unable to disable push");
+		}
+	}
+
+	private void retrieveFcmInstanceToken(final OnGcmInstanceTokenRetrieved instanceTokenRetrieved) {
+		FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
+			if (!task.isSuccessful()) {
+				Log.d(Config.LOGTAG, "unable to get Firebase instance token", task.getException());
+			}
+			final InstanceIdResult result = task.getResult();
+			if (result != null) {
+				instanceTokenRetrieved.onGcmInstanceTokenRetrieved(result.getToken());
+			}
+		});
 
 	}
 

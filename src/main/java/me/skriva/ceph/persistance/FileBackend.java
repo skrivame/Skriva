@@ -381,7 +381,7 @@ public class FileBackend {
         }
     }
 
-    public static void close(Closeable stream) {
+    public static void close(final Closeable stream) {
         if (stream != null) {
             try {
                 stream.close();
@@ -390,7 +390,7 @@ public class FileBackend {
         }
     }
 
-    public static void close(Socket socket) {
+    public static void close(final Socket socket) {
         if (socket != null) {
             try {
                 socket.close();

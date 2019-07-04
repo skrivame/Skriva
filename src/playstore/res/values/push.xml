@@ -1,7 +1,6 @@
-### THIS IS A SAMPLE CONFIG AND NO LONGER ACTIVE (SINCE 1.0.1)
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_server">p2.skriva.me</string>
-    <string name="gcm_defaultSenderId" translatable="false">1069548954416</string>
-    <string name="google_app_id">1:1069548954416:android:cbc69b63b67bd2c9</string>
+    <string name="gcm_defaultSenderId" translatable="false">197714597125</string>
+    <string name="google_app_id">1:197714597125:android:cbc69b63b67bd2c9</string>
 </resources>
