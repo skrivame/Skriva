@@ -39,13 +39,13 @@ import rocks.xmpp.addr.Jid;
 
 public class JidHelper {
 
-	private static final List<String> LOCALPART_BLACKLIST = Arrays.asList("xmpp","jabber","me");
+	private static List<String> LOCAL_PART_BLACKLIST = Arrays.asList("xmpp", "jabber", "me");
 
 	public static String localPartOrFallback(Jid jid) {
-		if (LOCALPART_BLACKLIST.contains(jid.getLocal().toLowerCase(Locale.ENGLISH))) {
+		if (LOCAL_PART_BLACKLIST.contains(jid.getLocal().toLowerCase(Locale.ENGLISH))) {
 			final String domain = jid.getDomain();
-			final int index = domain.lastIndexOf('.');
-			return index > 1 ? domain.substring(0,index) : domain;
+			final int index = domain.indexOf('.');
+			return index > 1 ? domain.substring(0, index) : domain;
 		} else {
 			return jid.getLocal();
 		}

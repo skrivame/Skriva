@@ -25,7 +25,7 @@
   <string name="just_now">هم اکنون</string>
   <string name="minute_ago">1 دقیقه قبل</string>
   <string name="minutes_ago">%d  دقیقه قبل</string>
-  <string name="unread_conversations">گفتگو های خوانده نشده</string>
+  <string name="x_unread_conversations">%dگفتگو های خوانده نشده</string>
   <string name="sending">در حال ارسال...</string>
   <string name="message_decrypting">در حال رمزگشایی پیام. لطفا صبور باشید...</string>
     <string name="nick_in_use">نام مستعار قبلا استفاده شده</string>

@@ -6,7 +6,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
 }
 
@@ -63,6 +63,8 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
     implementation 'com.facebook.fresco:fresco:2.0.0'
     implementation 'com.github.piasy:BigImageViewer:1.5.7'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
 }
 
 ext {
@@ -76,8 +78,8 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 120
-        versionName "1.0.5.1"
+        versionCode 121
+        versionName "1.0.6"
         archivesBaseName += "-$versionName"
         applicationId "me.skriva.ceph"
         resValue "string", "applicationId", applicationId

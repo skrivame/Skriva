@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import me.skriva.ceph.Config;
+import me.skriva.ceph.services.ExportBackupService;
 
 /**
  * Utilities for dealing with MIME types.
@@ -70,6 +71,7 @@ public final class MimeUtils {
         add("application/vnd.amazon.mobi8-ebook","kfx");
         add("application/vnd.android.package-archive", "apk");
         add("application/vnd.cinderella", "cdy");
+        add(ExportBackupService.MIME_TYPE, "ceb");
         add("application/vnd.ms-pki.stl", "stl");
         add("application/vnd.oasis.opendocument.database", "odb");
         add("application/vnd.oasis.opendocument.formula", "odf");

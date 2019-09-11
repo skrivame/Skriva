@@ -6,7 +6,7 @@ public abstract class AbstractEntity {
 
 	public static final String UUID = "uuid";
 
-	String uuid;
+	protected String uuid;
 
 	public String getUuid() {
 		return this.uuid;

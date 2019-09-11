@@ -28,7 +28,7 @@
   <string name="just_now">À l\'instant</string>
   <string name="minute_ago">Il y a 1 minute</string>
   <string name="minutes_ago">Il y a %d minutes</string>
-  <string name="unread_conversations">Skriva non lues</string>
+  <string name="x_unread_conversations">%dSkriva non lues</string>
   <string name="sending">Envoi…</string>
   <string name="message_decrypting">Déchiffrement du message. Veuillez patienter...</string>
     <string name="nick_in_use">Cet identifiant est déjà utilisé</string>

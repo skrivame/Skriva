@@ -62,6 +62,7 @@ import me.skriva.ceph.entities.Bookmark;
 import me.skriva.ceph.entities.Contact;
 import me.skriva.ceph.entities.Conversation;
 import me.skriva.ceph.entities.ListItem;
+import me.skriva.ceph.entities.MucOptions;
 import me.skriva.ceph.entities.Presence;
 import me.skriva.ceph.services.QuickConversationsService;
 import me.skriva.ceph.services.XmppConnectionService;
@@ -315,6 +316,9 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 				prefilled = null;
 			}
 			switch (actionItem.getId()) {
+				case R.id.discover_public_channels:
+					startActivity(new Intent(this, ChannelDiscoveryActivity.class));
+					break;
 				case R.id.join_public_channel:
 					showJoinConferenceDialog(prefilled);
 					break;
@@ -773,15 +777,7 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 			this.mPostponedActivityResult = null;
 		}
 		this.mActivatedAccounts.clear();
-		for (Account account : xmppConnectionService.getAccounts()) {
-			if (account.getStatus() != Account.State.DISABLED) {
-				if (Config.DOMAIN_LOCK != null) {
-					this.mActivatedAccounts.add(account.getJid().getLocal());
-				} else {
-					this.mActivatedAccounts.add(account.getJid().asBareJid().toString());
-				}
-			}
-		}
+		this.mActivatedAccounts.addAll(AccountUtils.getEnabledAccounts(xmppConnectionService));
 		configureHomeButton();
 		Intent intent = pendingViewIntent.pop();
 		if (intent != null && processViewIntent(intent)) {
@@ -1008,8 +1004,8 @@ public class StartConversationActivity extends XmppActivity implements XmppConne
 			} else {
 				final Bookmark bookmark = new Bookmark(account, conferenceJid.asBareJid());
 				bookmark.setAutojoin(getBooleanPreference("autojoin", R.bool.autojoin));
-				String nick = conferenceJid.getResource();
-				if (nick != null && !nick.isEmpty()) {
+				final String nick = conferenceJid.getResource();
+				if (nick != null && !nick.isEmpty() && !nick.equals(MucOptions.defaultNick(account))) {
 					bookmark.setNick(nick);
 				}
 				account.getBookmarks().add(bookmark);

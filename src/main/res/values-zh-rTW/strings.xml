@@ -21,7 +21,7 @@
   <string name="just_now">剛剛</string>
   <string name="minute_ago">1 分鐘前</string>
   <string name="minutes_ago">%d分鐘前</string>
-  <string name="unread_conversations">未讀會話</string>
+  <string name="x_unread_conversations">%d未讀會話</string>
   <string name="sending">正在發送…</string>
   <string name="message_decrypting">訊息解密中，請稍候…</string>
   <string name="nick_in_use">該名稱已存在</string>

@@ -10,7 +10,7 @@ import rocks.xmpp.addr.Jid;
 public class JingleCandidate {
 
 	private static int TYPE_UNKNOWN;
-	private static final int TYPE_DIRECT = 0;
+	public static final int TYPE_DIRECT = 0;
 	public static final int TYPE_PROXY = 1;
 
 	private final boolean ours;
@@ -110,15 +110,12 @@ public class JingleCandidate {
 	}
 
 	private static JingleCandidate parse(Element candidate) {
-		JingleCandidate parsedCandidate = new JingleCandidate(
-				candidate.getAttribute("cid"), false);
+		JingleCandidate parsedCandidate = new JingleCandidate(candidate.getAttribute("cid"), false);
 		parsedCandidate.setHost(candidate.getAttribute("host"));
 		parsedCandidate.setJid(InvalidJid.getNullForInvalid(candidate.getAttributeAsJid("jid")));
 		parsedCandidate.setType(candidate.getAttribute("type"));
-		parsedCandidate.setPriority(Integer.parseInt(candidate
-				.getAttribute("priority")));
-		parsedCandidate
-				.setPort(Integer.parseInt(candidate.getAttribute("port")));
+		parsedCandidate.setPriority(Integer.parseInt(candidate.getAttribute("priority")));
+		parsedCandidate.setPort(Integer.parseInt(candidate.getAttribute("port")));
 		return parsedCandidate;
 	}
 
@@ -127,7 +124,9 @@ public class JingleCandidate {
 		element.setAttribute("cid", this.getCid());
 		element.setAttribute("host", this.getHost());
 		element.setAttribute("port", Integer.toString(this.getPort()));
-		element.setAttribute("jid", this.getJid().toString());
+		if (jid != null) {
+			element.setAttribute("jid", jid.toEscapedString());
+		}
 		element.setAttribute("priority", Integer.toString(this.getPriority()));
 		if (this.getType() == TYPE_DIRECT) {
 			element.setAttribute("type", "direct");

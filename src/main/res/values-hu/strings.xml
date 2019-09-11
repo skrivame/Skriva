@@ -28,7 +28,7 @@
   <string name="just_now">Éppen most</string>
   <string name="minute_ago">1 perce</string>
   <string name="minutes_ago">%d perce</string>
-  <string name="unread_conversations">olvasatlan beszélgetés</string>
+  <string name="x_unread_conversations">%dolvasatlan beszélgetés</string>
   <string name="sending">küldés...</string>
   <string name="message_decrypting">Üzenet dekódolása. Kérem várjon...</string>
     <string name="nick_in_use">A becenév már foglalt</string>

@@ -28,7 +28,7 @@
   <string name="just_now">orain</string>
   <string name="minute_ago">min 1 lehenago</string>
   <string name="minutes_ago">%d min lehenago</string>
-  <string name="unread_conversations">irakurri gabeko elkarrizketak</string>
+  <string name="x_unread_conversations">%dirakurri gabeko elkarrizketak</string>
   <string name="sending">bidaltzen…</string>
   <string name="message_decrypting">Mezua desenkriptatzen. Mesedez itxaron…</string>
     <string name="nick_in_use">Ezizena erabilita dagoeneko</string>

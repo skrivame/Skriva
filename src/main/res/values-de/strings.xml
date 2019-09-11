@@ -816,7 +816,7 @@
   <string name="search_participants">Teilnehmer suchen</string>
   <string name="file_too_large">Datei ist zu groß</string>
   <string name="corresponding_conversations_closed">Entsprechende Unterhaltung geschlossen.</string>
-  <string name="unread_conversations">ungelesene Unterhaltungen</string>
+  <string name="x_unread_conversations">%d ungelesene Unterhaltungen</string>
   <string name="attach">Anfügen</string>
     <string name="clean_cache_complete">Cache komplett leeren</string>
     <string name="clean_private_storage_complete">Private Cache komplett leeren</string>
@@ -827,4 +827,17 @@
   <string name="add_existing_account">Bestehendes Konto hinzufügen</string>
   <string name="register_new_account">Neues Konto erstellen</string>
   <string name="create_new_account">Neues Konto erstellen</string>
+  <string name="action_block_participant">Teilnehmer blockieren</string>
+  <string name="action_unblock_participant">Teilnehmer entblocken</string>
+  <string name="open_backup">Backup öffnen</string>
+  <string name="not_a_backup_file">Die ausgewählte Datei ist kein Backup.</string>
+  <string name="account_already_setup">Dieser Account ist bereits eingerichtet.</string>
+  <string name="share_backup_files">Backup teilen</string>
+  <string name="conversations_backup">Skriva Backup</string>
+  <string name="event">Ereignis</string>
+  <string name="please_enter_password">Bitte das Passwort für diesen Account eingeben.</string>
+  <string name="discover_channels">Kanäle entdecken</string>
+  <string name="search_channels">Kanäle suchen</string>
+  <string name="channel_discovery_opt_in_title">Mögliche Datenschutzverletzung!</string>
+  <string name="unable_to_perform_this_action">Aktion kann nicht ausgeführt werden</string>
 </resources>

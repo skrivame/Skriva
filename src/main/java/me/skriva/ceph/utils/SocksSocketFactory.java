@@ -20,6 +20,9 @@ public class SocksSocketFactory {
 		proxyOs.write(new byte[]{0x05, 0x01, 0x00});
 		byte[] response = new byte[2];
 		proxyIs.read(response);
+		if (response[0] != 0x05 || response[1] != 0x00) {
+			throw new SocksConnectionException("Socks 5 handshake failed");
+		}
 		byte[] dest = destination.getBytes();
 		ByteBuffer request = ByteBuffer.allocate(7 + dest.length);
 		request.put(new byte[]{0x05, 0x01, 0x00, 0x03});
@@ -30,8 +33,23 @@ public class SocksSocketFactory {
 		response = new byte[7 + dest.length];
 		proxyIs.read(response);
 		if (response[1] != 0x00) {
-			throw new SocksConnectionException();
+			if (response[1] == 0x04) {
+				throw new HostNotFoundException("Host unreachable");
+			}
+			if (response[1] == 0x05) {
+				throw new HostNotFoundException("Connection refused");
+			}
+			throw new SocksConnectionException("Unable to connect to destination "+(int) (response[1]));
 		}
+	}
+
+	public static boolean contains(byte needle, byte[] haystack) {
+		for(byte hay : haystack) {
+			if (hay == needle) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static Socket createSocket(InetSocketAddress address, String destination, int port) throws IOException {
@@ -49,11 +67,20 @@ public class SocksSocketFactory {
 		return createSocket(new InetSocketAddress(InetAddress.getByAddress(LOCALHOST), 9050), destination, port);
 	}
 
-	public static class SocksConnectionException extends IOException {
-
+	private static class SocksConnectionException extends IOException {
+		SocksConnectionException(String message) {
+			super(message);
+		}
 	}
 
 	public static class SocksProxyNotFoundException extends IOException {
 
 	}
+
+	public static class HostNotFoundException extends SocksConnectionException {
+		HostNotFoundException(String message) {
+			super(message);
+		}
+	}
+
 }

@@ -37,6 +37,8 @@ import me.skriva.ceph.entities.Conversational;
 import me.skriva.ceph.entities.ListItem;
 import me.skriva.ceph.entities.Message;
 import me.skriva.ceph.entities.MucOptions;
+import me.skriva.ceph.entities.RawBlockable;
+import me.skriva.ceph.http.services.MuclumbusService;
 import me.skriva.ceph.utils.UIHelper;
 import me.skriva.ceph.xmpp.OnAdvancedStreamFeaturesLoaded;
 import me.skriva.ceph.xmpp.XmppConnection;
@@ -79,9 +81,20 @@ public class AvatarService implements OnAdvancedStreamFeaturesLoaded {
 			return get((ListItem) avatarable, size, cachedOnly);
 		} else if (avatarable instanceof MucOptions.User) {
 			return get((MucOptions.User) avatarable, size, cachedOnly);
+		} else if (avatarable instanceof MuclumbusService.Room) {
+			return get((MuclumbusService.Room) avatarable, size, cachedOnly);
 		}
 		throw new AssertionError("AvatarService does not know how to generate avatar from "+avatarable.getClass().getName());
 
+	}
+
+	private Bitmap get(final MuclumbusService.Room result, final int size, boolean cacheOnly) {
+		final Jid room = result.getRoom();
+		Conversation conversation = room != null ? mXmppConnectionService.findFirstMuc(room) : null;
+		if (conversation != null) {
+			return get(conversation,size,cacheOnly);
+		}
+		return get(result.getName(), room != null ? room.asBareJid().toEscapedString() : result.getName(), size, cacheOnly);
 	}
 
 	private Bitmap get(final Contact contact, final int size, boolean cachedOnly) {
@@ -257,7 +270,9 @@ public class AvatarService implements OnAdvancedStreamFeaturesLoaded {
 	}
 
 	private Bitmap get(ListItem item, int size, boolean cachedOnly) {
-		if (item instanceof Contact) {
+		if (item instanceof RawBlockable) {
+			return get(item.getDisplayName(), item.getJid().toEscapedString(), size, cachedOnly);
+		} else if (item instanceof Contact) {
 			return get((Contact) item, size, cachedOnly);
 		} else if (item instanceof Bookmark) {
 			Bookmark bookmark = (Bookmark) item;

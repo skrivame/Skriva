@@ -23,7 +23,7 @@
   <string name="just_now">agora há pouco</string>
   <string name="minute_ago">1 minuto atrás</string>
   <string name="minutes_ago">%d minutos atrás</string>
-  <string name="unread_conversations">Conversas não lidas</string>
+  <string name="x_unread_conversations">%dConversas não lidas</string>
   <string name="sending">enviando...</string>
   <string name="message_decrypting">Decifrando a mensagem. Por favor aguarde...</string>
   <string name="nick_in_use">O apelido já está em uso</string>

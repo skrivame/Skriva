@@ -28,7 +28,7 @@
   <string name="just_now">ahora</string>
   <string name="minute_ago">hace 1 min</string>
   <string name="minutes_ago">hace %d min</string>
-  <string name="unread_conversations">conversaciones por leer</string>
+  <string name="x_unread_conversations">%dconversaciones por leer</string>
   <string name="sending">enviando…</string>
   <string name="message_decrypting">Descifrando mensaje. Por favor, espera...</string>
   <string name="nick_in_use">El apodo ya está en uso</string>

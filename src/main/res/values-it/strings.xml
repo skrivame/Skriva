@@ -28,7 +28,7 @@
   <string name="just_now">adesso</string>
   <string name="minute_ago">1 min fa</string>
   <string name="minutes_ago">%d min fa</string>
-  <string name="unread_conversations">Conversazioni non lette</string>
+  <string name="x_unread_conversations">%dConversazioni non lette</string>
   <string name="sending">invio…</string>
   <string name="message_decrypting">Decifrazione messaggio. Attendere prego...</string>
     <string name="nick_in_use">Nome utente già in uso</string>

@@ -27,7 +27,7 @@
   <string name="just_now">щойно</string>
   <string name="minute_ago">1 хвилину тому</string>
   <string name="minutes_ago">%d хвилин тому</string>
-  <string name="unread_conversations">не переглянуті розмови </string>
+  <string name="x_unread_conversations">%dне переглянуті розмови </string>
   <string name="sending">відправляю…</string>
   <string name="message_decrypting">Розшифровую повідомлення. Зачекайте, будь ласка…</string>
   <string name="nick_in_use">Прізвисько вже використовується</string>

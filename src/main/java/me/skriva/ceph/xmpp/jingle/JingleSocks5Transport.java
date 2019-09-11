@@ -6,13 +6,17 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import me.skriva.ceph.Config;
+import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.entities.DownloadableFile;
 import me.skriva.ceph.persistance.FileBackend;
 import me.skriva.ceph.services.AbstractConnectionManager;
@@ -24,37 +28,124 @@ import me.skriva.ceph.xmpp.jingle.stanzas.Content;
 public class JingleSocks5Transport extends JingleTransport {
 	private final JingleCandidate candidate;
 	private final JingleConnection connection;
-	private String destination;
+	private final String destination;
 	private OutputStream outputStream;
 	private InputStream inputStream;
 	private boolean isEstablished = false;
 	private boolean activated = false;
+	private ServerSocket serverSocket;
 	private Socket socket;
 
 	JingleSocks5Transport(JingleConnection jingleConnection, JingleCandidate candidate) {
+		final MessageDigest messageDigest;
+		try {
+			messageDigest = MessageDigest.getInstance("SHA-1");
+		} catch (NoSuchAlgorithmException e) {
+			throw new AssertionError(e);
+		}
 		this.candidate = candidate;
 		this.connection = jingleConnection;
-		try {
-			MessageDigest mDigest = MessageDigest.getInstance("SHA-1");
-			StringBuilder destBuilder = new StringBuilder();
-			if (jingleConnection.getFtVersion() == Content.Version.FT_3) {
-				Log.d(Config.LOGTAG, this.connection.getAccount().getJid().asBareJid() + ": using session Id instead of transport Id for proxy destination");
-				destBuilder.append(jingleConnection.getSessionId());
-			} else {
-				destBuilder.append(jingleConnection.getTransportId());
-			}
-			if (candidate.isOurs()) {
-				destBuilder.append(jingleConnection.getAccount().getJid());
-				destBuilder.append(jingleConnection.getCounterPart());
-			} else {
-				destBuilder.append(jingleConnection.getCounterPart());
-				destBuilder.append(jingleConnection.getAccount().getJid());
-			}
-			mDigest.reset();
-			this.destination = CryptoHelper.bytesToHex(mDigest
-					.digest(destBuilder.toString().getBytes()));
-		} catch (NoSuchAlgorithmException e) {
+		final StringBuilder destBuilder = new StringBuilder();
+		if (jingleConnection.getFtVersion() == Content.Version.FT_3) {
+			Log.d(Config.LOGTAG, this.connection.getAccount().getJid().asBareJid() + ": using session Id instead of transport Id for proxy destination");
+			destBuilder.append(jingleConnection.getSessionId());
+		} else {
+			destBuilder.append(jingleConnection.getTransportId());
+		}
+		if (candidate.isOurs()) {
+			destBuilder.append(jingleConnection.getAccount().getJid());
+			destBuilder.append(jingleConnection.getCounterPart());
+		} else {
+			destBuilder.append(jingleConnection.getCounterPart());
+			destBuilder.append(jingleConnection.getAccount().getJid());
+		}
+		messageDigest.reset();
+		this.destination = CryptoHelper.bytesToHex(messageDigest.digest(destBuilder.toString().getBytes()));
+		if (candidate.isOurs() && candidate.getType() == JingleCandidate.TYPE_DIRECT) {
+			createServerSocket();
+		}
+	}
 
+	private void createServerSocket() {
+		try {
+			serverSocket = new ServerSocket();
+			serverSocket.bind(new InetSocketAddress(InetAddress.getByName(candidate.getHost()), candidate.getPort()));
+			new Thread(() -> {
+				try {
+					final Socket socket = serverSocket.accept();
+					new Thread(() -> {
+						try {
+							acceptIncomingSocketConnection(socket);
+						} catch (IOException e) {
+							Log.d(Config.LOGTAG, "unable to read from socket", e);
+
+						}
+					}).start();
+				} catch (IOException e) {
+					if (!serverSocket.isClosed()) {
+						Log.d(Config.LOGTAG, "unable to accept socket", e);
+					}
+				}
+			}).start();
+		} catch (IOException e) {
+			Log.d(Config.LOGTAG, "unable to bind server socket ", e);
+		}
+	}
+
+	private void acceptIncomingSocketConnection(Socket socket) throws IOException {
+		Log.d(Config.LOGTAG, "accepted connection from " + socket.getInetAddress().getHostAddress());
+		final byte[] authBegin = new byte[2];
+		final InputStream inputStream = socket.getInputStream();
+		final OutputStream outputStream = socket.getOutputStream();
+		inputStream.read(authBegin);
+		if (authBegin[0] != 0x5) {
+			socket.close();
+		}
+		final short methodCount = authBegin[1];
+		final byte[] methods = new byte[methodCount];
+		inputStream.read(methods);
+		if (SocksSocketFactory.contains((byte) 0x00, methods)) {
+			outputStream.write(new byte[]{0x05, 0x00});
+		} else {
+			outputStream.write(new byte[]{0x05, (byte) 0xff});
+		}
+		byte[] connectCommand = new byte[4];
+		inputStream.read(connectCommand);
+		if (connectCommand[0] == 0x05 && connectCommand[1] == 0x01 && connectCommand[3] == 0x03) {
+			int destinationCount = inputStream.read();
+			final byte[] destination = new byte[destinationCount];
+			inputStream.read(destination);
+			final int port = inputStream.read();
+			final String receivedDestination = new String(destination);
+			final ByteBuffer response = ByteBuffer.allocate(7 + destination.length);
+			final byte[] responseHeader;
+			final boolean success;
+			if (receivedDestination.equals(this.destination) && this.socket == null) {
+				responseHeader = new byte[]{0x05, 0x00, 0x00, 0x03};
+				success = true;
+			} else {
+				Log.d(Config.LOGTAG,connection.getAccount().getJid().asBareJid()+": destination mismatch. received "+receivedDestination+" (expected "+this.destination+")");
+				responseHeader = new byte[]{0x05, 0x04, 0x00, 0x03};
+				success = false;
+			}
+			response.put(responseHeader);
+			response.put((byte) destination.length);
+			response.put(destination);
+			response.putShort((short) port);
+			outputStream.write(response.array());
+			outputStream.flush();
+			if (success) {
+				Log.d(Config.LOGTAG,connection.getAccount().getJid().asBareJid()+": successfully processed connection to candidate "+candidate.getHost()+":"+candidate.getPort());
+				this.socket = socket;
+				this.inputStream = inputStream;
+				this.outputStream = outputStream;
+				this.isEstablished = true;
+				FileBackend.close(serverSocket);
+			} else {
+				this.socket.close();
+			}
+		} else {
+			socket.close();
 		}
 	}
 
@@ -67,11 +158,13 @@ public class JingleSocks5Transport extends JingleTransport {
 				} else {
 					socket = new Socket();
 					SocketAddress address = new InetSocketAddress(candidate.getHost(), candidate.getPort());
-					socket.connect(address, Config.SOCKET_TIMEOUT * 1000);
+					socket.connect(address, 5000);
 				}
 				inputStream = socket.getInputStream();
 				outputStream = socket.getOutputStream();
+				socket.setSoTimeout(5000);
 				SocksSocketFactory.createSocksConnection(socket, destination, 0);
+				socket.setSoTimeout(0);
 				isEstablished = true;
 				callback.established();
 			} catch (IOException e) {
@@ -85,6 +178,7 @@ public class JingleSocks5Transport extends JingleTransport {
 		new Thread(() -> {
 			InputStream fileInputStream = null;
 			final PowerManager.WakeLock wakeLock = connection.getConnectionManager().createWakeLock("jingle_send_" + connection.getSessionId());
+			long transmitted = 0;
 			try {
 				wakeLock.acquire();
 				MessageDigest digest = MessageDigest.getInstance("SHA-1");
@@ -97,7 +191,6 @@ public class JingleSocks5Transport extends JingleTransport {
 				}
 				final InputStream innerInputStream = AbstractConnectionManager.upgrade(file, fileInputStream);
 				long size = file.getExpectedSize();
-				long transmitted = 0;
 				int count;
 				byte[] buffer = new byte[8192];
 				while ((count = innerInputStream.read(buffer)) > 0) {
@@ -112,7 +205,8 @@ public class JingleSocks5Transport extends JingleTransport {
 					callback.onFileTransmitted(file);
 				}
 			} catch (Exception e) {
-				Log.d(Config.LOGTAG, connection.getAccount().getJid().asBareJid() + ": " + e.getMessage());
+				final Account account = connection.getAccount();
+				Log.d(Config.LOGTAG, account.getJid().asBareJid()+": failed sending file after "+transmitted+"/"+file.getExpectedSize()+" ("+ socket.getInetAddress()+":"+socket.getPort()+")", e);
 				callback.onFileTransferAborted();
 			} finally {
 				FileBackend.close(fileInputStream);
@@ -170,7 +264,7 @@ public class JingleSocks5Transport extends JingleTransport {
 		}).start();
 	}
 
-	private boolean isProxy() {
+	public boolean isProxy() {
 		return this.candidate.getType() == JingleCandidate.TYPE_PROXY;
 	}
 
@@ -182,6 +276,7 @@ public class JingleSocks5Transport extends JingleTransport {
 		FileBackend.close(inputStream);
 		FileBackend.close(outputStream);
 		FileBackend.close(socket);
+		FileBackend.close(serverSocket);
 	}
 
 	public boolean isEstablished() {

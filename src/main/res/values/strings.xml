@@ -28,7 +28,7 @@
     <string name="just_now">just now</string>
     <string name="minute_ago">1 min ago</string>
     <string name="minutes_ago">%d mins ago</string>
-    <string name="unread_conversations">unread Conversations</string>
+    <string name="x_unread_conversations">%d unread conversations</string>
     <string name="sending">sending…</string>
     <string name="message_decrypting">Decrypting message. Please wait…</string>
     <string name="nick_in_use">Nickname is already in use</string>
@@ -827,4 +827,18 @@
     <string name="i_already_have_an_account">I already have an account</string>
     <string name="add_existing_account">Add existing account</string>
     <string name="register_new_account">Register new account</string>
+    <string name="action_block_participant">Block participant</string>
+    <string name="action_unblock_participant">Unblock participant</string>
+    <string name="open_backup">Open backup</string>
+    <string name="not_a_backup_file">The file you selected is not backup file</string>
+    <string name="account_already_setup">This account has already been setup</string>
+    <string name="share_backup_files">Share backup files</string>
+    <string name="conversations_backup">Skriva backup</string>
+    <string name="event">Event</string>
+    <string name="please_enter_password">Please enter the password for this account</string>
+    <string name="discover_channels">Discover channels</string>
+    <string name="search_channels">Search channels</string>
+    <string name="channel_discovery_opt_in_title">Possible privacy violation!</string>
+    <string name="channel_discover_opt_in_message"><![CDATA[Channel discovery uses a third party service called <a href="https://search.jabbercat.org">search.jabbercat.org</a>.<br><br>Using this feature will transmit your IP address and search terms to that service. See their <a href="https://search.jabbercat.org/privacy">Privacy Policy</a> for more information.]]></string>
+    <string name="unable_to_perform_this_action">Unable to perform this action</string>
 </resources>

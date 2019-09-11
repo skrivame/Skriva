@@ -24,6 +24,7 @@ import java.util.concurrent.RejectedExecutionException;
 
 import me.skriva.ceph.R;
 import me.skriva.ceph.databinding.MediaBinding;
+import me.skriva.ceph.services.ExportBackupService;
 import me.skriva.ceph.ui.XmppActivity;
 import me.skriva.ceph.ui.util.Attachment;
 import me.skriva.ceph.ui.util.StyledAttributes;
@@ -80,6 +81,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                 attr = R.attr.media_preview_archive;
             } else if (mime.equals("application/epub+zip") || mime.equals("application/vnd.amazon.mobi8-ebook")) {
                 attr = R.attr.media_preview_ebook;
+            } else if (mime.equals(ExportBackupService.MIME_TYPE)) {
+                attr = R.attr.media_preview_backup;
             } else if (DOCUMENT_MIMES.contains(mime)) {
                 attr = R.attr.media_preview_document;
             } else {

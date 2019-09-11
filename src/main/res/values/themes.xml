@@ -78,6 +78,7 @@
         <item type="reference" name="media_preview_calendar">@drawable/ic_event_black_48dp</item>
         <item type="reference" name="media_preview_archive">@drawable/ic_archive_black_48dp</item>
         <item type="reference" name="media_preview_ebook">@drawable/ic_book_black_48dp</item>
+        <item type="reference" name="media_preview_backup">@drawable/ic_backup_black_48dp</item>
         <item type="reference" name="media_preview_unknown">@drawable/ic_help_black_48dp</item>
 
         <item type="reference" name="icon_add_group">@drawable/ic_group_add_white_24dp</item>
@@ -101,6 +102,7 @@
         <item type="reference" name="icon_secure">@drawable/ic_lock_open_white_24dp</item>
         <item type="reference" name="icon_settings">@drawable/ic_settings_black_24dp</item>
         <item type="reference" name="icon_share">@drawable/ic_share_white_24dp</item>
+        <item type="reference" name="ic_cloud_download">@drawable/ic_cloud_download_white_24dp</item>
         <item type="reference" name="icon_scan_qr_code">@drawable/ic_qr_code_scan_white_24dp</item>
         <item type="reference" name="icon_scroll_down">@drawable/ic_scroll_to_end_black</item>
 
@@ -197,6 +199,7 @@
         <item type="reference" name="media_preview_calendar">@drawable/ic_event_white_48dp</item>
         <item type="reference" name="media_preview_archive">@drawable/ic_archive_white_48dp</item>
         <item type="reference" name="media_preview_ebook">@drawable/ic_book_white_48dp</item>
+        <item type="reference" name="media_preview_backup">@drawable/ic_backup_white_48dp</item>
         <item type="reference" name="media_preview_unknown">@drawable/ic_help_white_48dp</item>
 
         <item type="reference" name="icon_add_group">@drawable/ic_group_add_white_24dp</item>
@@ -220,6 +223,7 @@
         <item type="reference" name="icon_secure">@drawable/ic_lock_open_white_24dp</item>
         <item type="reference" name="icon_settings">@drawable/ic_settings_white_24dp</item>
         <item type="reference" name="icon_share">@drawable/ic_share_white_24dp</item>
+        <item type="reference" name="ic_cloud_download">@drawable/ic_cloud_download_white_24dp</item>
         <item type="reference" name="icon_scan_qr_code">@drawable/ic_qr_code_scan_white_24dp</item>
         <item type="reference" name="icon_scroll_down">@drawable/ic_scroll_to_end_white</item>
 

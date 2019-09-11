@@ -1,0 +1,226 @@
+package me.skriva.ceph.ui;
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.text.Html;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import me.skriva.ceph.Config;
+import me.skriva.ceph.R;
+import me.skriva.ceph.databinding.ActivityChannelDiscoveryBinding;
+import me.skriva.ceph.entities.Account;
+import me.skriva.ceph.entities.Bookmark;
+import me.skriva.ceph.entities.Conversation;
+import me.skriva.ceph.http.services.MuclumbusService;
+import me.skriva.ceph.services.ChannelDiscoveryService;
+import me.skriva.ceph.ui.adapter.ChannelSearchResultAdapter;
+import me.skriva.ceph.ui.util.PendingItem;
+import me.skriva.ceph.ui.util.SoftKeyboardUtils;
+import me.skriva.ceph.utils.AccountUtils;
+import rocks.xmpp.addr.Jid;
+
+public class ChannelDiscoveryActivity extends XmppActivity implements MenuItem.OnActionExpandListener, TextView.OnEditorActionListener, ChannelDiscoveryService.OnChannelSearchResultsFound, ChannelSearchResultAdapter.OnChannelSearchResultSelected {
+
+    private static final String CHANNEL_DISCOVERY_OPT_IN = "channel_discovery_opt_in";
+
+    private final ChannelSearchResultAdapter adapter = new ChannelSearchResultAdapter();
+
+    private ActivityChannelDiscoveryBinding binding;
+
+    private final PendingItem<String> mInitialSearchValue = new PendingItem<>();
+
+    private MenuItem mMenuSearchView;
+    private EditText mSearchEditText;
+
+    private boolean optedIn = false;
+
+    @Override
+    protected void refreshUiReal() {
+
+    }
+
+    @Override
+    void onBackendConnected() {
+        if (optedIn) {
+            String query;
+            if (mMenuSearchView != null && mMenuSearchView.isActionViewExpanded()) {
+                query = mSearchEditText.getText().toString();
+            } else {
+                query = mInitialSearchValue.peek();
+            }
+            xmppConnectionService.discoverChannels(query, this);
+        }
+    }
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_channel_discovery);
+        setSupportActionBar((Toolbar) binding.toolbar);
+        configureActionBar(getSupportActionBar(), true);
+        binding.list.setAdapter(this.adapter);
+        this.adapter.setOnChannelSearchResultSelectedListener(this);
+        optedIn = getPreferences().getBoolean(CHANNEL_DISCOVERY_OPT_IN, false);
+
+        final String search = savedInstanceState == null ? null : savedInstanceState.getString("search");
+        if (search != null) {
+            mInitialSearchValue.push(search);
+        }
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.muc_users_activity, menu);
+        mMenuSearchView = menu.findItem(R.id.action_search);
+        final View mSearchView = mMenuSearchView.getActionView();
+        mSearchEditText = mSearchView.findViewById(R.id.search_field);
+        mSearchEditText.setHint(R.string.search_channels);
+        String initialSearchValue = mInitialSearchValue.pop();
+        if (initialSearchValue != null) {
+            mMenuSearchView.expandActionView();
+            mSearchEditText.append(initialSearchValue);
+            mSearchEditText.requestFocus();
+            if (optedIn && xmppConnectionService != null) {
+                xmppConnectionService.discoverChannels(initialSearchValue, this);
+            }
+        }
+        mSearchEditText.setOnEditorActionListener(this);
+        mMenuSearchView.setOnActionExpandListener(this);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionExpand(MenuItem item) {
+        mSearchEditText.post(() -> {
+            mSearchEditText.requestFocus();
+            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(mSearchEditText, InputMethodManager.SHOW_IMPLICIT);
+        });
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemActionCollapse(MenuItem item) {
+        final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mSearchEditText.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
+        mSearchEditText.setText("");
+        toggleLoadingScreen();
+        if (optedIn) {
+            xmppConnectionService.discoverChannels(null, this);
+        }
+        return true;
+    }
+
+    private void toggleLoadingScreen() {
+        adapter.submitList(Collections.emptyList());
+        binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!optedIn) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.channel_discovery_opt_in_title);
+            builder.setMessage(Html.fromHtml(getString(R.string.channel_discover_opt_in_message)));
+            builder.setNegativeButton(R.string.cancel, (dialog, which) -> finish());
+            builder.setPositiveButton(R.string.confirm, (dialog, which) -> optIn());
+            builder.setOnCancelListener(dialog -> finish());
+            final AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        if (mMenuSearchView != null && mMenuSearchView.isActionViewExpanded()) {
+            savedInstanceState.putString("search", mSearchEditText != null ? mSearchEditText.getText().toString() : null);
+        }
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    private void optIn() {
+        SharedPreferences preferences = getPreferences();
+        preferences.edit().putBoolean(CHANNEL_DISCOVERY_OPT_IN, true).apply();
+        optedIn = true;
+        xmppConnectionService.discoverChannels(null, this);
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (optedIn) {
+            xmppConnectionService.discoverChannels(v.getText().toString(), this);
+        }
+        toggleLoadingScreen();
+        SoftKeyboardUtils.hideSoftKeyboard(this);
+        return true;
+    }
+
+    @Override
+    public void onChannelSearchResultsFound(List<MuclumbusService.Room> results) {
+        runOnUiThread(() -> {
+            adapter.submitList(results);
+            binding.list.setVisibility(View.VISIBLE);
+            binding.progressBar.setVisibility(View.GONE);
+        });
+
+    }
+
+    @Override
+    public void onChannelSearchResult(final MuclumbusService.Room result) {
+        List<String> accounts = AccountUtils.getEnabledAccounts(xmppConnectionService);
+        if (accounts.size() == 1) {
+            joinChannelSearchResult(accounts.get(0), result);
+        } else if (accounts.size() > 0) {
+            final AtomicReference<String> account = new AtomicReference<>(accounts.get(0));
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.choose_account);
+            builder.setSingleChoiceItems(accounts.toArray(new CharSequence[0]), 0, (dialog, which) -> account.set(accounts.get(which)));
+            builder.setPositiveButton(R.string.join, (dialog, which) -> joinChannelSearchResult(account.get(), result));
+            builder.setNegativeButton(R.string.cancel, null);
+            builder.create().show();
+        }
+
+    }
+
+    private void joinChannelSearchResult(String accountJid, MuclumbusService.Room result) {
+        final boolean syncAutojoin = getBooleanPreference("autojoin", R.bool.autojoin);
+        // Credits to ChaosKid42 - https://github.com/siacs/Conversations/pull/3458
+        Account account;
+        if (Config.DOMAIN_LOCK != null) {
+            account = xmppConnectionService.findAccountByJid(Jid.of(accountJid, Config.DOMAIN_LOCK, null));
+        } else {
+            account = xmppConnectionService.findAccountByJid(Jid.of(accountJid));
+        }
+        final Conversation conversation = xmppConnectionService.findOrCreateConversation(account, result.getRoom(), true, true, true);
+        if (conversation.getBookmark() != null) {
+            if (!conversation.getBookmark().autojoin() && syncAutojoin) {
+                conversation.getBookmark().setAutojoin(true);
+                xmppConnectionService.pushBookmarks(account);
+            }
+        } else {
+            final Bookmark bookmark = new Bookmark(account, conversation.getJid().asBareJid());
+            bookmark.setAutojoin(syncAutojoin);
+            account.getBookmarks().add(bookmark);
+            xmppConnectionService.pushBookmarks(account);
+        }
+        switchToConversation(conversation);
+    }
+}

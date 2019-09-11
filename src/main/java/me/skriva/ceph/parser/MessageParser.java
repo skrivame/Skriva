@@ -125,7 +125,8 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
                     service.reportBrokenSessionException(e, postpone);
                     return new Message(conversation, "", Message.ENCRYPTION_AXOLOTL_FAILED, status);
                 } else {
-                    Log.d(Config.LOGTAG,"ignoring broken session exception because checkForDuplicase failed");
+                    Log.d(Config.LOGTAG,"ignoring broken session exception because checkForDuplicates failed");
+                    //TODO should be still emit a failed message?
                     return null;
                 }
             } catch (NotEncryptedForThisDeviceException e) {
@@ -445,6 +446,7 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
                     origin = from;
                 }
 
+                //TODO either or is probably fine?
                 final boolean checkedForDuplicates = serverMsgId != null && remoteMsgId != null && !conversation.possibleDuplicate(serverMsgId, remoteMsgId);
 
                 if (origin != null) {
@@ -532,7 +534,8 @@ public class MessageParser extends AbstractParser implements OnMessagePacketRece
                     final boolean fingerprintsMatch = replacedMessage.getFingerprint() == null
                             || replacedMessage.getFingerprint().equals(message.getFingerprint());
                     final boolean trueCountersMatch = replacedMessage.getTrueCounterpart() != null
-                            && replacedMessage.getTrueCounterpart().equals(message.getTrueCounterpart());
+                            && message.getTrueCounterpart() != null
+                            && replacedMessage.getTrueCounterpart().asBareJid().equals(message.getTrueCounterpart().asBareJid());
                     final boolean mucUserMatches = query == null && replacedMessage.sameMucUser(message); //can not be checked when using mam
                     final boolean duplicate = conversation.hasDuplicateMessage(message);
                     if (fingerprintsMatch && (trueCountersMatch || !conversationMultiMode || mucUserMatches) && !duplicate) {

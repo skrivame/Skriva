@@ -6,8 +6,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import me.skriva.ceph.Config;
 import me.skriva.ceph.R;
 import me.skriva.ceph.entities.Account;
 import me.skriva.ceph.services.XmppConnectionService;
@@ -30,6 +32,20 @@ public class AccountUtils {
             }
         }
         return false;
+    }
+
+    public static List<String> getEnabledAccounts(final XmppConnectionService service) {
+        ArrayList<String> accounts = new ArrayList<>();
+        for (Account account : service.getAccounts()) {
+            if (account.getStatus() != Account.State.DISABLED) {
+                if (Config.DOMAIN_LOCK != null) {
+                    accounts.add(account.getJid().getLocal());
+                } else {
+                    accounts.add(account.getJid().asBareJid().toString());
+                }
+            }
+        }
+        return accounts;
     }
 
     public static Account getFirstEnabled(XmppConnectionService service) {

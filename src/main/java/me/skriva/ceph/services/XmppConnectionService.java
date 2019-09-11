@@ -68,6 +68,9 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -97,6 +100,7 @@ import me.skriva.ceph.generator.IqGenerator;
 import me.skriva.ceph.generator.MessageGenerator;
 import me.skriva.ceph.generator.PresenceGenerator;
 import me.skriva.ceph.http.CustomURLStreamHandlerFactory;
+import me.skriva.ceph.http.services.MuclumbusService;
 import me.skriva.ceph.http.HttpConnectionManager;
 import me.skriva.ceph.parser.AbstractParser;
 import me.skriva.ceph.parser.IqParser;
@@ -111,6 +115,7 @@ import me.skriva.ceph.ui.XmppActivity;
 import me.skriva.ceph.ui.interfaces.OnAvatarPublication;
 import me.skriva.ceph.ui.interfaces.OnMediaLoaded;
 import me.skriva.ceph.ui.interfaces.OnSearchResultsAvailable;
+import me.skriva.ceph.utils.AccountUtils;
 import me.skriva.ceph.utils.Compatibility;
 import me.skriva.ceph.utils.ConversationsFileObserver;
 import me.skriva.ceph.utils.CryptoHelper;
@@ -197,6 +202,7 @@ public class XmppConnectionService extends Service {
     private final FileBackend fileBackend = new FileBackend(this);
     private MemorizingTrustManager mMemorizingTrustManager;
     private final NotificationService mNotificationService = new NotificationService(this);
+    private final ChannelDiscoveryService mChannelDiscoveryService = new ChannelDiscoveryService(this);
     private final ShortcutService mShortcutService = new ShortcutService(this);
     private final AtomicBoolean mInitialAddressbookSyncCompleted = new AtomicBoolean(false);
     private final AtomicBoolean mForceForegroundService = new AtomicBoolean(false);
@@ -772,6 +778,14 @@ public class XmppConnectionService extends Service {
         return pingNow;
     }
 
+    public void reinitializeMuclumbusService() {
+        mChannelDiscoveryService.initializeMuclumbusService();
+    }
+
+    public void discoverChannels(String query, ChannelDiscoveryService.OnChannelSearchResultsFound onChannelSearchResultsFound) {
+        mChannelDiscoveryService.discover(query, onChannelSearchResultsFound);
+    }
+
     private void checkMucStillJoined(final Account account, final String hash, final String androidId) {
         for(final Conversation conversation : this.conversations) {
             if (conversation.getAccount() == account && conversation.getMode() == Conversational.MODE_MULTI) {
@@ -946,6 +960,7 @@ public class XmppConnectionService extends Service {
         if (Compatibility.runsTwentySix()) {
             mNotificationService.initializeChannels();
         }
+        mChannelDiscoveryService.initializeMuclumbusService();
         mForceDuringOnCreate.set(Compatibility.runsAndTargetsTwentySix(this));
         toggleForegroundService();
         this.destroyed = false;
@@ -1266,7 +1281,7 @@ public class XmppConnectionService extends Service {
 
         final boolean inProgressJoin;
         synchronized (account.inProgressConferenceJoins) {
-            inProgressJoin = conversation.getMode() == Conversational.MODE_MULTI && account.inProgressConferenceJoins.contains(conversation);
+            inProgressJoin = conversation.getMode() == Conversational.MODE_MULTI && (account.inProgressConferenceJoins.contains(conversation) || account.pendingConferenceJoins.contains(conversation));
         }
 
         if (account.isOnlineAndConnected() && !inProgressJoin) {
@@ -2396,8 +2411,10 @@ public class XmppConnectionService extends Service {
             synchronized (account.inProgressConferenceJoins) {
                 account.inProgressConferenceJoins.add(conversation);
             }
-			sendPresencePacket(account, mPresenceGenerator.leave(conversation.getMucOptions()));
-			conversation.resetMucOptions();
+            if (Config.MUC_LEAVE_BEFORE_JOIN) {
+                sendPresencePacket(account, mPresenceGenerator.leave(conversation.getMucOptions()));
+            }
+            conversation.resetMucOptions();
 			if (onConferenceJoined != null) {
 				conversation.getMucOptions().flagNoAutoPushConfiguration();
 			}
@@ -2651,7 +2668,13 @@ public class XmppConnectionService extends Service {
 		final Bookmark bookmark = conversation.getBookmark();
 		final String bookmarkedNick = bookmark == null ? null : bookmark.getNick();
         if (bookmark != null && (tookProposedNickFromBookmark || TextUtils.isEmpty(bookmarkedNick)) && !full.getResource().equals(bookmarkedNick)) {
-            Log.d(Config.LOGTAG, conversation.getAccount().getJid().asBareJid() + ": persist nick '" + full.getResource() + "' into bookmark for " + conversation.getJid().asBareJid());
+            final Account account = conversation.getAccount();
+            final String defaultNick = MucOptions.defaultNick(account);
+            if (TextUtils.isEmpty(bookmarkedNick) && full.getResource().equals(defaultNick)) {
+                Log.d(Config.LOGTAG,account.getJid().asBareJid()+": do not overwrite empty bookmark nick with default nick for "+conversation.getJid().asBareJid());
+                return;
+            }
+            Log.d(Config.LOGTAG, account.getJid().asBareJid() + ": persist nick '" + full.getResource() + "' into bookmark for " + conversation.getJid().asBareJid());
             bookmark.setNick(full.getResource());
             pushBookmarks(bookmark.getAccount());
         }
@@ -4092,13 +4115,15 @@ updateRosterUi();
 	public boolean sendBlockRequest(final Blockable blockable, boolean reportSpam) {
 		if (blockable != null && blockable.getBlockedJid() != null) {
 			final Jid jid = blockable.getBlockedJid();
-			this.sendIqPacket(blockable.getAccount(), getIqGenerator().generateSetBlockRequest(jid, reportSpam), (account, packet) -> {
-                if (packet.getType() == IqPacket.TYPE.RESULT) {
-                    account.getBlocklist().add(jid);
+            this.sendIqPacket(blockable.getAccount(), getIqGenerator().generateSetBlockRequest(jid, reportSpam), (a, response) -> {
+                if (response.getType() == IqPacket.TYPE.RESULT) {
+                    a.getBlocklist().add(jid);
                     updateBlocklistUi(OnUpdateBlocklist.Status.BLOCKED);
                 }
             });
-			if (removeBlockedConversations(blockable.getAccount(), jid)) {
+            if (blockable.getBlockedJid().isFullJid()) {
+                return false;
+            } else if (removeBlockedConversations(blockable.getAccount(), jid)) {
 				updateConversationUi();
 				return true;
 			} else {
@@ -4255,11 +4280,12 @@ updateRosterUi();
 	}
 
 	public void saveConversationAsBookmark(Conversation conversation, String name) {
-		Account account = conversation.getAccount();
-		Bookmark bookmark = new Bookmark(account, conversation.getJid().asBareJid());
-		if (!conversation.getJid().isBareJid()) {
-			bookmark.setNick(conversation.getJid().getResource());
-		}
+        final Account account = conversation.getAccount();
+        final Bookmark bookmark = new Bookmark(account, conversation.getJid().asBareJid());
+        final String nick = conversation.getJid().getResource();
+        if (nick != null && !nick.isEmpty() && !nick.equals(MucOptions.defaultNick(account))) {
+            bookmark.setNick(nick);
+        }
 		if (!TextUtils.isEmpty(name)) {
 			bookmark.setBookmarkName(name);
 		}
