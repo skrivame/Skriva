@@ -1,3 +1,4 @@
+# THIS PROJECT HAS BEEN DISCONTINUED
 <div align="center">
 <img src="https://i.ibb.co/ZVd9Gvq/github-logo.png" alt="github-logo" border="0"><br>
 <a href="https://github.com/skrivame/Skriva/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/skrivame/Skriva.svg?style=flat-square"></a> <a href="https://github.com/skrivame/Skriva/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/skrivame/Skriva.svg?style=flat-square"></a> <a href="https://travis-ci.org/skrivame/Skriva"><img alt="Travis (.org)" src="https://img.shields.io/travis/skrivame/Skriva.svg?style=popout-square"></a>
